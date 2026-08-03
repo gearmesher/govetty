@@ -1,0 +1,216 @@
+/* =========================================================
+   Vetty — Our Vets — Main Content Only
+   Design source: Figma "Govetty Inside pages" (node 20:663)
+   Baseline: 1920px, fluid down to mobile
+   ========================================================= */
+
+:root {
+  --color-brand: #6a0d17;
+  --color-bio-text: #262626;
+  --color-surface: #ffffff;
+
+  --font-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --section-pad-x: clamp(1.25rem, 6vw, 7.94rem);
+  --content-max: 1920px;
+}
+
+/* =============== RESET (scoped) =============== */
+.vets-main, .vets-main * {
+  box-sizing: border-box;
+}
+
+.vets-main {
+  font-family: var(--font-base);
+  color: #1a1a1a;
+  background: var(--color-surface);
+  overflow-x: clip;
+}
+
+.vets-main img {
+  display: block;
+  max-width: 100%;
+}
+
+.vets-main ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.vets-main h1, .vets-main h2, .vets-main p {
+  margin: 0;
+}
+
+/* =============== HERO =============== */
+.hero {
+  width: 100%;
+  line-height: 0;
+  margin-top: 20px;
+}
+
+.hero__img {
+  width: 100%;
+  height: clamp(14rem, 40vw, 42.5rem); /* up to 680px */
+  object-fit: cover;
+  object-position: center 25%;
+}
+
+/* =============== INTRO =============== */
+.intro {
+  padding: clamp(2.5rem, 6vw, 5.5rem) var(--section-pad-x) clamp(1.5rem, 3vw, 2rem);
+  max-width: var(--content-max);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.intro__eyebrow {
+  color: var(--color-brand);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 2vw, 2.5rem); /* up to 40px */
+  letter-spacing: 0.03em;
+}
+
+.intro__title {
+  color: var(--color-brand);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 3.6vw, 4.6875rem); /* up to 75px */
+  line-height: 1.1;
+  margin-top: clamp(0.5rem, 1vw, 0.75rem);
+}
+
+/* =============== VET PROFILES =============== */
+.vets {
+  padding: clamp(1.5rem, 3vw, 2.5rem) var(--section-pad-x) clamp(3rem, 6vw, 6rem);
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.vets-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 6vw, 6.5rem);
+}
+
+.vet {
+  display: flex;
+  gap: clamp(2rem, 4vw, 3.75rem);
+  align-items: flex-start;
+}
+
+.vet__media {
+  position: relative;
+  flex: 0 0 clamp(12rem, 22vw, 31.5625rem); /* up to 505px */
+}
+
+.vet__leaf {
+  position: absolute;
+  top: clamp(-2rem, -3vw, -3.5rem);
+  left: clamp(-1rem, -1.6vw, -1.75rem);
+  width: clamp(3.5rem, 4.8vw, 7.13rem); /* up to ~114px */
+  z-index: 1;
+}
+
+.vet__photo {
+  width: 100%;
+  aspect-ratio: 505 / 645;
+  object-fit: cover;
+  border-radius: 1.25rem; /* 20px */
+  border: 0.25rem solid var(--color-brand);
+  box-shadow: 0 1.25rem 1.875rem rgba(0, 0, 0, 0.1);
+}
+
+.vet__info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.vet__name {
+  color: var(--color-brand);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2.7vw, 3.4375rem); /* up to 55px */
+  line-height: 1.15;
+}
+
+.vet__credential {
+  color: var(--color-brand);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1.9vw, 2.5rem); /* up to 40px */
+  margin-top: clamp(0.4rem, 0.6vw, 0.6rem);
+}
+
+.vet__experience {
+  color: var(--color-brand);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1.9vw, 2.5rem); /* up to 40px */
+}
+
+.vet__bio {
+  color: var(--color-bio-text);
+  font-weight: 400;
+  font-size: clamp(1rem, 1.5vw, 1.375rem); /* up to ~22px, design 33px scaled for readability */
+  line-height: 1.7;
+  margin-top: clamp(1rem, 1.6vw, 1.5rem);
+  max-width: 62ch;
+}
+
+/* =============== SCROLL REVEAL =============== */
+.reveal {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* =============== BREAKPOINTS =============== */
+
+/* Tablet: reduce photo column a bit more, keep row layout */
+@media (max-width: 900px) {
+  .vet {
+    gap: 1.75rem;
+  }
+
+  .vet__media {
+    flex-basis: 11rem;
+  }
+}
+
+/* Mobile: stack photo above bio */
+@media (max-width: 640px) {
+  .vet {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .vet__media {
+    flex-basis: auto;
+    width: min(16rem, 70vw);
+  }
+
+  .vet__leaf {
+    left: clamp(-1.5rem, -4vw, -1rem);
+  }
+
+  .vet__bio {
+    max-width: 42ch;
+    margin-inline: auto;
+  }
+
+  .hero__img {
+    height: clamp(10rem, 55vw, 20rem);
+    object-position: center 30%;
+  }
+}

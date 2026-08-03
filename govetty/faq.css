@@ -1,0 +1,198 @@
+/* =========================================================
+   Vetty — FAQ — Main Content Only
+   Design source: Figma "Govetty Inside pages" (node 20:1127)
+   Baseline: 1920px, fluid down to mobile
+   ========================================================= */
+
+:root {
+  --color-brand: #6a0d17;
+  --color-surface: #ffffff;
+  --color-answer-text: #333333;
+
+  --font-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --section-pad-x: clamp(1.25rem, 6vw, 7.94rem);
+  --content-max: 1920px;
+}
+
+/* =============== RESET (scoped) =============== */
+.faq-main, .faq-main * {
+  box-sizing: border-box;
+}
+
+.faq-main {
+  font-family: var(--font-base);
+  color: #1a1a1a;
+  background: var(--color-surface);
+  overflow-x: clip;
+}
+
+.faq-main img {
+  display: block;
+  max-width: 100%;
+}
+
+.faq-main h1, .faq-main p {
+  margin: 0;
+}
+
+.faq-main button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* =============== HERO =============== */
+.hero {
+  width: 100%;
+  line-height: 0;
+  margin-top: 20px;
+}
+
+.hero__img {
+  width: 100%;
+  height: clamp(14rem, 40vw, 42.5rem); /* up to 680px */
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+/* =============== FAQ =============== */
+.faq {
+  padding: clamp(2.5rem, 6vw, 5rem) var(--section-pad-x) clamp(3rem, 7vw, 6.5rem);
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.faq__inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 4.25rem);
+}
+
+.faq__category {
+  position: relative;
+}
+
+.faq__heading {
+  color: var(--color-brand);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 3.4vw, 4.6875rem); /* up to 75px */
+  line-height: 1.1;
+  margin-bottom: clamp(1.25rem, 2.5vw, 2.25rem);
+  margin-top: 0;
+}
+
+.faq__leaf {
+  position: absolute;
+  top: clamp(-0.5rem, -0.5vw, 0.2rem);
+  right: clamp(0.5rem, 4vw, 4.6rem);
+  width: clamp(2.5rem, 3.2vw, 4.5rem);
+}
+
+.faq__list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.9rem, 1.6vw, 1.3rem);
+}
+
+.faq-item {
+  border: 0.3125rem solid var(--color-brand); /* 5px */
+  border-radius: 1.5625rem; /* 25px */
+  box-shadow: 0 0.375rem 2.5rem rgba(0, 0, 0, 0.16);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.faq-item__question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1.1rem, 2vw, 1.9rem) clamp(1.25rem, 2.5vw, 2.4rem);
+  text-align: left;
+}
+
+.faq-item__question span {
+  color: var(--color-brand);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1.9vw, 2.5rem); /* up to 40px, design used 50px scaled slightly */
+  line-height: 1.3;
+}
+
+.faq-item__icon {
+  flex: none;
+  width: clamp(1.5rem, 1.8vw, 2.6rem);
+  transition: transform 0.25s ease;
+}
+
+.faq-item__question[aria-expanded="true"] .faq-item__icon {
+  transform: rotate(135deg);
+}
+
+.faq-item__answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.faq-item__answer > p {
+  overflow: hidden;
+  min-height: 0;
+  color: var(--color-answer-text);
+  font-size: clamp(0.95rem, 1.2vw, 1.25rem);
+  line-height: 1.6;
+  padding: 0 clamp(1.25rem, 2.5vw, 2.4rem);
+  max-width: 75ch;
+}
+
+.faq-item.is-open .faq-item__answer {
+  grid-template-rows: 1fr;
+}
+
+.faq-item.is-open .faq-item__answer > p {
+  padding-bottom: clamp(1.1rem, 2vw, 1.9rem);
+}
+
+/* =============== SCROLL REVEAL =============== */
+.reveal {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .faq-item__answer,
+  .faq-item__icon {
+    transition: none;
+  }
+}
+
+/* =============== BREAKPOINTS =============== */
+@media (max-width: 560px) {
+  .faq-item__question span {
+    font-size: 1.05rem;
+  }
+
+  .hero__img {
+    height: clamp(10rem, 55vw, 20rem);
+    object-position: center 40%;
+  }
+
+  .faq__leaf {
+    display: none;
+  }
+}

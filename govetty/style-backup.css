@@ -1,0 +1,825 @@
+/*
+Theme Name: Go Vetty
+Theme URI: https://govetty.com/
+Author: Go Vetty Team
+Description: A highly optimized, minimal responsive starter theme built for speed, fully compatible with Gutenberg and Elementor.
+Version: 1.0.0
+License: GNU General Public License v2 or later
+Text Domain: go-vetty
+*/
+
+/* Core Minimal Layout Reset */
+img { max-width: 100%; height: auto; }
+.site-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* Coming Soon Screen Minimal Styles */
+.coming-soon-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    background: #f9f9f9;
+}
+.coming-soon-wrapper h1 { font-size: 2.5rem; margin-bottom: 10px; color: #111; }
+
+/* Default Font */
+/* Inter Variable Font - Strictly limited to 400-600 weights for maximum performance */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 500 600;
+  src: url('assets/fonts/inter.woff2') format('woff2-variations');
+}
+
+/* Apply it globally */
+body, h1, h2, h3, h4, h5, h6, button {
+  font-family: 'Inter', sans-serif;
+}
+/* end */
+
+/* --------------------------------------------------------------------------
+ * RESPONSIVE HEADINGS (Inter Font)
+ * Fluid sizing scales down naturally from 1920px desktop to mobile.
+ * -------------------------------------------------------------------------- */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  color: #111111; /* Feel free to change this to your theme color */
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+
+h1 {
+  /* Figma: 80px | 1440px: ~66px | Mobile min: 54px */
+  font-size: clamp(3.375rem, 1.23rem + 3.35vw, 5rem);
+}
+
+h2 {
+  /* Figma: 54px | 1440px: ~46px | Mobile min: 38px */
+  font-size: clamp(2.375rem, 1.21rem + 1.82vw, 3.375rem);
+}
+
+h3 {
+  /* Figma: 40px | 1440px: ~35px | Mobile min: 30px */
+  font-size: clamp(1.875rem, 1.16rem + 1.12vw, 2.5rem);
+}
+
+h4 {
+  /* Figma: 24px | 1440px: ~22px | Mobile min: 20px */
+  font-size: clamp(1.25rem, 1.04rem + 0.34vw, 1.5rem);
+}
+
+h5 {
+  /* Figma: 22px | 1440px: ~20px | Mobile min: 19px */
+  font-size: clamp(1.1875rem, 1.05rem + 0.25vw, 1.375rem);
+}
+
+h6 {
+  /* Figma: 20px | 1440px: ~19px | Mobile min: 18px */
+  font-size: clamp(1.125rem, 1.05rem + 0.13vw, 1.25rem);
+}
+
+p, span {
+  font-size: clamp(1.125rem, 1.05rem + 0.13vw, 1.25rem);
+}
+
+.fs80 {
+  font-size: clamp(3.375rem, 1.23rem + 3.35vw, 5rem);
+}
+
+.fs54 {
+  /* Mobile: 32px -> Desktop: 54px */
+  font-size: clamp(2.375rem, 1.21rem + 1.82vw, 3.375rem);
+}
+
+.fs40 {
+  /* Mobile: 28px -> Desktop: 40px */
+  font-size: clamp(1.875rem, 1.16rem + 1.12vw, 2.5rem);
+}
+
+.fs24 {
+  font-size: clamp(1.25rem, 1.04rem + 0.34vw, 1.5rem);
+}
+
+.fs22 {
+  /* Mobile: 19px -> Desktop: 22px */
+  font-size: clamp(1.1875rem, 1.05rem + 0.25vw, 1.375rem);
+}
+
+.fs20 {
+  /* Mobile: 18px -> Desktop: 20px */
+  font-size: clamp(1.125rem, 1.05rem + 0.13vw, 1.25rem);
+}
+
+.fw600 {
+  font-weight: 600;
+}
+
+.fw500 {
+  font-weight: 500;
+}
+
+.fw400 {
+  font-weight: 400;
+}
+
+/* Color */
+.fcburgundy {
+  color: #8B0D1E;
+}
+
+.fcfirered {
+  color: #D62828;
+}
+
+.fcsalmon {
+  color: #E57373;
+}
+
+.fcmistyrose {
+  color: #F8D7DA;
+}
+
+.fcwhite {
+  color: #ffffff;
+}
+
+.fcblack {
+  color: #000000;
+}
+
+/* Container */
+.site-container {
+    max-width: 100%;
+    padding: 0;
+}
+
+/* Homepage */
+/* ==========================================================================
+   HERO SECTION - UNWARPED NATURAL PROPORTIONS
+   ========================================================================== */
+
+/*.hero-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+.hero-section h1 {
+  color: #8B0D1E;
+  padding-left: calc((100vw - 1520px) / 2); 
+  max-width: calc(682px + ((100vw - 1520px) / 2)); 
+  padding-right: 60px; 
+  width: 100%;
+  box-sizing: border-box; 
+  flex-shrink: 0;
+}
+
+.hero-section figure {
+  margin: 0;
+  height: 825px;
+  flex-grow: 1;  
+  display: flex;
+  justify-content: flex-end; 
+  width: auto !important;
+}
+
+.hero-section figure img {
+  display: block;
+  height: 100% !important;
+  width: auto !important; 
+  object-fit: none;
+  object-position: left center; 
+}
+
+@media (max-width: 1600px) {
+  .hero-section h1 {
+    padding-left: 40px;
+    max-width: 742px; 
+  }
+}
+
+@media (max-width: 1200px) {
+  .hero-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .hero-section h1 {
+    padding: 60px 20px;
+    max-width: 100%;
+  }
+  
+  .hero-section figure {
+    width: 100% !important;
+    height: 450px;
+  }
+  
+  .hero-section figure img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+} */
+
+.govetty-hero-section {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: #FFFFFF;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    overflow: hidden;
+  }
+
+  .govetty-hero-section *, .govetty-hero-section *::before, .govetty-hero-section *::after {
+    box-sizing: inherit;
+  }
+
+  /* Structural Containers */
+  .govetty-container {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Proportional scaling grid padding optimized for standard and wide desktop screens */
+  .govetty-grid-padding {
+    padding-left: clamp(4rem, -0.5rem + 5vw, 12.5rem);  
+    padding-right: clamp(4rem, -0.5rem + 5vw, 12.5rem); 
+  }
+
+  /* Main Hero Presentation Block */
+  .govetty-main-row {
+    position: relative;
+    min-height: 580px; /* Reduced to balance composition depth */
+    display: flex;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .govetty-text-col {
+    width: 100%;
+    max-width: 680px; /* Gently compressed content zone to force clean typographic wrap */
+    position: relative;
+    z-index: 12;
+    padding-top: 60px;
+    padding-bottom: 20px;
+  }
+
+  /* Core Design Typography Set Engine */
+  .govetty-text-col h1 {
+    font-size: clamp(2.8rem, 1rem + 3.2vw, 5rem); 
+    font-weight: 600;
+    color: #8B0D1E;
+    line-height: 1.1;
+    margin: 0 0 24px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .govetty-text-col p.govetty-hero-lead {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #000000;
+    margin: 0 0 40px 0;
+    max-width: 520px;
+  }
+
+  /* Actions Layout */
+  .govetty-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .govetty-btn-hero-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #8B0D1E;
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+    height: 56px;
+    padding: 0 32px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+
+  .govetty-btn-hero-primary:hover {
+    background-color: #D62828;
+  }
+
+  .govetty-btn-hero-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: #8B0D1E;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+    height: 56px;
+    padding: 0 32px;
+    border: 2px solid #8B0D1E;
+    border-radius: 8px;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+  }
+
+  .govetty-btn-hero-secondary:hover {
+    background-color: #F8D7DA;
+  }
+
+  .govetty-btn-hero-secondary img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .govetty-hero-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 400;
+    color: #8B0D1E;
+  }
+
+  .govetty-hero-badge img {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Fixed Hero Placement Composition Layer */
+  .govetty-image-col {
+    position: absolute;
+    right: 0;
+    bottom: -2px; /* Pins graphic flush straight to meet the upcoming features block curve boundary */
+    width: 52%;
+    max-width: 1100px;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .govetty-hero-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Horizontal Bottom Features/Blurbs Block */
+  .govetty-features-wrapper {
+    background-color: #F8D7DA;
+    border-radius: 24px;
+    padding: 40px clamp(2rem, 1rem + 2vw, 3rem);
+    margin-bottom: 60px;
+    position: relative;
+    z-index: 15;
+  }
+
+  .govetty-features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  @media (min-width: 640px) {
+    .govetty-features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .govetty-features-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .govetty-feature-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  @media (min-width: 1100px) {
+    .govetty-feature-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: -16px;
+      top: 5%;
+      height: 90%;
+      width: 1px;
+      background-color: rgba(139, 13, 30, 0.15);
+    }
+  }
+
+  .govetty-feature-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+
+  .govetty-feature-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Adjusted down to stay cleanly balanced with the text lines below */
+  .govetty-feature-info h3 {
+    font-size: clamp(22px, 1.3vw, 26px); 
+    font-weight: 600;
+    color: #8B0D1E;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .govetty-feature-info p {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #000000;
+    margin: 0;
+  }
+
+  /* Responsive Adjustments for Mobile and Tablets */
+  @media (max-width: 991px) {
+    .govetty-grid-padding {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    
+    .govetty-main-row {
+      flex-direction: column-reverse;
+      min-height: auto;
+    }
+
+    .govetty-text-col {
+      width: 100%;
+      padding-top: 40px;
+      padding-bottom: 40px;
+    }
+
+    .govetty-image-col {
+      position: relative;
+      width: 100%;
+      margin-top: 20px;
+      bottom: 0;
+    }
+  }
+
+
+  
+
+
+
+/* Section 2 */
+
+  .govetty-how-it-works-section {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding-top: 100px;
+    padding-bottom: 80px;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    overflow: hidden;
+  }
+
+  .govetty-how-it-works-section *, .govetty-why-choose-section * {
+    box-sizing: border-box;
+  }
+
+  .govetty-section-container {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .govetty-section-padding {
+    padding-left: clamp(4rem, -0.5rem + 5vw, 12.5rem);  
+    padding-right: clamp(4rem, -0.5rem + 5vw, 12.5rem); 
+  }
+
+  .govetty-how-it-works-section .govetty-center-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .govetty-how-it-works-section .govetty-center-header span {
+    font-size: 16px;
+    font-weight: 600;
+    color: #8B0D1E;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .govetty-how-it-works-section .govetty-center-header h2 {
+    font-size: clamp(2.25rem, 1.2rem + 1.8vw, 3.5rem);
+    font-weight: 600;
+    color: #3A0007;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .govetty-steps-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    gap: 16px;
+  }
+
+  .govetty-step-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    max-width: 320px;
+  }
+
+  .govetty-step-graphic-container {
+    width: 140px;
+    height: 140px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .govetty-step-main-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .govetty-step-card h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+  }
+
+  .govetty-step-card p {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #4A4A4A;
+    margin: 0;
+  }
+
+  .govetty-step-connector {
+    width: clamp(60px, 6vw, 140px);
+    height: auto;
+    pointer-events: none;
+    flex-shrink: 0;
+    margin-top: 55px; 
+  }
+
+  /* --- SECTION 3: WHY CHOOSE GOVETTY --- */
+  .govetty-why-choose-section {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: #FFFFFF;
+    padding-bottom: 120px;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    overflow: hidden;
+  }
+
+  /* Fixed 12-column grid prevents floating separation on 1920px width screens */
+  .govetty-split-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    align-items: center;
+    gap: 20px;
+  }
+
+  .govetty-choose-text-side {
+    grid-column: 1 / 7; /* Spans left half of grid */
+    max-width: 620px;
+  }
+
+  .govetty-choose-text-side span.govetty-pre-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #8B0D1E;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .govetty-choose-text-side h2 {
+    font-size: clamp(2.25rem, 1.2rem + 1.8vw, 3.5rem);
+    font-weight: 600;
+    color: #3A0007;
+    line-height: 1.15;
+    margin: 0 0 20px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .govetty-choose-text-side p.govetty-choose-lead {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: #4A4A4A;
+    margin: 0 0 32px 0;
+  }
+
+  .govetty-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .govetty-checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #222222;
+  }
+
+  .govetty-checklist-item svg {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    color: #8B0D1E;
+  }
+
+  /* Container wrapper column alignment */
+  .govetty-choose-image-side {
+    grid-column: 7 / 13; /* Takes right half of grid */
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative;
+  }
+
+  /* Upscaled layout frame values for sharp 1920px rendering layout ratios */
+  .govetty-main-scene-container {
+    position: relative;
+    width: 590px; 
+    height: 560px;
+  }
+
+  /* Rectangle_12 upscaled and aligned right edge layout */
+  .govetty-scene-img {
+    width: 530px;
+    height: 490px;
+    object-fit: cover;
+    border-radius: 28px;
+    display: block;
+    position: absolute;
+    top: 35px;
+    right: 0;
+    z-index: 5;
+    box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.04);
+  }
+
+  .govetty-ambient-ellipse {
+    position: absolute;
+    pointer-events: none;
+    height: auto;
+  }
+
+  /* Ellipse 3 - Pinned accurately behind the top right photo edge */
+  .govetty-ambient-ellipse.el-3 {
+    width: 290px;
+    top: 0;
+    right: -25px;
+    z-index: 1;
+  }
+
+  /* Ellipse 4 - Positioned cleanly behind the bottom-left edge context */
+  .govetty-ambient-ellipse.el-4 {
+    width: 250px;
+    bottom: 5px;
+    left: -10px;
+    z-index: 1;
+  }
+
+  /* Frame_1707481293 badge overlap position fixed relative to the photo edge */
+  .govetty-trust-graphic-badge {
+    position: absolute;
+    bottom: 0;
+    left: -35px; /* Pulls further left to break past the upscaled photo framework cleanly */
+    width: 320px;
+    height: auto;
+    z-index: 10;
+    display: block;
+  }
+
+  /* --- RESPONSIVE LAYOUT ENGINE BREAKPOINTS --- */
+  @media (max-width: 1280px) {
+    .govetty-main-scene-container {
+      width: 500px;
+      height: 480px;
+    }
+    .govetty-scene-img {
+      width: 440px;
+      height: 410px;
+    }
+    .govetty-trust-graphic-badge {
+      width: 270px;
+      left: -15px;
+    }
+    .govetty-ambient-ellipse.el-3 { width: 230px; right: -15px; }
+    .govetty-ambient-ellipse.el-4 { width: 200px; }
+  }
+
+  @media (max-width: 1100px) {
+    .govetty-step-connector {
+      display: none; 
+    }
+  }
+
+  @media (max-width: 991px) {
+    .govetty-how-it-works-section {
+      padding-top: 60px;
+      padding-bottom: 60px;
+    }
+    .govetty-why-choose-section {
+      padding-bottom: 60px;
+    }
+    .govetty-split-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+    }
+    .govetty-choose-text-side {
+      width: 100%;
+      max-width: 100%;
+    }
+    .govetty-choose-image-side {
+      width: 100%;
+      justify-content: center;
+    }
+    .govetty-steps-row {
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .govetty-main-scene-container {
+      width: 100%;
+      max-width: 340px;
+      height: 340px;
+    }
+    .govetty-scene-img {
+      width: 300px;
+      height: 280px;
+      top: 25px;
+    }
+    .govetty-trust-graphic-badge {
+      width: 200px;
+      left: -10px;
+      bottom: 10px;
+    }
+    .govetty-ambient-ellipse {
+      display: none;
+    }
+  }

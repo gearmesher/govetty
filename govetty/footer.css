@@ -1,0 +1,274 @@
+/* ==========================================================================
+   GO VETTY - FOOTER STYLES
+   ========================================================================== */
+
+/* Main Outer Footer Element (<footer class="frame-54">) */
+footer,
+footer.frame-54 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  gap: 80px;
+  padding: 88px 70px 48px;
+  position: relative;
+  background-color: #ffffff;
+  border-top: 1px solid #ececec;
+  box-sizing: border-box;
+  max-width: 1760px;
+  margin: 0 auto;
+}
+
+/* Inner Layout Container (<div class="frame-55">) */
+footer .frame-55 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+}
+
+/* Footer Navigation Columns (<div/nav class="frame-56">) */
+footer .frame-56 {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* Branding Logo Image (<img class="group-3">) */
+footer .group-3 {
+  position: relative;
+  width: 215px;
+  height: 91px;
+  object-fit: contain;
+}
+
+/* Column Titles & Tagline Header (<div class="text-wrapper-28">) */
+footer .text-wrapper-28 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  font-family: "Inter", Helvetica, sans-serif;
+  font-weight: 600;
+  color: #600209;
+  font-size: 20px;
+  letter-spacing: -0.25px;
+  line-height: 30px;
+  white-space: nowrap;
+}
+
+/* Tagline Paragraph (<p class="text-wrapper-26 footer-tagline">) */
+footer .text-wrapper-26 {
+  position: relative;
+  width: auto;
+  margin-top: -1px;
+  margin-bottom: 0;
+  font-family: "Inter", Helvetica, sans-serif;
+  font-weight: 500;
+  color: #333333;
+  font-size: 20px;
+  letter-spacing: -0.2px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+/* Nav Links Sub-Container (<div class="frame-57">) */
+footer .frame-57 {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* Nav Link Anchors Styling */
+footer .frame-57 a {
+  font-family: "Inter", Helvetica, sans-serif;
+  font-weight: 500;
+  color: #000000;
+  font-size: 20px;
+  letter-spacing: -0.2px;
+  line-height: 24px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+footer .frame-57 a:hover {
+  color: #600209;
+}
+
+/* "FOLLOW US" Header (<div class="text-wrapper-27">) */
+footer .text-wrapper-27 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  font-family: "Inter", Helvetica, sans-serif;
+  font-weight: 600;
+  color: #600209;
+  font-size: 20px;
+  letter-spacing: -0.25px;
+  line-height: 30px;
+  white-space: nowrap;
+}
+
+/* Social & Localized Identity Block (<div class="frame-58">) */
+footer .frame-58 {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* Social & Canadian Flag Sub-Wrapper (<div class="frame-7">) */
+footer .frame-7 {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* Social Icons Banner (<img class="frame-59">) */
+footer .frame-59 {
+  position: relative;
+  width: 208px;
+  height: 32px;
+}
+
+/* Canadian Flag Row Wrapper (<div class="frame-60">) */
+footer .frame-60 {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* Canadian Flag Icon (<img class="fi-5">) */
+footer .fi-5 {
+  position: relative;
+  width: 40px;
+  height: 42px;
+}
+
+/* Support Text Wrapper (<div class="frame-61">) */
+footer .frame-61 {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* "Proudly Canadian." Heading (<div class="text-wrapper-30">) */
+footer .text-wrapper-30 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  font-family: "Inter", Helvetica, sans-serif;
+  font-weight: 600;
+  color: #600209;
+  font-size: 20px;
+  letter-spacing: -0.2px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+/* "Service & support in Canada" Subtext (<p class="text-wrapper-29">) */
+footer .text-wrapper-29 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  margin: 0;
+  font-family: "Inter", Helvetica, sans-serif;
+  font-weight: 500;
+  color: #000;
+  font-size: 20px;
+  letter-spacing: -0.18px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* Copyright Paragraph (<p class="copyright">) */
+footer .copyright {
+  position: relative;
+  width: fit-content;
+  font-family: "Inter", Helvetica, sans-serif;
+  font-weight: 400;
+  color: #777777;
+  font-size: 14px;
+  letter-spacing: -0.18px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   MID-SIZE DESKTOPS & LAPTOPS (1200px - 1599px)
+   ========================================================================== */
+
+@media (min-width: 1200px) and (max-width: 1599px) {
+  footer,
+  footer.frame-54 {
+    padding: 60px max(30px, 3.6vw) 40px !important;
+  }
+
+  /* Fluid typography scaling for links and text in footer */
+  footer .frame-57 a,
+  footer .text-wrapper-26,
+  footer .text-wrapper-27,
+  footer .text-wrapper-28,
+  footer .text-wrapper-29,
+  footer .text-wrapper-30,
+  footer .copyright {
+    font-size: clamp(15px, 1vw, 20px) !important;
+    line-height: clamp(22px, 1.5vw, 30px) !important;
+  }
+}
+
+/* ==========================================================================
+   TABLET & MOBILE RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  footer,
+  footer.frame-54 {
+    padding: 60px 40px 40px;
+    gap: 60px;
+  }
+
+  footer .frame-55 {
+    flex-wrap: wrap;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  footer,
+  footer.frame-54 {
+    padding: 48px 20px 32px;
+    gap: 40px;
+  }
+
+  footer .frame-55 {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  footer .frame-56,
+  footer .frame-58 {
+    width: 100%;
+  }
+  
+  footer .frame-59 {
+	width: auto;
+  }
+}

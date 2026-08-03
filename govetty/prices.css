@@ -1,0 +1,439 @@
+/* =========================================================
+   Vetty — Pricing — Main Content Only
+   Design source: Figma "Govetty Inside pages" (node 20:3)
+   Baseline: 1920px, fluid down to mobile
+   ========================================================= */
+
+:root {
+  --color-brand: #6a0d17;
+  --color-maroon: #67111a;
+  --color-card-light: #fbe9e7;
+  --color-surface: #ffffff;
+
+  --font-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --section-pad-x: clamp(1.25rem, 6vw, 7.94rem);
+  --section-pad-y: clamp(2.5rem, 6vw, 6.25rem);
+  --content-max: 1920px;
+
+  --radius-lg: 1.875rem; /* 30px */
+}
+
+/* =============== RESET (scoped) =============== */
+.prices-main, .prices-main * {
+  box-sizing: border-box;
+}
+
+.prices-main {
+  font-family: var(--font-base);
+  color: #1a1a1a;
+  background: var(--color-surface);
+  overflow-x: clip;
+}
+
+.prices-main img {
+  display: block;
+  max-width: 100%;
+}
+
+.prices-main ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prices-main h1, .prices-main h2, .prices-main h3, .prices-main p, .prices-main blockquote {
+  margin: 0;
+}
+
+:where(.prices-main) a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =============== SHARED =============== */
+.section-heading {
+  font-weight: 800;
+  color: var(--color-brand);
+  font-size: clamp(1.75rem, 3.2vw, 3.75rem); /* up to 60px */
+  line-height: 1.1;
+}
+
+.section-heading--center {
+  text-align: center;
+}
+
+/* =============== HERO =============== */
+.hero {
+  width: 100%;
+  line-height: 0;
+  margin-top: 20px;
+}
+
+.hero__img {
+  width: 100%;
+  height: clamp(14rem, 40vw, 42.5rem); /* up to 680px */
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+/* =============== PRICING PLANS =============== */
+.pricing {
+  padding: clamp(3rem, 7vw, 8rem) var(--section-pad-x) var(--section-pad-y);
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.pricing-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+
+.plan {
+  position: relative;
+  flex: 1 1 17rem;
+  max-width: 26rem;
+  border-radius: var(--radius-lg);
+  padding: clamp(2rem, 3vw, 3.4rem) clamp(1.5rem, 2.5vw, 2.7rem) clamp(2rem, 3vw, 2.8rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(0.6rem, 1vw, 1rem);
+}
+
+/* Monthly and Premium share this exact floor so they always match each
+   other's height, regardless of their differing feature-list lengths.
+   The value is chosen generously above either card's natural content
+   height so the floor — not the content — decides the final size. */
+.plan--monthly,
+.plan--premium {
+  min-height: clamp(36rem, 50vw, 50rem);
+}
+
+.plan--monthly {
+  background: var(--color-maroon);
+  color: #fff;
+}
+
+.plan--annual,
+.plan--premium {
+  background: var(--color-card-light);
+  border: 0.3125rem solid var(--color-maroon); /* 5px */
+  box-shadow: 0 2.5rem 3.125rem rgba(0, 0, 0, 0.15);
+  color: var(--color-brand);
+}
+
+/* Featured card gets a taller floor + more padding, so it is reliably
+   taller than the (now-matched) Monthly/Premium pair and, since the row
+   is vertically centered, pokes up above and extends below them evenly. */
+.plan--featured {
+  min-height: clamp(43rem, 60vw, 60rem);
+  padding-top: clamp(3rem, 4.5vw, 4.5rem);
+  padding-bottom: clamp(2.5rem, 4vw, 4rem);
+  z-index: 1;
+}
+
+.plan__leaf {
+  position: absolute;
+  top: clamp(-3rem, -3.5vw, -2.5rem);
+  width: clamp(3.5rem, 4.5vw, 5.9rem);
+  height: auto;
+}
+
+.plan__name {
+  font-weight: 800;
+  font-size: clamp(1.5rem, 2vw, 2.5rem); /* up to 40px */
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+}
+
+.plan__subtitle {
+  font-size: clamp(1rem, 1.2vw, 1.625rem); /* up to 26px */
+}
+
+.plan__price {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: clamp(0.5rem, 1vw, 1rem);
+}
+
+.plan__currency {
+  font-weight: 800;
+  font-size: clamp(1.5rem, 2vw, 3.1875rem); /* up to 51px */
+  transform: translateY(-0.3em);
+}
+
+.plan__amount {
+  font-weight: 800;
+  font-size: clamp(3rem, 5.6vw, 6.75rem); /* up to 108px */
+  line-height: 0.9;
+}
+
+.plan__period {
+  font-weight: 400;
+  font-size: clamp(1rem, 1.5vw, 1.875rem); /* up to 30px */
+  align-self: flex-end;
+  transform: translateY(-0.15em);
+}
+
+.plan__badge {
+  border-radius: 1.5625rem;
+  padding: 0.75rem 1.5rem;
+  font-size: clamp(0.85rem, 1vw, 1.125rem); /* up to 18px, design 21px scaled slightly */
+  width: 100%;
+  max-width: 23.5rem;
+}
+
+.plan__badge--solid {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+.plan__badge--outline {
+  background: #fff;
+  color: var(--color-maroon);
+  border: 0.1875rem solid var(--color-brand);
+}
+
+.plan__features {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.65rem, 1vw, 1rem);
+  text-align: left;
+  margin-top: clamp(0.5rem, 1vw, 1rem);
+}
+
+.plan__features li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: clamp(0.85rem, 1vw, 1.125rem); /* up to ~18px, design 21px */
+  line-height: 1.4;
+}
+
+.plan__features img {
+  flex: none;
+  width: clamp(1.1rem, 1.4vw, 1.5rem);
+  height: clamp(1.1rem, 1.4vw, 1.5rem);
+}
+
+.plan__cta {
+  width: 100%;
+  max-width: 23.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 1.875rem;
+  font-weight: 500;
+  font-size: clamp(0.9rem, 1.1vw, 1.125rem);
+  letter-spacing: 0.02em;
+  margin-top: auto;
+  text-align: center;
+  transition: opacity 0.15s ease;
+}
+
+.plan__cta:hover,
+.plan__cta:focus-visible {
+  opacity: 0.85;
+}
+
+.plan__cta--light {
+  background: #fff;
+  color: var(--color-maroon);
+}
+
+.plan__cta--solid {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+/* =============== INCLUDED IN EVERY VISIT =============== */
+.included {
+  padding: var(--section-pad-y) var(--section-pad-x);
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.included__inner h2 {
+	margin-bottom: 73px;
+}
+
+.included-grid {
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.included-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(0.75rem, 1.4vw, 1.25rem);
+}
+
+.included-item__icon {
+  position: relative;
+  width: clamp(5.5rem, 7vw, 11.3125rem); /* up to 181px */
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+
+.included-item__circle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.included-item__glyph {
+  position: relative;
+  width: 42%;
+  height: auto;
+}
+
+.included-item__title {
+  color: var(--color-brand);
+  font-weight: 700;
+  font-size: clamp(1.05rem, 1.4vw, 1.5rem); /* up to 30px, scaled for balance */
+}
+
+.included-item__desc {
+  color: var(--color-brand);
+  font-size: clamp(0.9rem, 1.05vw, 1.3125rem); /* up to 21px */
+  line-height: 1.5;
+  max-width: 22ch;
+}
+
+/* =============== TESTIMONIAL =============== */
+.testimonial {
+  background: var(--color-brand);
+  padding: clamp(3rem, 7vw, 8rem) var(--section-pad-x);
+}
+
+.testimonial__inner {
+  max-width: 62.5rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+.testimonial__leaf {
+  width: clamp(3.5rem, 4.5vw, 5.9rem);
+}
+
+.testimonial__heading {
+  color: #fff;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 3.4vw, 4.0625rem); /* up to 65px */
+}
+
+.testimonial__stars {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.testimonial__stars img {
+  width: clamp(1.5rem, 2vw, 2.4rem);
+  height: auto;
+}
+
+.testimonial__quote {
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+.testimonial__quote p {
+  font-size: clamp(1.15rem, 2vw, 2rem); /* up to ~32px, design used 40px */
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.testimonial__lead {
+  font-weight: 600 !important;
+}
+
+.testimonial__cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-style: normal;
+  font-size: clamp(1rem, 1.4vw, 1.5rem); /* up to 24px */
+  opacity: 0.9;
+}
+
+/* =============== SCROLL REVEAL =============== */
+.reveal {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* =============== BREAKPOINTS =============== */
+
+/* Tablet: stack plans, Annual (featured) shown first */
+@media (max-width: 1100px) {
+  .pricing-grid {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+
+  .plan {
+    max-width: none;
+  }
+
+  .plan--featured {
+    order: -1;
+  }
+
+  .plan--monthly,
+  .plan--premium,
+  .plan--featured {
+    min-height: auto;
+  }
+
+  .included-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile: everything single column */
+@media (max-width: 560px) {
+  .included-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plan__features li {
+    font-size: 0.95rem;
+  }
+
+  .hero__img {
+    height: clamp(10rem, 55vw, 20rem);
+    object-position: center 40%;
+  }
+}

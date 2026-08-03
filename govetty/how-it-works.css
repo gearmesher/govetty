@@ -1,0 +1,231 @@
+/* =========================================================
+   Vetty — How It Works — Main Content Only
+   Design source: Figma "Govetty Inside pages" (node 20:422)
+   Baseline: 1920px, fluid down to mobile
+   ========================================================= */
+
+:root {
+  --color-brand: #6a0d17;
+  --color-surface: #ffffff;
+  --color-surface-alt: #d9d9d9;
+
+  --font-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --section-pad-x: clamp(1.25rem, 6vw, 7.94rem);
+  --section-pad-y: clamp(2.5rem, 6vw, 6.25rem);
+  --content-max: 1920px;
+}
+
+/* =============== RESET (scoped) =============== */
+.how-main, .how-main * {
+  box-sizing: border-box;
+}
+
+.how-main {
+  font-family: var(--font-base);
+  color: #1a1a1a;
+  background: var(--color-surface);
+  overflow-x: clip;
+}
+
+.how-main img {
+  display: block;
+  max-width: 100%;
+}
+
+.how-main ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.how-main h1, .how-main h2, .how-main h3, .how-main p {
+  margin: 0;
+}
+
+/* =============== SHARED =============== */
+.section-heading {
+  font-weight: 800;
+  color: var(--color-brand);
+  font-size: clamp(1.75rem, 3.4vw, 4.8125rem); /* up to 77px */
+  line-height: 1.1;
+}
+
+.section-heading--center {
+  text-align: center;
+}
+
+/* =============== HERO =============== */
+.hero {
+  width: 100%;
+  line-height: 0;
+  margin-top: 20px;
+}
+
+.hero__img {
+  width: 100%;
+  height: clamp(14rem, 40vw, 42.5rem); /* up to 680px */
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+/* =============== INTRO ============== */
+.intro {
+  padding: clamp(3rem, 7vw, 6.5rem) var(--section-pad-x) clamp(1.5rem, 3vw, 2.5rem);
+  max-width: var(--content-max);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.intro__title {
+  color: var(--color-brand);
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 6.0625rem); /* up to 97px */
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.intro__subtitle {
+  color: var(--color-brand);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 2vw, 2.5rem); /* up to 40px */
+  line-height: 1.4;
+  margin-top: clamp(1rem, 2vw, 1.75rem);
+}
+
+/* =============== 4-STEP GRAPHIC =============== */
+.steps {
+  padding: clamp(1.5rem, 3vw, 2rem) var(--section-pad-x) clamp(2.5rem, 5vw, 4rem);
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.steps__frame {
+  position: relative;
+  max-width: 78rem; /* ~1248px, keeps the tall illustration from over-scaling on ultra-wide screens */
+  margin-inline: auto;
+}
+
+.steps__img {
+  width: 100%;
+}
+
+/* Checkmarks are positioned as percentages of the graphic's own box, so
+   they stay aligned to the illustration's built-in checklist at any
+   viewport width (the image is never cropped — width:100% height:auto
+   preserves its aspect ratio, keeping overlay alignment accurate). */
+.steps__checks {
+  position: absolute;
+  inset: 0;
+}
+
+.steps__checks li {
+  position: absolute;
+  top: var(--pos);
+  left: 15.7%;
+  width: 1.85%;
+  aspect-ratio: 1 / 1;
+  background: url("https://www.figma.com/api/mcp/asset/472156f6-1fb4-45ff-9c90-a99498e7e601.svg") center / contain no-repeat;
+}
+
+/* =============== KEY BENEFITS =============== */
+.benefits {
+  background: var(--color-surface-alt);
+  padding: var(--section-pad-y) var(--section-pad-x);
+}
+
+.benefits__inner {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.benefits__leaf {
+  width: clamp(3.5rem, 4.5vw, 5.9rem);
+  margin-bottom: clamp(0.5rem, 1vw, 1rem);
+}
+
+.benefits-grid {
+  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: clamp(1.5rem, 3vw, 2.5rem);
+  row-gap: clamp(2.5rem, 5vw, 4rem);
+  width: 100%;
+}
+
+.benefit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(0.75rem, 1.4vw, 1.25rem);
+}
+
+.benefit__icon {
+  width: clamp(6rem, 8vw, 14.27rem); /* up to ~228px */
+  height: auto;
+}
+
+.benefit__title {
+  color: var(--color-brand);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(1.05rem, 1.6vw, 1.875rem); /* up to 30px */
+}
+
+.benefit__desc {
+  color: var(--color-brand);
+  font-size: clamp(0.9rem, 1.05vw, 1.3125rem); /* up to 21px */
+  line-height: 1.5;
+  max-width: 28ch;
+}
+
+/* =============== SCROLL REVEAL =============== */
+.reveal {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* =============== BREAKPOINTS =============== */
+
+/* Tablet: 2-up benefits */
+@media (max-width: 900px) {
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile: single column, hide the dense checklist overlay
+   (illustration text is too small to read at this size anyway) */
+@media (max-width: 560px) {
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps__checks {
+    display: none;
+  }
+
+  .hero__img {
+    height: clamp(10rem, 55vw, 20rem);
+    object-position: center 40%;
+  }
+}
