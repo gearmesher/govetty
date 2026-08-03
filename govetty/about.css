@@ -1,0 +1,315 @@
+/* =========================================================
+   Vetty — About Us — Main Content Only
+   Design source: Figma "Govetty Inside pages" (node 20:895)
+   Baseline: 1920px, fluid down to mobile
+   ========================================================= */
+
+:root {
+  /* Brand */
+  --color-brand: #6a0d17;
+  --color-brand-dark: #56070f;
+  --color-surface: #ffffff;
+  --color-surface-alt: #d9d9d9;
+  --color-text-on-brand: #ffffff;
+
+  /* Type */
+  --font-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Fluid section rhythm (scales between mobile and the 1920px design) */
+  --section-pad-x: clamp(1.25rem, 6vw, 7.94rem);   /* 127px at 1920 */
+  --section-pad-y: clamp(2.5rem, 6vw, 6.25rem);     /* ~100px at 1920 */
+  --content-max: 1920px;
+
+  --radius-lg: 1.6875rem; /* 27px */
+  --radius-md: 0.8125rem; /* 13px */
+}
+
+/* =============== RESET (scoped, minimal) =============== */
+.about-main, .about-main * {
+  box-sizing: border-box;
+}
+
+.about-main {
+  font-family: var(--font-base);
+  color: #1a1a1a;
+  background: var(--color-surface);
+  overflow-x: clip;
+}
+
+.about-main img {
+  display: block;
+  max-width: 100%;
+}
+
+.about-main ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.about-main h1, .about-main h2, .about-main h3, .about-main p {
+  margin: 0;
+}
+
+/* =============== SHARED ELEMENTS =============== */
+.section-heading {
+  font-weight: 800;
+  color: var(--color-brand);
+  font-size: clamp(1.75rem, 3.4vw, 4.6875rem); /* up to 75px */
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.section-heading--center {
+  text-align: center;
+}
+
+/* =============== HERO =============== */
+.hero {
+  width: 100%;
+  line-height: 0;
+  margin-top: 20px;
+}
+
+.hero__img {
+  width: 100%;
+  height: clamp(14rem, 40vw, 42.5rem); /* up to 680px */
+  object-fit: cover;
+  object-position: center 38%;
+}
+
+/* =============== MISSION & VISION =============== */
+.mission-vision {
+  padding: var(--section-pad-y) var(--section-pad-x);
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.mission-vision__inner {
+  display: flex;
+  gap: clamp(1.5rem, 3vw, 3.5rem);
+  align-items: stretch;
+}
+
+.mission-vision__media {
+  flex: 1 1 42%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 20rem;
+}
+
+.mission-vision__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mission-vision__cards {
+  flex: 1 1 58%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.5625rem); /* ~25px */
+}
+
+.mv-card {
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+  border-radius: var(--radius-lg);
+  padding-top: clamp(1.75rem, 3.2vw, 3.4rem);
+  padding-bottom: clamp(1.75rem, 3.2vw, 3.4rem);
+  padding-left: clamp(1.75rem, 3.5vw, 2.875rem);
+  padding-right: clamp(1.5rem, 3vw, 3rem);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(0.9rem, 1.6vw, 1.5rem);
+}
+
+.mv-card__title {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(1.5rem, 2.7vw, 3rem); /* up to ~48px, design used 75px for a 33px cap-height word wrap; scaled down for readability */
+  line-height: 1.1;
+}
+
+.mv-card__text {
+  font-size: clamp(1rem, 1.4vw, 1.3rem); /* up to ~21px, design used 33px which is quite large; scaled for real-world readability */
+  line-height: 1.6;
+  font-weight: 400;
+  max-width: 46ch;
+}
+
+/* =============== STORY & VALUES (+ PARTNERS) =============== */
+.story-values {
+  background: var(--color-surface-alt);
+  padding: var(--section-pad-y) var(--section-pad-x);
+}
+
+.story-values__inner {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.value-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(0.75rem, 1.4vw, 1.25rem);
+}
+
+.value-card__icon {
+  position: relative;
+  width: clamp(6.5rem, 9vw, 14.36rem); /* up to ~229.8px */
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+
+.value-card__circle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.value-card__glyph {
+  position: relative;
+  width: 46%;
+  height: auto;
+}
+
+.value-card__title {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-brand);
+  font-size: clamp(1.05rem, 1.6vw, 1.875rem); /* up to 30px */
+  line-height: 1.25;
+}
+
+.value-card__desc {
+  color: var(--color-brand);
+  font-size: clamp(0.9rem, 1.05vw, 1.3125rem); /* up to 21px */
+  line-height: 1.5;
+  max-width: 26ch;
+}
+
+/* ---- Partners ---- */
+.partners {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.partners__intro {
+  color: var(--color-brand);
+  font-size: clamp(1.15rem, 1.9vw, 2.5rem); /* up to 40px */
+  line-height: 1.35;
+  max-width: 62ch;
+}
+
+.partners__logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(1.75rem, 4vw, 4.5rem);
+  width: 100%;
+}
+
+.partners__logos li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(4.5rem, 8vw, 8.85rem); /* up to ~141.5px */
+}
+
+.partners__logos img {
+  height: 100%;
+  width: auto;
+  max-width: 14rem;
+  object-fit: contain;
+}
+
+/* =============== SCROLL REVEAL =============== */
+.reveal {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* =============== BREAKPOINTS =============== */
+
+/* Tablet landscape */
+@media (max-width: 1200px) {
+  .mv-card__title {
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+  }
+}
+
+/* Tablet portrait: stack mission/vision, 2-col values */
+@media (max-width: 900px) {
+  .mission-vision__inner {
+    flex-direction: column;
+  }
+
+  .mission-vision__media {
+    min-height: 16rem;
+    order: -1;
+  }
+
+  .values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile: single column everything */
+@media (max-width: 560px) {
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mv-card {
+    padding: 1.75rem;
+    text-align: left;
+  }
+
+  .partners__logos {
+    gap: 2rem;
+  }
+
+  .partners__logos li {
+    height: 3.5rem;
+    flex: 1 1 40%;
+  }
+
+  .hero__img {
+    height: clamp(10rem, 55vw, 20rem);
+    object-position: center 45%;
+  }
+}

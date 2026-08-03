@@ -1,0 +1,399 @@
+/* ==========================================================================
+   GO VETTY - HEADER STYLES
+   ========================================================================== */
+
+/* --- Core Header Structure & Cloud Fade Engine --- */
+header,
+header.frame-62 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100%;
+  z-index: 9999;
+  background-color: #ffffff;
+  
+  /* Cloudy soft edge engine */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
+  
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 30px 70px 60px; 
+  box-sizing: border-box;
+}
+
+/* Hidden system checkbox for mobile navigation toggle */
+.menu-toggle {
+  display: none !important;
+}
+
+/* Header Container Layout */
+header .frame-63 {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* Logo & Branding Area */
+header .group-wrapper {
+  position: relative;
+  width: 293px;
+  height: auto;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+header .group-4 {
+  position: relative;
+  top: -7px;
+  width: 215px;
+  height: auto;
+  display: flex;
+  gap: 3.9px;
+}
+
+header .group-5 {
+  margin-top: -0.9px;
+  width: 106.26px;
+  height: 93.72px;
+  margin-left: -1.1px;
+}
+
+header .canda {
+  margin-top: 33.8px;
+  width: 105.86px;
+  height: 50.3px;
+  aspect-ratio: 2.1;
+}
+
+/* Actions & Navigation Wrappers */
+header .frame-64-parent {
+  display: flex;
+  align-items: center;
+  order: 2;
+}
+
+header .frame-64 {
+  display: inline-flex;
+  align-items: center;
+  gap: 84px;
+  position: relative;
+  flex: 0 0 auto;
+  order: 3;
+}
+
+header .frame-65 {
+  display: inline-flex;
+  align-items: center;
+  gap: 42px;
+  position: relative;
+  flex: 0 0 auto;
+  padding-right: 20px;
+}
+
+/* Action Buttons (Log In & Talk to a Vet) */
+header .frame-66 {
+  display: flex;
+  width: 100px;
+  height: 60px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid;
+  border-color: var(--x-1);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+header .frame-67 {
+  display: flex;
+  width: auto;
+  height: 60px;
+  background-color: var(--x-1);
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 15px;
+  position: relative;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+header .frame-8 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+header .text-wrapper-25 {
+  position: relative;
+  width: fit-content;
+  font-family: "Inter", Helvetica;
+  font-weight: 600;
+  color: var(--x-1);
+  font-size: 20px;
+  letter-spacing: -0.25px;
+  line-height: 30px;
+  white-space: nowrap;
+  margin: 0;
+}
+
+header .text-wrapper-18 {
+  position: relative;
+  width: fit-content;
+  font-family: "Inter", Helvetica;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 20px;
+  letter-spacing: -0.25px;
+  line-height: 30px;
+  white-space: nowrap;
+  margin: 0;
+}
+
+header .text-wrapper-31 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  font-family: "Inter", Helvetica;
+  font-weight: 600;
+  color: #000000;
+  font-size: 20px;
+  letter-spacing: -0.25px;
+  line-height: 30px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   MID-SIZE DESKTOPS & LAPTOPS (1200px - 1599px)
+   ========================================================================== */
+
+@media (min-width: 1200px) and (max-width: 1599px) {
+  header,
+  header.frame-62 {
+    padding: 20px max(30px, 3.6vw) 30px !important;
+  }
+
+  header .frame-64 {
+    gap: clamp(20px, 4vw, 80px) !important;
+  }
+
+  header .frame-65 {
+    gap: clamp(15px, 2vw, 40px) !important;
+    padding-right: 20px;
+  }
+
+  header .frame-65 a, 
+  header .frame-65 .menu-item a {
+    font-size: clamp(15px, 1vw, 20px) !important;
+    line-height: clamp(22px, 1.5vw, 30px) !important;
+  }
+}
+
+/* ==========================================================================
+   MOBILE OPTIMIZATION ENGINE (767px and below)
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  header,
+  header.frame-62 {
+    position: relative !important;
+    padding: 15px 16px !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    margin: 0 !important;
+  }
+
+  header .frame-63 {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: 60px !important;
+    position: relative !important;
+    width: 100% !important;
+  }
+
+  header .group-wrapper {
+    width: 140px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  header .group-4 {
+    top: 0 !important;
+    height: 100% !important;
+    align-items: center !important;
+  }
+
+  header .group-5 {
+    width: 35px !important;
+    height: 35px !important;
+    margin: 0 !important;
+  }
+
+  header .canda {
+    width: 65px !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  header .frame-64-parent {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    height: 100% !important;
+  }
+
+  header .frame-64 {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    height: 100% !important;
+    width: auto !important;
+    margin-left: 0 !important;
+  }
+
+  header .frame-8.mobile-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    width: auto !important;
+    gap: 8px !important;
+  }
+
+  header .frame-66, 
+  header .frame-67 {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    background: transparent !important;
+    flex: unset !important;
+  }
+
+  header .btn-text {
+    display: none !important;
+  }
+
+  .mobile-icon {
+    display: block !important;
+    width: 28px !important;
+    height: 28px !important;
+    fill: #600209 !important;
+  }
+
+  /* Navigation dropdown is hidden by default on mobile */
+  header .frame-65 {
+    display: none !important;
+  }
+
+  /* Hamburger Trigger Styling */
+  .hamburger-label {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    z-index: 1001;
+  }
+
+  .hamburger-icon {
+    width: 26px;
+    height: 26px;
+    color: #333333;
+    transition: transform 0.25s ease-in-out;
+  }
+
+  .hamburger-icon .menu-close {
+    display: none;
+  }
+
+  .hamburger-icon .menu-bars {
+    display: block;
+  }
+
+  /* Dynamic Checked Toggles */
+  .menu-toggle:checked ~ .frame-64-parent .hamburger-icon {
+    transform: rotate(90deg);
+  }
+
+  .menu-toggle:checked ~ .frame-64-parent .hamburger-icon .menu-bars {
+    display: none !important;
+  }
+
+  .menu-toggle:checked ~ .frame-64-parent .hamburger-icon .menu-close {
+    display: block !important;
+    fill: #600209 !important;
+  }
+
+  /* Show Dropdown Menu when Checked */
+  .menu-toggle:checked ~ .frame-64-parent .frame-65 {
+    display: flex !important;
+    flex-direction: column !important;
+    position: absolute !important;
+    top: 60px !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    margin-left: calc(-50vw + 50%) !important;
+    background: #ffffff !important;
+    z-index: 99999 !important;
+    padding: 20px 24px !important;
+    border-top: 1px solid #ececec !important;
+    border-bottom: 1px solid #ececec !important;
+    gap: 16px !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  header .frame-65 a {
+    display: block !important;
+    width: 100%;
+    text-align: left;
+    font-size: 16px !important;
+    line-height: 24px !important;
+    color: #000000 !important;
+    padding: 8px 0;
+    font-weight: 500;
+    text-decoration: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-icon, 
+  .hamburger-label {
+    display: none !important;
+  }
+
+  header .btn-text {
+    display: inline !important;
+  }
+}
