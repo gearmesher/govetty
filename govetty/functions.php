@@ -34,41 +34,71 @@ add_action( 'after_setup_theme', 'go_vetty_setup' );
  * Super-Fast Asset Optimization
  * Removing block-library margins and emojis to keep scripts minimal.
  */
-function go_vetty_purged_assets() {
-    wp_enqueue_style(
-		'six13-style',
-		get_stylesheet_uri(),
-		[],
-		filemtime(get_stylesheet_directory() . '/style.css')
-	);
+function go_vetty_purged_assets() { 
+    $theme_dir = get_stylesheet_directory();
+    $theme_uri = get_template_directory_uri();
 
-	wp_enqueue_style(
-		'six13-header',
-		get_template_directory_uri() . '/header.css',
-		['six13-style'],
-		filemtime(get_stylesheet_directory() . '/header.css')
-	);
+    if ( is_front_page() || is_home() ) {
+		$home_css_path = $theme_dir . '/home.min.css';
 
-	wp_enqueue_style(
-		'six13-footer',
-		get_template_directory_uri() . '/footer.css',
-		['six13-style'],
-		filemtime(get_stylesheet_directory() . '/footer.css')
-	);
-    
-    // Remove Gutenberg global inline styles if you want true performance control
-    wp_dequeue_style( 'global-styles' ); 
-    
-    // SAFE SPEED WIN: Only remove jQuery if the user is NOT logged in AND NOT using the Customizer
-    if ( ! is_admin() && ! is_user_logged_in() && ! is_customize_preview() ) {
-        wp_deregister_script( 'jquery' );
-    }
-}
+		if ( file_exists( $home_css_path ) ) {
+			// Option 1: Read the CSS file contents directly and print in head
+			add_action( 'wp_head', function() use ( $home_css_path ) {
+				echo '<style id="govetty-home-inline-css">' . file_get_contents( $home_css_path ) . '</style>';
+			}, 5 );
+		}
+	} else {  
+        $style_css  = $theme_dir . '/style.css';
+        $header_css = $theme_dir . '/header.css';
+        $footer_css = $theme_dir . '/footer.css';
+
+        wp_enqueue_style( 
+            'govetty-style', 
+            get_stylesheet_uri(), 
+            [], 
+            file_exists( $style_css ) ? filemtime( $style_css ) : '1.0.0'
+        ); 
+
+        wp_enqueue_style( 
+            'govetty-header', 
+            $theme_uri . '/header.css', 
+            [ 'govetty-style' ], 
+            file_exists( $header_css ) ? filemtime( $header_css ) : '1.0.0'
+        ); 
+         
+        wp_enqueue_style( 
+            'govetty-footer', 
+            $theme_uri . '/footer.css', 
+            [ 'govetty-style' ], 
+            file_exists( $footer_css ) ? filemtime( $footer_css ) : '1.0.0'
+        ); 
+    } 
+
+    // Remove Gutenberg global inline styles
+    wp_dequeue_style( 'global-styles' );  
+     
+    // Safe jQuery Removal
+    if ( ! is_admin() && ! is_user_logged_in() && ! is_customize_preview() ) { 
+        wp_deregister_script( 'jquery' ); 
+    } 
+} 
 add_action( 'wp_enqueue_scripts', 'go_vetty_purged_assets', 100 );
 
-// Strip Emoji tracking scripts
-remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
-remove_action( 'wp_print_styles', 'print_emoji_styles' );
+remove_action('wp_head', 'wp_oembed_add_discovery_links');
+remove_action('wp_head', 'wp_oembed_add_host_js');
+remove_action('wp_head', 'rsd_link');
+remove_action('wp_head', 'wp_generator');
+remove_action('wp_head', 'wp_shortlink_wp_head');
+remove_action('wp_head', 'print_emoji_detection_script', 7);
+remove_action('wp_print_styles', 'print_emoji_styles');
+remove_action('admin_print_scripts', 'print_emoji_detection_script');
+remove_action('admin_print_styles', 'print_emoji_styles');
+remove_filter('the_content_feed', 'wp_staticize_emoji');
+remove_filter('comment_text_rss', 'wp_staticize_emoji');
+remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
+remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
+remove_action( 'wp_enqueue_scripts', 'wp_enqueue_classic_theme_styles' );
 
 /**
  * Customizer Control for Coming Soon Mode

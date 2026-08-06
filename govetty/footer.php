@@ -18,7 +18,35 @@ if ( ! defined( 'ABSPATH' ) ) {
             <!-- Branding Area -->
             <div class="frame-56 footer-branding">
                 <a href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php bloginfo( 'name' ); ?> home">
-                    <img class="group-3" src="https://c.animaapp.com/9gvlQcgi/img/group-2@2x.png" alt="<?php bloginfo( 'name' ); ?> logo" />
+                    <?php 
+						// 1. Pass the FULL URL to attachment_url_to_postid()
+						$site_logo_relative_path = '/wp-content/uploads/2026/08/site-logo.webp';
+						$site_logo_full_url      = site_url( $site_logo_relative_path );
+
+						$image_id = attachment_url_to_postid( $site_logo_full_url );
+
+						if ( $image_id ) {
+							// Media Library match found: Outputs optimized <img> with full srcset & sizes
+							echo wp_get_attachment_image( $image_id, 'full', false, array(
+								'class'         => 'group-5',
+								'fetchpriority' => 'high',
+								'decoding'      => 'async',
+								'alt'           =>  'Govetty',
+								'sizes'         => '(max-width: 768px) 100vw, 1200px'
+							) );
+						} else {
+							// Fallback: Uses site_url() to ensure valid full URL path
+							?>
+							<img 
+								class="img" 
+								src="<?php echo esc_url( $site_logo_full_url ); ?>" 
+								fetchpriority="high"
+								decoding="async"
+								alt="<?php bloginfo( 'name' ); ?> logo icon"
+							/>
+							<?php
+						}
+					?>
                 </a>                
             </div>
 
@@ -84,9 +112,9 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="frame-58">
                 <div class="text-wrapper-27"><?php esc_html_e( 'FOLLOW US', 'go-vetty' ); ?></div>
                 <div class="frame-7">
-                    <img class="frame-59" src="https://c.animaapp.com/9gvlQcgi/img/frame-1707481337.svg" alt="Social media icons" />
+                    <img class="frame-59" src="/wp-content/uploads/2026/08/social-icons.svg" alt="Social media icons" width="138" height="34"/>
                     <div class="frame-60">
-                        <img class="fi-5" src="https://c.animaapp.com/9gvlQcgi/img/fi-5699119-1.svg" alt="" aria-hidden="true" />
+                        <img class="fi-5" src="/wp-content/uploads/2026/08/icon-maple-leaf.svg" alt="" aria-hidden="true" />
                         <div class="frame-61">
                             <div class="text-wrapper-30"><?php esc_html_e( 'Proudly Canadian.', 'go-vetty' ); ?></div>
                             <p class="text-wrapper-29"><?php esc_html_e( 'Service & support in Canada', 'go-vetty' ); ?></p>

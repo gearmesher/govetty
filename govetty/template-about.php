@@ -20,7 +20,7 @@ get_header(); ?>
   <section class="hero" aria-label="Vetty veterinary team with a pet and pet owner">
     <img
       class="hero__img"
-      src="https://www.figma.com/api/mcp/asset/ba0c76ef-713e-4f24-90a5-4aa4ce15a11f.png"
+      src="/wp-content/uploads/2026/08/about-banner-scaled.webp"
       alt="Veterinary team examining a dog alongside its owner in a bright clinic room"
       loading="eager"
       fetchpriority="high"

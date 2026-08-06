@@ -20,7 +20,7 @@ get_header(); ?>
   <section class="hero" aria-label="Vetty pricing hero image">
     <img
       class="hero__img"
-      src="https://www.figma.com/api/mcp/asset/923f2961-9b82-4c59-9538-c45fbc90d94f.png"
+      src="/wp-content/uploads/2026/08/pricing-banner-scaled.webp"
       alt="Veterinarian caring for a pet in a bright clinic room"
       loading="eager"
       fetchpriority="high"
