@@ -10,13 +10,13 @@ footer.frame-54 {
   width: 100%;
   max-width: 100%;
   align-items: center;
-  gap: 80px;
-  padding: 88px 70px 48px;
+  gap: clamp(50px, 4.167vw, 80px);
+  padding: clamp(55px, 4.583vw, 88px) clamp(43.75px, 3.646vw, 70px) clamp(30px, 2.5vw, 48px);
   position: relative;
   background-color: #ffffff;
   border-top: 1px solid #ececec;
   box-sizing: border-box;
-  max-width: 1760px;
+  max-width: clamp(1100px, 91.667vw, 1760px);
   margin: 0 auto;
 }
 
@@ -35,16 +35,21 @@ footer .frame-56 {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 20px;
+  gap: clamp(12.5px, 1.042vw, 20px);
   position: relative;
   flex: 0 0 auto;
+}
+
+footer .frame-56 img {
+  width: 245px;
+  height: auto;
 }
 
 /* Branding Logo Image (<img class="group-3">) */
 footer .group-3 {
   position: relative;
-  width: 215px;
-  height: 91px;
+  width: clamp(134.38px, 11.198vw, 215px);
+  height: clamp(56.88px, 4.74vw, 91px);
   object-fit: contain;
 }
 
@@ -56,9 +61,9 @@ footer .text-wrapper-28 {
   font-family: "Inter", Helvetica, sans-serif;
   font-weight: 600;
   color: #600209;
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
-  line-height: 30px;
+  line-height: clamp(18.75px, 1.562vw, 30px);
   white-space: nowrap;
 }
 
@@ -71,9 +76,9 @@ footer .text-wrapper-26 {
   font-family: "Inter", Helvetica, sans-serif;
   font-weight: 500;
   color: #333333;
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.2px;
-  line-height: 24px;
+  line-height: clamp(15px, 1.25vw, 24px);
   white-space: nowrap;
 }
 
@@ -82,7 +87,7 @@ footer .frame-57 {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: clamp(7.5px, 0.625vw, 12px);
   position: relative;
   flex: 0 0 auto;
 }
@@ -92,9 +97,9 @@ footer .frame-57 a {
   font-family: "Inter", Helvetica, sans-serif;
   font-weight: 500;
   color: #000000;
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.2px;
-  line-height: 24px;
+  line-height: clamp(15px, 1.25vw, 24px);
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -111,9 +116,9 @@ footer .text-wrapper-27 {
   font-family: "Inter", Helvetica, sans-serif;
   font-weight: 600;
   color: #600209;
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
-  line-height: 30px;
+  line-height: clamp(18.75px, 1.562vw, 30px);
   white-space: nowrap;
 }
 
@@ -122,7 +127,7 @@ footer .frame-58 {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 20px;
+  gap: clamp(12.5px, 1.042vw, 20px);
   position: relative;
   flex: 0 0 auto;
 }
@@ -132,7 +137,7 @@ footer .frame-7 {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 20px;
+  gap: clamp(12.5px, 1.042vw, 20px);
   position: relative;
   flex: 0 0 auto;
 }
@@ -140,15 +145,15 @@ footer .frame-7 {
 /* Social Icons Banner (<img class="frame-59">) */
 footer .frame-59 {
   position: relative;
-  width: 208px;
-  height: 32px;
+  width: clamp(130px, 10.833vw, 208px);
+  height: clamp(20px, 1.667vw, 32px);
 }
 
 /* Canadian Flag Row Wrapper (<div class="frame-60">) */
 footer .frame-60 {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: clamp(7.5px, 0.625vw, 12px);
   position: relative;
   flex: 0 0 auto;
 }
@@ -156,8 +161,8 @@ footer .frame-60 {
 /* Canadian Flag Icon (<img class="fi-5">) */
 footer .fi-5 {
   position: relative;
-  width: 40px;
-  height: 42px;
+  width: clamp(25px, 2.083vw, 40px);
+  height: clamp(26.25px, 2.188vw, 42px);
 }
 
 /* Support Text Wrapper (<div class="frame-61">) */
@@ -177,9 +182,9 @@ footer .text-wrapper-30 {
   font-family: "Inter", Helvetica, sans-serif;
   font-weight: 600;
   color: #600209;
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.2px;
-  line-height: 24px;
+  line-height: clamp(15px, 1.25vw, 24px);
   white-space: nowrap;
 }
 
@@ -192,9 +197,9 @@ footer .text-wrapper-29 {
   font-family: "Inter", Helvetica, sans-serif;
   font-weight: 500;
   color: #000;
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.18px;
-  line-height: 20px;
+  line-height: clamp(12.5px, 1.042vw, 20px);
   white-space: nowrap;
 }
 
@@ -205,37 +210,23 @@ footer .copyright {
   font-family: "Inter", Helvetica, sans-serif;
   font-weight: 400;
   color: #777777;
-  font-size: 14px;
+  font-size: clamp(8.75px, 0.729vw, 14px);
   letter-spacing: -0.18px;
-  line-height: 20px;
+  line-height: clamp(12.5px, 1.042vw, 20px);
   white-space: nowrap;
 }
 
 /* ==========================================================================
-   MID-SIZE DESKTOPS & LAPTOPS (1200px - 1599px)
+   NOTE ON THE OLD "MID-SIZE DESKTOPS & LAPTOPS (1200px - 1599px)" BLOCK
+   ==========================================================================
+   Removed. It re-padded the footer and re-sized all the link/label text
+   between 1200-1599px with !important overrides — all of that now happens
+   continuously via the clamp() values baked into the base rules above, so
+   the step-based override is redundant.
    ========================================================================== */
 
-@media (min-width: 1200px) and (max-width: 1599px) {
-  footer,
-  footer.frame-54 {
-    padding: 60px max(30px, 3.6vw) 40px !important;
-  }
-
-  /* Fluid typography scaling for links and text in footer */
-  footer .frame-57 a,
-  footer .text-wrapper-26,
-  footer .text-wrapper-27,
-  footer .text-wrapper-28,
-  footer .text-wrapper-29,
-  footer .text-wrapper-30,
-  footer .copyright {
-    font-size: clamp(15px, 1vw, 20px) !important;
-    line-height: clamp(22px, 1.5vw, 30px) !important;
-  }
-}
-
 /* ==========================================================================
-   TABLET & MOBILE RESPONSIVE MEDIA QUERIES
+   TABLET & MOBILE RESPONSIVE MEDIA QUERIES — unchanged, out of scope
    ========================================================================== */
 
 @media (max-width: 1024px) {
@@ -267,7 +258,7 @@ footer .copyright {
   footer .frame-58 {
     width: 100%;
   }
-  
+
   footer .frame-59 {
 	width: auto;
   }

@@ -12,18 +12,18 @@ header.frame-62 {
   max-width: 100%;
   z-index: 9999;
   background-color: #ffffff;
-  
+
   /* Cloudy soft edge engine */
   -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
-  
+
   transition: all 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
   height: auto;
   align-items: flex-start;
-  gap: 10px;
-  padding: 30px 70px 60px; 
+  gap: clamp(6.25px, 0.521vw, 10px);
+  padding: clamp(18.75px, 1.562vw, 30px) clamp(43.75px, 3.646vw, 70px) clamp(37.5px, 3.125vw, 60px);
   box-sizing: border-box;
 }
 
@@ -46,7 +46,7 @@ header .frame-63 {
 /* Logo & Branding Area */
 header .group-wrapper {
   position: relative;
-  width: 293px;
+  width: clamp(183.12px, 15.26vw, 293px);
   height: auto;
   cursor: pointer;
   text-decoration: none;
@@ -54,25 +54,18 @@ header .group-wrapper {
 
 header .group-4 {
   position: relative;
-  top: -7px;
-  width: 215px;
+  top: -7px; /* fine-tuning offset, kept fixed — negligible at any scale */
+  width: auto;
   height: auto;
   display: flex;
-  gap: 3.9px;
+  gap: 3.9px; /* sub-pixel logo kerning, kept fixed */
 }
 
 header .group-5 {
-  margin-top: -0.9px;
-  width: 106.26px;
-  height: 93.72px;
-  margin-left: -1.1px;
-}
-
-header .canda {
-  margin-top: 33.8px;
-  width: 105.86px;
-  height: 50.3px;
-  aspect-ratio: 2.1;
+  margin-top: -0.9px; /* fine-tuning offset, kept fixed */
+  width: clamp(215px, 5.534vw, 106.26px);
+  height: clamp(91px, 4.881vw, 93.72px);
+  margin-left: -1.1px; /* fine-tuning offset, kept fixed */
 }
 
 /* Actions & Navigation Wrappers */
@@ -85,7 +78,7 @@ header .frame-64-parent {
 header .frame-64 {
   display: inline-flex;
   align-items: center;
-  gap: 84px;
+  gap: clamp(52.5px, 4.375vw, 84px);
   position: relative;
   flex: 0 0 auto;
   order: 3;
@@ -94,21 +87,21 @@ header .frame-64 {
 header .frame-65 {
   display: inline-flex;
   align-items: center;
-  gap: 42px;
+  gap: clamp(26.25px, 2.188vw, 42px);
   position: relative;
   flex: 0 0 auto;
-  padding-right: 20px;
+  padding-right: clamp(12.5px, 1.042vw, 20px);
 }
 
 /* Action Buttons (Log In & Talk to a Vet) */
 header .frame-66 {
   display: flex;
-  width: 100px;
-  height: 60px;
+  width: clamp(62.5px, 5.208vw, 100px);
+  height: clamp(37.5px, 3.125vw, 60px);
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 10px;
+  gap: clamp(6.25px, 0.521vw, 10px);
+  padding: clamp(6.25px, 0.521vw, 10px);
   position: relative;
   background-color: #ffffff;
   border-radius: 10px;
@@ -121,12 +114,12 @@ header .frame-66 {
 header .frame-67 {
   display: flex;
   width: auto;
-  height: 60px;
+  height: clamp(37.5px, 3.125vw, 60px);
   background-color: var(--x-1);
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 10px 15px;
+  gap: clamp(6.25px, 0.521vw, 10px);
+  padding: clamp(6.25px, 0.521vw, 10px) clamp(9.38px, 0.781vw, 15px);
   position: relative;
   border-radius: 10px;
   cursor: pointer;
@@ -136,7 +129,7 @@ header .frame-67 {
 header .frame-8 {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: clamp(6.25px, 0.521vw, 10px);
   position: relative;
   flex: 0 0 auto;
 }
@@ -147,9 +140,9 @@ header .text-wrapper-25 {
   font-family: "Inter", Helvetica;
   font-weight: 600;
   color: var(--x-1);
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
-  line-height: 30px;
+  line-height: clamp(18.75px, 1.562vw, 30px);
   white-space: nowrap;
   margin: 0;
 }
@@ -160,9 +153,9 @@ header .text-wrapper-18 {
   font-family: "Inter", Helvetica;
   font-weight: 600;
   color: #ffffff;
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
-  line-height: 30px;
+  line-height: clamp(18.75px, 1.562vw, 30px);
   white-space: nowrap;
   margin: 0;
 }
@@ -174,41 +167,25 @@ header .text-wrapper-31 {
   font-family: "Inter", Helvetica;
   font-weight: 600;
   color: #000000;
-  font-size: 20px;
+  font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
-  line-height: 30px;
+  line-height: clamp(18.75px, 1.562vw, 30px);
   white-space: nowrap;
   cursor: pointer;
 }
 
 /* ==========================================================================
-   MID-SIZE DESKTOPS & LAPTOPS (1200px - 1599px)
+   NOTE ON THE OLD "MID-SIZE DESKTOPS & LAPTOPS (1200px - 1599px)" BLOCK
+   ==========================================================================
+   Removed. It re-padded the header and re-sized .frame-64/.frame-65 gaps and
+   nav-link type between 1200-1599px with !important overrides — all of that
+   now happens continuously via the clamp() values in the base rules above,
+   so the step-based override is redundant (and would otherwise fight with
+   the new fluid values right at its own boundaries).
    ========================================================================== */
 
-@media (min-width: 1200px) and (max-width: 1599px) {
-  header,
-  header.frame-62 {
-    padding: 20px max(30px, 3.6vw) 30px !important;
-  }
-
-  header .frame-64 {
-    gap: clamp(20px, 4vw, 80px) !important;
-  }
-
-  header .frame-65 {
-    gap: clamp(15px, 2vw, 40px) !important;
-    padding-right: 20px;
-  }
-
-  header .frame-65 a, 
-  header .frame-65 .menu-item a {
-    font-size: clamp(15px, 1vw, 20px) !important;
-    line-height: clamp(22px, 1.5vw, 30px) !important;
-  }
-}
-
 /* ==========================================================================
-   MOBILE OPTIMIZATION ENGINE (767px and below)
+   MOBILE OPTIMIZATION ENGINE (767px and below) — unchanged, out of scope
    ========================================================================== */
 
 @media (max-width: 767px) {
@@ -246,8 +223,8 @@ header .text-wrapper-31 {
   }
 
   header .group-5 {
-    width: 35px !important;
-    height: 35px !important;
+    width: 135px !important;
+    height: auto !important;
     margin: 0 !important;
   }
 
@@ -284,7 +261,7 @@ header .text-wrapper-31 {
     gap: 8px !important;
   }
 
-  header .frame-66, 
+  header .frame-66,
   header .frame-67 {
     width: 38px !important;
     height: 38px !important;
@@ -388,7 +365,7 @@ header .text-wrapper-31 {
 }
 
 @media (min-width: 768px) {
-  .mobile-icon, 
+  .mobile-icon,
   .hamburger-label {
     display: none !important;
   }

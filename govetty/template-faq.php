@@ -20,7 +20,7 @@ get_header(); ?>
   <section class="hero" aria-label="Vetty FAQ hero image">
     <img
       class="hero__img"
-      src="https://www.figma.com/api/mcp/asset/fc5926d5-b3db-403e-83e5-7efb4f66a653.png"
+      src="/wp-content/uploads/2026/08/faq-banner-scaled.webp"
       alt="Happy dog and cat together"
       loading="eager"
       fetchpriority="high"

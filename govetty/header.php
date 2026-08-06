@@ -15,9 +15,12 @@ if ( ! defined( 'ABSPATH' ) ) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <link rel="profile" href="https://gmpg.org/xfn/11"> 
     <?php wp_head(); ?> 
-    <?php if ( is_front_page() ) : ?> 
-        <link rel="stylesheet" href="<?php echo esc_url( get_template_directory_uri() . '/home.css' ); ?>"> 
-    <?php endif; ?>
+    <link
+		rel="preload"
+		href="<?php echo esc_url( get_template_directory_uri() . '/assets/fonts/inter.woff2' ); ?>"
+		as="font"
+		type="font/woff2"
+    crossorigin>
     <?php if ( is_page( 'about-us' ) ) : ?> 
         <link rel="stylesheet" href="<?php echo esc_url( get_template_directory_uri() . '/about.css' ); ?>"> 
     <?php endif; ?>   
@@ -48,8 +51,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <a class="group-wrapper" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php bloginfo( 'name' ); ?> home"> 
                 <div class="group-4"> 
-                    <img class="group-5" src="https://c.animaapp.com/9gvlQcgi/img/group-3@2x.png" alt="<?php bloginfo( 'name' ); ?> logo icon" /> 
-                    <img class="canda" src="https://c.animaapp.com/9gvlQcgi/img/canda2-2.png" alt="<?php bloginfo( 'name' ); ?> typography brand mark" /> 
+					<?php 
+						// 1. Pass the FULL URL to attachment_url_to_postid()
+						$site_logo_relative_path = '/wp-content/uploads/2026/08/site-logo.webp';
+						$site_logo_full_url      = site_url( $site_logo_relative_path );
+
+						$image_id = attachment_url_to_postid( $site_logo_full_url );
+
+						if ( $image_id ) {
+							// Media Library match found: Outputs optimized <img> with full srcset & sizes
+							echo wp_get_attachment_image( $image_id, 'full', false, array(
+								'class'         => 'group-5',
+								'fetchpriority' => 'high',
+								'decoding'      => 'async',
+								'alt'           =>  'Govetty',
+								'sizes' 		=> '(max-width:768px) 180px,245px'
+							) );
+						} else {
+							// Fallback: Uses site_url() to ensure valid full URL path
+							?>
+							<img 
+								class="img" 
+								src="<?php echo esc_url( $site_logo_full_url ); ?>" 
+								fetchpriority="high"
+								decoding="async"
+								alt="<?php bloginfo( 'name' ); ?> logo icon"
+							/>
+							<?php
+						}
+					?>
                 </div> 
             </a> 
 

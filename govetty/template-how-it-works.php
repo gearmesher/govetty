@@ -20,7 +20,7 @@ get_header(); ?>
   <section class="hero" aria-label="Vetty how-it-works hero image">
     <img
       class="hero__img"
-      src="https://www.figma.com/api/mcp/asset/01cb7df1-67b3-4013-9df6-b2dd98d6ddcc.png"
+      src="/wp-content/uploads/2026/08/hiw-banner-scaled.webp"
       alt="Pet owner using a laptop to video call a Vetty veterinarian"
       loading="eager"
       fetchpriority="high"

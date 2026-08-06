@@ -20,7 +20,7 @@ get_header(); ?>
   <section class="hero" aria-label="Vetty veterinary team hero image">
     <img
       class="hero__img"
-      src="https://www.figma.com/api/mcp/asset/0802d285-59a4-4efa-a02d-e605f5de15e9.png"
+      src="/wp-content/uploads/2026/08/our-vets-banner-scaled.webp"
       alt="Vetty's veterinary team standing together in a clinic with a golden retriever"
       loading="eager"
       fetchpriority="high"
