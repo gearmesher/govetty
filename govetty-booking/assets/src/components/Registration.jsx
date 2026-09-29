@@ -129,7 +129,7 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
             <label className="gv-label" htmlFor="gv-pet-type">
               Species
             </label>
-            <select id="gv-pet-type" className="gv-select" value={pet.type} onChange={updatePet('type')}>
+            <select id="gv-pet-type" className="gv-select" required value={pet.type} onChange={updatePet('type')}>
               <option value="dog">Dog</option>
               <option value="cat">Cat</option>
             </select>

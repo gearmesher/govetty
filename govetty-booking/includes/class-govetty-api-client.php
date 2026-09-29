@@ -134,8 +134,26 @@ class Govetty_Api_Client {
 		);
 	}
 
+	/**
+	 * Build the full request URL, always over HTTPS.
+	 *
+	 * The Marpet dev environment serves both HTTP and HTTPS, and the client
+	 * has offered to enable Force HTTPS (auto-redirect) on their end. Since
+	 * the ApiUser token travels in the X-Api-Token header on every request,
+	 * this enforces encryption at the plugin level too, rather than relying
+	 * solely on GOVETTY_API_BASE_URL always being configured with an
+	 * `https://` scheme or on the upstream redirect being in place.
+	 */
 	private static function build_url( $path ) {
-		return rtrim( GOVETTY_API_BASE_URL, '/' ) . self::BASE_PATH . '/' . ltrim( $path, '/' );
+		$base = self::force_https( GOVETTY_API_BASE_URL );
+		return rtrim( $base, '/' ) . self::BASE_PATH . '/' . ltrim( $path, '/' );
+	}
+
+	private static function force_https( $url ) {
+		if ( 0 === stripos( $url, 'http://' ) ) {
+			return 'https://' . substr( $url, 7 );
+		}
+		return $url;
 	}
 
 	/**

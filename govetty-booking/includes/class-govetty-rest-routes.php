@@ -157,9 +157,9 @@ class Govetty_Rest_Routes {
 			return new WP_Error( 'govetty_bad_payload', 'Expected a JSON body.', array( 'status' => 400 ) );
 		}
 
-		// Confirmed field set (per client, still pending final sign-off
-		// from Oren on their end): customer -- name, email, phone, address,
-		// zip; pet -- name, dob, chip, gender. image_id is optional and
+		// Confirmed field set (per client): customer -- name, email, phone,
+		// address, zip; pet -- name, species (sent as `type`: dog/cat),
+		// breed_id, dob, chip, gender. image_id is optional and
 		// intentionally omitted by the frontend when no photo was taken
 		// (see Registration.jsx) -- do not add/remove fields here beyond
 		// what's confirmed.
