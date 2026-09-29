@@ -1,0 +1,495 @@
+/*
+ * GoVetty Booking -- styles
+ *
+ * Design direction: grounded in the "Vetty" wordmark and warm, calm
+ * homepage seen in the Figma mockups (deep maroon on warm white), rather
+ * than inventing an unrelated new palette. A slab serif carries the
+ * step titles -- sturdy and dependable, the way a vet clinic's signage
+ * reads -- while Inter handles body copy and form controls, where
+ * legibility matters more than personality. The signature element is
+ * the progress ribbon: a single filling line that's honest about how
+ * many real steps this flow branches through, rather than a numbered
+ * 1-2-3 that would misrepresent a flow that forks.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+.gv-root {
+  --gv-bg: #f7f4ee;
+  --gv-surface: #ffffff;
+  --gv-text: #26211d;
+  --gv-text-muted: #7c7368;
+  --gv-border: #e7e0d5;
+  --gv-primary: #7a2e2a;
+  --gv-primary-hover: #611f1c;
+  --gv-primary-tint: #f3e6e4;
+  --gv-accent: #4f7a6b;
+  --gv-accent-tint: #e8f0ec;
+  --gv-error: #c43d3d;
+  --gv-error-bg: #fbeaea;
+  --gv-radius-lg: 16px;
+  --gv-radius: 10px;
+  --gv-radius-sm: 6px;
+  --gv-shadow: 0 1px 2px rgba(38, 33, 29, 0.04), 0 10px 30px rgba(38, 33, 29, 0.07);
+  --gv-font-display: 'Zilla Slab', Georgia, 'Times New Roman', serif;
+  --gv-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  font-family: var(--gv-font-body);
+  color: var(--gv-text);
+  background: var(--gv-bg);
+  padding: 32px 16px;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.gv-root * {
+  box-sizing: border-box;
+}
+
+.gv-shell {
+  width: 100%;
+  max-width: 480px;
+}
+
+.gv-card {
+  background: var(--gv-surface);
+  border: 1px solid var(--gv-border);
+  border-radius: var(--gv-radius-lg);
+  box-shadow: var(--gv-shadow);
+  padding: 28px 28px 32px;
+}
+
+.gv-mock-banner {
+  background: #ffe58f;
+  color: #7a5b00;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: center;
+  padding: 8px 14px;
+  border-radius: var(--gv-radius) var(--gv-radius) 0 0;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 480px) {
+  .gv-root {
+    padding: 16px 10px;
+  }
+  .gv-card {
+    padding: 22px 18px 26px;
+    border-radius: var(--gv-radius);
+  }
+}
+
+/* Progress ribbon -------------------------------------------------- */
+
+.gv-progress-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--gv-border);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.gv-progress-fill {
+  height: 100%;
+  background: var(--gv-primary);
+  border-radius: 999px;
+  transition: width 400ms ease;
+}
+
+.gv-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gv-accent);
+  margin: 0 0 6px;
+}
+
+.gv-title {
+  font-family: var(--gv-font-display);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.25;
+  margin: 0 0 6px;
+  color: var(--gv-text);
+}
+
+.gv-subtitle {
+  font-size: 14.5px;
+  color: var(--gv-text-muted);
+  margin: 0 0 22px;
+  line-height: 1.5;
+}
+
+/* Forms -------------------------------------------------------------- */
+
+.gv-field {
+  margin-bottom: 16px;
+}
+
+.gv-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--gv-text);
+}
+
+.gv-input,
+.gv-select {
+  width: 100%;
+  font-family: var(--gv-font-body);
+  font-size: 15px;
+  padding: 11px 13px;
+  border: 1.5px solid var(--gv-border);
+  border-radius: var(--gv-radius);
+  background: var(--gv-surface);
+  color: var(--gv-text);
+  transition: border-color 150ms ease;
+}
+
+.gv-input:focus,
+.gv-select:focus {
+  outline: none;
+  border-color: var(--gv-primary);
+}
+
+.gv-input:focus-visible,
+.gv-select:focus-visible,
+.gv-btn:focus-visible,
+.gv-pet-card:focus-visible,
+.gv-plan-card:focus-visible,
+.gv-slot:focus-visible,
+.gv-otp-digit:focus-visible {
+  outline: 2.5px solid var(--gv-accent);
+  outline-offset: 2px;
+}
+
+.gv-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Buttons -------------------------------------------------------------- */
+
+.gv-btn {
+  appearance: none;
+  border: none;
+  border-radius: var(--gv-radius);
+  font-family: var(--gv-font-body);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 13px 20px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 150ms ease, transform 100ms ease, opacity 150ms ease;
+}
+
+.gv-btn:active {
+  transform: scale(0.99);
+}
+
+.gv-btn-primary {
+  background: var(--gv-primary);
+  color: #fff;
+}
+
+.gv-btn-primary:hover:not(:disabled) {
+  background: var(--gv-primary-hover);
+}
+
+.gv-btn-secondary {
+  background: transparent;
+  color: var(--gv-primary);
+  border: 1.5px solid var(--gv-border);
+}
+
+.gv-btn-secondary:hover:not(:disabled) {
+  border-color: var(--gv-primary);
+}
+
+.gv-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gv-btn-link {
+  background: none;
+  border: none;
+  color: var(--gv-accent);
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  padding: 4px 0;
+  width: auto;
+}
+
+.gv-btn-link:disabled {
+  color: var(--gv-text-muted);
+  cursor: not-allowed;
+}
+
+.gv-actions {
+  margin-top: 22px;
+}
+
+/* OTP digit inputs ---------------------------------------------------- */
+
+.gv-otp-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.gv-otp-digit {
+  width: 100%;
+  aspect-ratio: 1;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  border: 1.5px solid var(--gv-border);
+  border-radius: var(--gv-radius-sm);
+  font-family: var(--gv-font-body);
+}
+
+.gv-otp-digit:focus {
+  outline: none;
+  border-color: var(--gv-primary);
+}
+
+.gv-otp-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--gv-text-muted);
+  margin: 10px 0 4px;
+}
+
+/* Error / info banners -------------------------------------------------- */
+
+.gv-error {
+  background: var(--gv-error-bg);
+  color: var(--gv-error);
+  border-radius: var(--gv-radius-sm);
+  padding: 10px 12px;
+  font-size: 13.5px;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.gv-hint {
+  font-size: 13px;
+  color: var(--gv-text-muted);
+  margin-top: 4px;
+}
+
+/* Spinner ---------------------------------------------------------------- */
+
+.gv-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--gv-text-muted);
+  font-size: 14px;
+  padding: 6px 0;
+}
+
+.gv-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2.5px solid var(--gv-border);
+  border-top-color: var(--gv-primary);
+  animation: gv-spin 700ms linear infinite;
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gv-spinner {
+    animation-duration: 1400ms;
+  }
+  .gv-progress-fill {
+    transition: none;
+  }
+}
+
+@keyframes gv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pet / plan / slot selection lists --------------------------------------- */
+
+.gv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.gv-pet-card,
+.gv-plan-card,
+.gv-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  background: var(--gv-surface);
+  border: 1.5px solid var(--gv-border);
+  border-radius: var(--gv-radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  font-family: var(--gv-font-body);
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.gv-pet-card:hover,
+.gv-plan-card:hover,
+.gv-slot:hover {
+  border-color: var(--gv-primary);
+}
+
+.gv-pet-name,
+.gv-plan-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--gv-text);
+}
+
+.gv-pet-meta {
+  font-size: 13px;
+  color: var(--gv-text-muted);
+  margin-top: 2px;
+}
+
+.gv-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.gv-badge-balance {
+  background: var(--gv-accent-tint);
+  color: var(--gv-accent);
+}
+
+.gv-badge-empty {
+  background: #f1ece3;
+  color: var(--gv-text-muted);
+}
+
+.gv-plan-price {
+  font-family: var(--gv-font-display);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.gv-plan-popular {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--gv-primary);
+  background: var(--gv-primary-tint);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.gv-slot-date {
+  font-weight: 600;
+  font-size: 14.5px;
+}
+
+.gv-slot-meta {
+  font-size: 13px;
+  color: var(--gv-text-muted);
+}
+
+/* Confirmation / terminal screens ----------------------------------------- */
+
+.gv-confirm-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--gv-accent-tint);
+  color: var(--gv-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 26px;
+}
+
+.gv-summary {
+  background: var(--gv-bg);
+  border: 1px solid var(--gv-border);
+  border-radius: var(--gv-radius);
+  padding: 14px 16px;
+  font-size: 14px;
+  margin: 16px 0;
+}
+
+.gv-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.gv-summary-row + .gv-summary-row {
+  border-top: 1px solid var(--gv-border);
+}
+
+.gv-back-link {
+  background: none;
+  border: none;
+  color: var(--gv-text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gv-back-link:hover {
+  color: var(--gv-primary);
+}
+
+/* Image upload (Personal Area) --------------------------------------------- */
+
+.gv-upload-dropzone {
+  border: 1.5px dashed var(--gv-border);
+  border-radius: var(--gv-radius);
+  padding: 24px;
+  text-align: center;
+  color: var(--gv-text-muted);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.gv-upload-dropzone:hover {
+  border-color: var(--gv-accent);
+  background: var(--gv-accent-tint);
+}
+
+.gv-upload-preview {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gv-border);
+  display: block;
+  margin: 0 auto 14px;
+}
