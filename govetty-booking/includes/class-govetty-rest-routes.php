@@ -19,6 +19,7 @@ class Govetty_Rest_Routes {
 		$routes = array(
 			array( 'POST', '/otp/start', array( __CLASS__, 'otp_start' ) ),
 			array( 'POST', '/otp/verify', array( __CLASS__, 'otp_verify' ) ),
+			array( 'POST', '/logout', array( __CLASS__, 'logout' ) ),
 			array( 'POST', '/register', array( __CLASS__, 'register_customer' ) ),
 			array( 'GET', '/info/user', array( __CLASS__, 'info_user' ) ),
 			array( 'GET', '/info/breeds', array( __CLASS__, 'info_breeds' ) ),
@@ -145,6 +146,19 @@ class Govetty_Rest_Routes {
 		}
 
 		return self::passthrough( $result );
+	}
+
+	/**
+	 * Ends the customer's session by clearing the HttpOnly customer_token
+	 * cookie. Purely local -- the CPP API doc has no /session/end or
+	 * equivalent endpoint to call, and the token itself simply expires or
+	 * rotates on the API side on its own schedule, so there's nothing to
+	 * revoke upstream. Always returns success; clearing an already-absent
+	 * cookie is a no-op, not an error.
+	 */
+	public static function logout( WP_REST_Request $request ) {
+		Govetty_Customer_Session::clear_token();
+		return new WP_REST_Response( array( 'status' => 'ok' ), 200 );
 	}
 
 	// ---------------------------------------------------------------------
