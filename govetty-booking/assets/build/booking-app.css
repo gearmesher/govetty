@@ -639,3 +639,37 @@
     align-items: flex-start;
   }
 }
+
+.gv-pa-phone-edit {
+  margin-left: 6px;
+  font-size: 13px;
+}
+
+.gv-pa-phone-pending {
+  grid-column: 2;
+  color: var(--gv-text-muted);
+  font-style: italic;
+}
+
+.gv-pa-phone-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.gv-pa-phone-input {
+  width: auto;
+  max-width: 200px;
+  padding: 7px 10px;
+  font-size: 14px;
+}
+
+.gv-pa-phone-btn {
+  font-size: 13px;
+}
+
+.gv-pa-phone-editor .gv-hint {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+}

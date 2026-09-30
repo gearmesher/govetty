@@ -117,7 +117,16 @@ class Govetty_Shortcodes {
 			);
 		}
 
+		// govetty_intent=login tells the booking flow this click came from the
+		// header's login control, not from "book a call" -- so once OTP
+		// verifies an existing customer, bookingMachine.js sends them straight
+		// to the Personal Area dashboard instead of into pet/plan selection.
+		// A new (unregistered) phone still goes through registration either
+		// way -- the intent only short-circuits the *existing customer*
+		// branch. Appended even when login_url is overridden, since the
+		// action is still "log in" regardless of which page it points at.
 		$login_url = $atts['login_url'] ? $atts['login_url'] : Govetty_Rest_Routes::booking_page_url();
+		$login_url = add_query_arg( 'govetty_intent', 'login', $login_url );
 		return sprintf(
 			'<a href="%1$s" class="%2$s" aria-label="%3$s">%4$s%5$s</a>',
 			esc_url( $login_url ),

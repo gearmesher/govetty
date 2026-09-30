@@ -8,6 +8,7 @@ import Registration from './components/Registration';
 import PetSelection from './components/PetSelection';
 import PlanSelection from './components/PlanSelection';
 import RedirectingToStripe from './components/RedirectingToStripe';
+import RedirectingToAccount from './components/RedirectingToAccount';
 import SlotSelection from './components/SlotSelection';
 import { BookingConfirmation, BookingCompleteNoCall } from './components/BookingConfirmation';
 import { Shell, Loading } from './components/shared/UI';
@@ -71,6 +72,10 @@ export default function App() {
 
   if (state.matches('redirectingToStripe')) {
     return <RedirectingToStripe />;
+  }
+
+  if (state.matches('redirectingToAccount')) {
+    return <RedirectingToAccount />;
   }
 
   if (state.matches('slotSelection') || state.matches('booking')) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from './api';
-import { Shell, ErrorBanner, Loading } from './components/shared/UI';
+import { Shell, ErrorBanner, Loading, errorMessage } from './components/shared/UI';
 
 // Mirrors PlanSelection.jsx's PLAN_INFO names -- kept as a small local copy
 // rather than a shared import since this only needs the display name, not
@@ -34,6 +34,83 @@ function formatDate(mysqlDatetime) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return mysqlDatetime;
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+// Phone changes aren't applied immediately -- the client wants a web admin
+// to approve them first, so this submits a request rather than calling a
+// "change my phone" endpoint. See class-govetty-data-store.php's docblock
+// for the caveat on what an approval actually does today.
+function PhoneEditor({ phone, phoneRequest, onSubmitted }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(phone || '');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const pending = phoneRequest && phoneRequest.status === 'pending';
+
+  const handleSave = async () => {
+    setSubmitting(true);
+    setError(null);
+    const res = await api.phoneChangeRequest(value);
+    setSubmitting(false);
+    if (res.ok) {
+      setEditing(false);
+      onSubmitted(res.data.request);
+    } else {
+      setError(res.data.message || 'request_failed');
+    }
+  };
+
+  if (pending) {
+    return (
+      <>
+        <dd>{phone}</dd>
+        <dd className="gv-hint gv-pa-phone-pending">
+          Change to {phoneRequest.requested_phone} submitted -- waiting on admin approval.
+        </dd>
+      </>
+    );
+  }
+
+  if (!editing) {
+    return (
+      <dd>
+        {phone}{' '}
+        <button type="button" className="gv-btn-link gv-pa-phone-edit" onClick={() => setEditing(true)}>
+          Edit
+        </button>
+      </dd>
+    );
+  }
+
+  return (
+    <dd className="gv-pa-phone-editor">
+      <input
+        type="tel"
+        className="gv-input gv-pa-phone-input"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        disabled={submitting}
+      />
+      <button type="button" className="gv-btn gv-btn-secondary gv-pa-phone-btn" onClick={handleSave} disabled={submitting}>
+        {submitting ? 'Submitting…' : 'Submit for approval'}
+      </button>
+      <button
+        type="button"
+        className="gv-btn-link gv-pa-phone-btn"
+        onClick={() => {
+          setEditing(false);
+          setValue(phone || '');
+          setError(null);
+        }}
+        disabled={submitting}
+      >
+        Cancel
+      </button>
+      {error && <p className="gv-hint">{errorMessage(error)}</p>}
+      <p className="gv-hint">Phone number changes are reviewed by our team before they take effect.</p>
+    </dd>
+  );
 }
 
 function PetImageUpload({ pet, onUpdated }) {
@@ -91,6 +168,7 @@ export default function PersonalArea() {
   const [customer, setCustomer] = useState(null);
   const [pets, setPets] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [phoneRequest, setPhoneRequest] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -100,6 +178,7 @@ export default function PersonalArea() {
         setCustomer(res.data.customer || null);
         setPets(res.data.pets || []);
         setPayments(res.data.payments || []);
+        setPhoneRequest(res.data.phone_request || null);
       } else {
         setError(res.data.message || 'not_logged_in');
       }
@@ -128,7 +207,7 @@ export default function PersonalArea() {
               {customer?.phone ? (
                 <>
                   <dt>Phone</dt>
-                  <dd>{customer.phone}</dd>
+                  <PhoneEditor phone={customer.phone} phoneRequest={phoneRequest} onSubmitted={setPhoneRequest} />
                 </>
               ) : null}
             </dl>

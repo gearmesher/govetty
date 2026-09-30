@@ -57,6 +57,8 @@ export const api = {
   register: (payload) => call('POST', 'register', payload),
   infoUser: () => call('GET', 'info/user'),
   dashboard: () => call('GET', 'customer/dashboard'),
+  phoneChangeRequest: (requestedPhone) =>
+    call('POST', 'customer/phone-change-request', { requested_phone: requestedPhone }),
   infoBreeds: () => call('GET', 'info/breeds'),
   addressValidate: (address) => call('POST', 'address/validate', { address }),
   billingPlans: (petId) => call('GET', 'billing/plans', { pet_id: petId }),
