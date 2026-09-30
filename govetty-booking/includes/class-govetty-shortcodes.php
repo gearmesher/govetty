@@ -42,7 +42,8 @@ class Govetty_Shortcodes {
 	 * cached "Log in" link.
 	 *
 	 * Attributes:
-	 *   login_text, logout_text  -- link label for each state.
+	 *   login_text, logout_text  -- link label for each state; also used as
+	 *                                the rendered <a>'s aria-label.
 	 *   login_url                -- defaults to the [govetty_booking] page
 	 *                                (Govetty_Rest_Routes::booking_page_url()),
 	 *                                since that's where OTP login happens.
@@ -79,8 +80,9 @@ class Govetty_Shortcodes {
 		if ( $logged_in ) {
 			$redirect = $atts['redirect'] ? $atts['redirect'] : self::current_url();
 			return sprintf(
-				'<a href="#" class="%1$s" data-govetty-logout="1" data-redirect="%2$s">%3$s%4$s</a>',
+				'<a href="#" class="%1$s" aria-label="%2$s" data-govetty-logout="1" data-redirect="%3$s">%4$s%5$s</a>',
 				esc_attr( $atts['class'] ),
+				esc_attr( $atts['logout_text'] ),
 				esc_url( $redirect ),
 				$icon,
 				self::label( $atts['logout_text'], $atts['text_class'] )
@@ -89,9 +91,10 @@ class Govetty_Shortcodes {
 
 		$login_url = $atts['login_url'] ? $atts['login_url'] : Govetty_Rest_Routes::booking_page_url();
 		return sprintf(
-			'<a href="%1$s" class="%2$s">%3$s%4$s</a>',
+			'<a href="%1$s" class="%2$s" aria-label="%3$s">%4$s%5$s</a>',
 			esc_url( $login_url ),
 			esc_attr( $atts['class'] ),
+			esc_attr( $atts['login_text'] ),
 			$icon,
 			self::label( $atts['login_text'], $atts['text_class'] )
 		);
