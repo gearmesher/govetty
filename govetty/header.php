@@ -86,12 +86,27 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="frame-64-parent"> 
                 <div class="frame-64"> 
                     <div class="frame-8 mobile-actions"> 
-                        <a class="frame-66" href="<?php echo esc_url( wp_login_url() ); ?>" aria-label="<?php esc_attr_e( 'Log in', 'go-vetty' ); ?>"> 
-                            <span class="btn-text text-wrapper-25"><?php esc_html_e( 'Log in', 'go-vetty' ); ?></span> 
-                            <svg class="mobile-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"> 
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 10 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/> 
-                            </svg> 
-                        </a> 
+                        <?php
+                        // Was wp_login_url() (WP admin login) -- replaced with the
+                        // GoVetty Booking plugin's own customer session state, since
+                        // customers log in via phone/OTP, not a WP user account.
+                        // text_class reuses .btn-text.text-wrapper-25 so the existing
+                        // mobile/desktop show-hide CSS for the label keeps working;
+                        // the icon is passed through as-is and shown in both states.
+                        //
+                        // The icon attribute below is intentionally single-quoted
+                        // (unlike the others) because its own SVG markup contains
+                        // double quotes -- do NOT run it through esc_attr(), which
+                        // would HTML-entity-encode the markup and make the icon
+                        // render as literal text instead of an actual <svg>.
+                        $govetty_login_icon = '<svg class="mobile-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 10 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/></svg>';
+                        echo do_shortcode(
+                            sprintf(
+                                "[govetty_login class=\"frame-66\" text_class=\"btn-text text-wrapper-25\" icon='%s']",
+                                $govetty_login_icon
+                            )
+                        );
+                        ?>
                          
                         <a class="frame-67" href="#" aria-label="<?php esc_attr_e( 'Talk to a vet now', 'go-vetty' ); ?>"> 
                             <span class="btn-text text-wrapper-18"><?php esc_html_e( 'Talk to a Vet Now', 'go-vetty' ); ?></span> 
