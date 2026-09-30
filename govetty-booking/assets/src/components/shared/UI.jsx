@@ -14,6 +14,7 @@ export const PROGRESS_BY_STATE = {
   planSelection: 0.55,
   checkingOut: 0.65,
   redirectingToStripe: 0.7,
+  redirectingToAccount: 0.9,
   scheduleImmediateCall: 0.75,
   slotSelection: 0.85,
   booking: 0.92,

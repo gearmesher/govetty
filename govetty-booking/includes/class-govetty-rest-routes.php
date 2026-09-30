@@ -23,6 +23,7 @@ class Govetty_Rest_Routes {
 			array( 'POST', '/register', array( __CLASS__, 'register_customer' ) ),
 			array( 'GET', '/info/user', array( __CLASS__, 'info_user' ) ),
 			array( 'GET', '/customer/dashboard', array( __CLASS__, 'customer_dashboard' ) ),
+			array( 'POST', '/customer/phone-change-request', array( __CLASS__, 'phone_change_request' ) ),
 			array( 'GET', '/info/breeds', array( __CLASS__, 'info_breeds' ) ),
 			array( 'POST', '/address/validate', array( __CLASS__, 'address_validate' ) ),
 			array( 'GET', '/billing/plans', array( __CLASS__, 'billing_get_plans' ) ),
@@ -296,6 +297,11 @@ class Govetty_Rest_Routes {
 			}
 		}
 
+		// Surface the latest phone-change request (if any) so the Personal
+		// Area can show "pending admin approval" / "declined" next to the
+		// Edit control instead of just silently accepting another submit.
+		$phone_request = $phone ? Govetty_Data_Store::get_latest_phone_change_request( $phone ) : null;
+
 		return new WP_REST_Response(
 			array(
 				'status'   => 'ok',
@@ -304,8 +310,68 @@ class Govetty_Rest_Routes {
 					'last_name'  => $customer['last_name'] ?? '',
 					'phone'      => $phone,
 				),
-				'pets'     => $pets,
-				'payments' => $payments,
+				'pets'          => $pets,
+				'payments'      => $payments,
+				'phone_request' => $phone_request ? array(
+					'requested_phone' => $phone_request['requested_phone'],
+					'status'          => $phone_request['status'],
+					'requested_at'    => $phone_request['requested_at'],
+				) : null,
+			),
+			200
+		);
+	}
+
+	/**
+	 * Customer submits a request to change their registered phone number.
+	 * This does NOT change anything the customer can log in with -- it only
+	 * files a pending row for a web admin to review (see
+	 * Govetty_Admin_Phone_Requests and the caveat in
+	 * Govetty_Data_Store's docblock about why this can't be immediate).
+	 */
+	public static function phone_change_request( WP_REST_Request $request ) {
+		$token = Govetty_Customer_Session::get_token();
+		if ( ! $token ) {
+			return self::unauthenticated();
+		}
+
+		$meta          = get_transient( 'govetty_token_meta_' . md5( $token ) ) ?: array();
+		$current_phone = (string) ( $meta['phone'] ?? '' );
+		if ( ! $current_phone ) {
+			// Can happen if the meta transient expired (see customer_dashboard's
+			// comment) -- there's no other local record of which phone this
+			// session belongs to, so there's nothing to attach the request to.
+			return new WP_REST_Response(
+				array( 'status' => 'error', 'message' => 'session_phone_unknown' ),
+				409
+			);
+		}
+
+		$requested_phone = sanitize_text_field( (string) $request->get_param( 'requested_phone' ) );
+		$requested_phone = preg_replace( '/[^0-9+]/', '', $requested_phone );
+		if ( strlen( $requested_phone ) < 7 ) {
+			return new WP_REST_Response(
+				array( 'status' => 'error', 'message' => 'invalid_phone' ),
+				400
+			);
+		}
+		if ( $requested_phone === $current_phone ) {
+			return new WP_REST_Response(
+				array( 'status' => 'error', 'message' => 'same_as_current' ),
+				400
+			);
+		}
+
+		$customer_name = trim( ( $meta['first_name'] ?? '' ) . ' ' . ( $meta['last_name'] ?? '' ) );
+		Govetty_Data_Store::create_phone_change_request( $current_phone, $requested_phone, $customer_name );
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'ok',
+				'request' => array(
+					'requested_phone' => $requested_phone,
+					'status'          => 'pending',
+				),
 			),
 			200
 		);
@@ -383,7 +449,7 @@ class Govetty_Rest_Routes {
 		// NOTE: the client has asked us to send the exact staging and
 		// production domains for their Stripe redirect allow-list. Confirm
 		// booking_page_url() below resolves to the real domain in each
-		// environment (it defaults to home_url('/book-a-vet/'), filterable
+		// environment (it defaults to home_url('/talk-to-a-vet/'), filterable
 		// via `govetty_booking_page_path`) and pass those two domains back
 		// to the backend team -- until they're allow-listed,
 		// createCheckoutSession will fail with invalid_success_url /
@@ -660,13 +726,15 @@ class Govetty_Rest_Routes {
 
 	/**
 	 * URL of the page carrying the [govetty_booking] shortcode. Defaults to
-	 * /book-a-vet/ -- override with the govetty_booking_page_path filter
-	 * (or just create the page at that slug) if you place the shortcode
-	 * somewhere else. This is also the exact URL that needs to go on the
+	 * /talk-to-a-vet/ (the site's real page -- corrected from an earlier
+	 * /book-a-vet/ guess that never matched an actual page and sent the
+	 * header's "Log in" link to a dead URL) -- override with the
+	 * govetty_booking_page_path filter if the shortcode ever moves to a
+	 * different slug. This is also the exact URL that needs to go on the
 	 * Stripe success/cancel domain allow-list (see billing_checkout()).
 	 */
 	public static function booking_page_url() {
-		$path = apply_filters( 'govetty_booking_page_path', '/book-a-vet/' );
+		$path = apply_filters( 'govetty_booking_page_path', '/talk-to-a-vet/' );
 		return home_url( $path );
 	}
 

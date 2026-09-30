@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * substitute: a record of what's actually happened through this widget,
  * not a live view of the real system of record.
  *
- * Two tables:
+ * Three tables:
  * - {prefix}govetty_customers: upserted whenever someone completes OTP
  *   verification or registration through this widget. A last-known
  *   snapshot (pets, balances), not a live sync -- it's only as fresh as
@@ -27,12 +27,26 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   back via the success redirect -- it is NOT a confirmed payment, since
  *   the connected API has no webhook to verify that server-side. Treat
  *   these figures as directional, not as an accounting record.
+ * - {prefix}govetty_phone_change_requests: a customer-submitted request
+ *   (from the Personal Area) to change their registered phone number,
+ *   held for web-admin approval rather than applied immediately. IMPORTANT
+ *   caveat, same spirit as the two tables above: approving a request here
+ *   only updates this plugin's own local govetty_customers snapshot row --
+ *   there is no confirmed Marpet CPP API endpoint to change the actual
+ *   login-credential phone number on their side. Until/unless the backend
+ *   team confirms and wires up a real endpoint for that, an "approved"
+ *   request does NOT let the customer log in with the new number; it's
+ *   recorded here so the approval workflow the client asked for exists and
+ *   is visible, and so this gap is easy to find and finish once a real
+ *   endpoint exists. Don't build customer-facing copy that implies this is
+ *   already a full phone-number change.
  */
 class Govetty_Data_Store {
 
-	const CUSTOMERS_TABLE = 'govetty_customers';
-	const EVENTS_TABLE    = 'govetty_checkout_events';
-	const DB_VERSION_OPT  = 'govetty_booking_db_version';
+	const CUSTOMERS_TABLE      = 'govetty_customers';
+	const EVENTS_TABLE         = 'govetty_checkout_events';
+	const PHONE_REQUESTS_TABLE = 'govetty_phone_change_requests';
+	const DB_VERSION_OPT       = 'govetty_booking_db_version';
 
 	public static function install() {
 		global $wpdb;
@@ -74,8 +88,25 @@ class Govetty_Data_Store {
 			KEY status (status)
 		) $charset_collate;";
 
+		$requests_table = $wpdb->prefix . self::PHONE_REQUESTS_TABLE;
+		$sql3           = "CREATE TABLE $requests_table (
+			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+			current_phone VARCHAR(32) NOT NULL,
+			requested_phone VARCHAR(32) NOT NULL,
+			customer_name VARCHAR(255) NOT NULL DEFAULT '',
+			status VARCHAR(32) NOT NULL DEFAULT 'pending',
+			admin_note TEXT NULL,
+			requested_at DATETIME NOT NULL,
+			reviewed_at DATETIME NULL,
+			reviewed_by BIGINT UNSIGNED NULL,
+			PRIMARY KEY  (id),
+			KEY current_phone (current_phone),
+			KEY status (status)
+		) $charset_collate;";
+
 		dbDelta( $sql1 );
 		dbDelta( $sql2 );
+		dbDelta( $sql3 );
 	}
 
 	/**
@@ -236,5 +267,133 @@ class Govetty_Data_Store {
 			'revenue_cents' => $revenue,
 			'by_plan'       => $by_plan,
 		);
+	}
+
+	// ---------------------------------------------------------------------
+	// Phone change requests -- see the class docblock for the important
+	// caveat about what "approved" actually does (and doesn't do) here.
+	// ---------------------------------------------------------------------
+
+	/**
+	 * Records a new request. Deliberately allowed even if an earlier
+	 * pending request exists for this phone -- the admin list shows every
+	 * request, newest first, so a customer resubmitting after being
+	 * declined (or just changing their mind about the new number) doesn't
+	 * get silently blocked. The dashboard only ever surfaces the latest one.
+	 */
+	public static function create_phone_change_request( $current_phone, $requested_phone, $customer_name = '' ) {
+		global $wpdb;
+		$table = $wpdb->prefix . self::PHONE_REQUESTS_TABLE;
+		$wpdb->insert(
+			$table,
+			array(
+				'current_phone'   => $current_phone,
+				'requested_phone' => $requested_phone,
+				'customer_name'   => (string) $customer_name,
+				'status'          => 'pending',
+				'requested_at'    => current_time( 'mysql' ),
+			)
+		);
+		return (int) $wpdb->insert_id;
+	}
+
+	/**
+	 * The single most recent request for this phone, if any -- used by the
+	 * dashboard to show "pending approval" / "declined" state next to the
+	 * phone number rather than a bare Edit control.
+	 */
+	public static function get_latest_phone_change_request( $current_phone ) {
+		global $wpdb;
+		$table = $wpdb->prefix . self::PHONE_REQUESTS_TABLE;
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM $table WHERE current_phone = %s ORDER BY requested_at DESC LIMIT 1",
+				$current_phone
+			),
+			ARRAY_A
+		);
+	}
+
+	public static function get_phone_change_requests( $args = array() ) {
+		global $wpdb;
+		$table    = $wpdb->prefix . self::PHONE_REQUESTS_TABLE;
+		$per_page = $args['per_page'] ?? 20;
+		$offset   = $args['offset'] ?? 0;
+		$status   = $args['status'] ?? '';
+		$where    = $status ? $wpdb->prepare( 'WHERE status = %s', $status ) : '';
+
+		$rows  = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM $table $where ORDER BY requested_at DESC LIMIT %d OFFSET %d", $per_page, $offset ),
+			ARRAY_A
+		);
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table $where" );
+		return array(
+			'rows'  => $rows,
+			'total' => $total,
+		);
+	}
+
+	public static function get_phone_change_request_by_id( $id ) {
+		global $wpdb;
+		$table = $wpdb->prefix . self::PHONE_REQUESTS_TABLE;
+		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $id ), ARRAY_A );
+	}
+
+	/**
+	 * Marks the request approved AND updates the local govetty_customers
+	 * snapshot row's phone column -- but that snapshot is only ever read
+	 * back by this plugin's own admin screens/dashboard payload, never used
+	 * to authenticate. It does NOT change what phone number the customer
+	 * actually logs in with on Marpet's side. See the class docblock.
+	 */
+	public static function approve_phone_change_request( $id, $reviewed_by, $admin_note = '' ) {
+		global $wpdb;
+		$request = self::get_phone_change_request_by_id( $id );
+		if ( ! $request || 'pending' !== $request['status'] ) {
+			return false;
+		}
+
+		$table = $wpdb->prefix . self::PHONE_REQUESTS_TABLE;
+		$wpdb->update(
+			$table,
+			array(
+				'status'      => 'approved',
+				'admin_note'  => (string) $admin_note,
+				'reviewed_at' => current_time( 'mysql' ),
+				'reviewed_by' => (int) $reviewed_by,
+			),
+			array( 'id' => (int) $id )
+		);
+
+		$customers_table = $wpdb->prefix . self::CUSTOMERS_TABLE;
+		$wpdb->update(
+			$customers_table,
+			array( 'phone' => $request['requested_phone'] ),
+			array( 'phone' => $request['current_phone'] )
+		);
+
+		return true;
+	}
+
+	public static function reject_phone_change_request( $id, $reviewed_by, $admin_note = '' ) {
+		global $wpdb;
+		$request = self::get_phone_change_request_by_id( $id );
+		if ( ! $request || 'pending' !== $request['status'] ) {
+			return false;
+		}
+
+		$table = $wpdb->prefix . self::PHONE_REQUESTS_TABLE;
+		$wpdb->update(
+			$table,
+			array(
+				'status'      => 'rejected',
+				'admin_note'  => (string) $admin_note,
+				'reviewed_at' => current_time( 'mysql' ),
+				'reviewed_by' => (int) $reviewed_by,
+			),
+			array( 'id' => (int) $id )
+		);
+
+		return true;
 	}
 }

@@ -2,6 +2,24 @@ import { setup, assign, fromPromise } from 'xstate';
 import { api, saveContinuation } from './api';
 
 /**
+ * The header's [govetty_login] shortcode appends ?govetty_intent=login to
+ * the booking-page URL it links to (see class-govetty-shortcodes.php) so
+ * this machine can tell "clicked the header's login control" apart from
+ * "clicked book a call" -- both land on the same page/shortcode. Read once
+ * at module load (this bundle is freshly loaded on every page navigation,
+ * there's no client-side routing here), same timing index.jsx already
+ * relies on for its own govetty_step check.
+ */
+function readLoginOnly() {
+  if (typeof window === 'undefined' || !window.location) return false;
+  try {
+    return new URLSearchParams(window.location.search).get('govetty_intent') === 'login';
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
  * This machine's states map 1:1 onto the Figma board's nodes, and its
  * guarded transitions map onto the board's diamonds. Keeping that
  * correspondence exact is deliberate: when the client requests a flow
@@ -22,6 +40,11 @@ import { api, saveContinuation } from './api';
  * Schedule Immediate Call?  -> scheduleImmediateCall
  * Slot Selection             -> slotSelection
  * Booking Confirmation      -> bookingConfirmation / bookingCompleteNoCall
+ *
+ * Not on the original board: header "Login" click (govetty_intent=login) by
+ * an existing customer -> redirectingToAccount, a client-requested shortcut
+ * so logging in from the site header goes straight to the Personal Area
+ * dashboard instead of into this booking flow.
  *
  * One deliberate implementation choice, since the two written accounts of
  * the existing-customer branch differ slightly in emphasis: existing
@@ -51,6 +74,7 @@ const machine = setup({
       return !!pet && pet.token_amount > 0;
     },
     canResend: ({ context }) => context.canResend,
+    isLoginOnly: ({ context }) => context.loginOnly,
   },
 }).createMachine({
   id: 'booking',
@@ -59,6 +83,7 @@ const machine = setup({
     phone: '',
     code: '',
     otpPurpose: 'login', // 'login' | 'postRegistration'
+    loginOnly: readLoginOnly(),
     otpSentAt: null,
     canResend: false,
     otpError: null,
@@ -157,6 +182,27 @@ const machine = setup({
             guard: 'isNewCustomer',
             target: 'registration',
             actions: assign({ otpError: null }),
+          },
+          {
+            // Header "Login" click (govetty_intent=login) by a recognized,
+            // already-registered customer -- the client wants this to land
+            // on the Personal Area dashboard directly, not continue into
+            // pet/plan selection. A phone that turns out to be unregistered
+            // still falls into isNewCustomer above regardless of loginOnly,
+            // since there's no dashboard to send them to yet.
+            guard: 'isLoginOnly',
+            target: 'redirectingToAccount',
+            actions: [
+              assign({
+                customer: ({ event }) => event.output.data.customer,
+                pets: ({ event }) => event.output.data.pets,
+                otpError: null,
+              }),
+              () => {
+                window.location.href =
+                  (typeof window.GovettyBooking !== 'undefined' && window.GovettyBooking.personalAreaUrl) || '/';
+              },
+            ],
           },
           {
             target: 'petSelection',
@@ -314,6 +360,18 @@ const machine = setup({
       // Terminal from the SPA's point of view -- the browser is about to
       // do a full navigation to Stripe's hosted page. The app resumes on
       // the payment-success/payment-cancelled routes, see index.jsx.
+      type: 'final',
+    },
+
+    redirectingToAccount: {
+      // Terminal from the SPA's point of view -- same pattern as
+      // redirectingToStripe above, but for the header-login shortcut: the
+      // browser is about to do a full navigation to the Personal Area
+      // dashboard (window.GovettyBooking.personalAreaUrl, localized from
+      // Govetty_Rest_Routes::personal_area_page_url() in
+      // govetty_booking_register_config()). The actual redirect happens in
+      // otpVerifying's onDone action above; this state just gives the UI
+      // something to render for the moment before that navigation lands.
       type: 'final',
     },
 

@@ -6,7 +6,7 @@
  *                     (OTP login, registration, plans, Stripe checkout, slots, image
  *                     upload) to the external Marpet CPP API, so the ApiUser server
  *                     credential never has to be exposed to the browser.
- * Version:           1.7.0
+ * Version:           1.8.0
  * Requires PHP:      7.4
  * Requires at least: 6.0
  * License:           GPL v2 or later
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // No direct access.
 }
 
-define( 'GOVETTY_BOOKING_VERSION', '0.2.0' );
+define( 'GOVETTY_BOOKING_VERSION', '1.8.0' );
 define( 'GOVETTY_BOOKING_PATH', plugin_dir_path( __FILE__ ) );
 define( 'GOVETTY_BOOKING_URL', plugin_dir_url( __FILE__ ) );
 
@@ -51,6 +51,7 @@ require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-shortcodes.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-admin-menu.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-admin-customers.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-admin-subscriptions.php';
+require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-admin-phone-requests.php';
 
 register_activation_hook( __FILE__, array( 'Govetty_Data_Store', 'install' ) );
 
@@ -85,10 +86,11 @@ function govetty_booking_register_config() {
 		'govetty-booking-config',
 		'GovettyBooking',
 		array(
-			'root'         => esc_url_raw( rest_url( Govetty_Rest_Routes::NAMESPACE_ . '/' ) ),
-			'nonce'        => wp_create_nonce( 'wp_rest' ),
-			'mockMode'     => Govetty_Settings::is_mock_mode(),
-			'mockScenario' => Govetty_Settings::scenario(),
+			'root'            => esc_url_raw( rest_url( Govetty_Rest_Routes::NAMESPACE_ . '/' ) ),
+			'nonce'           => wp_create_nonce( 'wp_rest' ),
+			'mockMode'        => Govetty_Settings::is_mock_mode(),
+			'mockScenario'    => Govetty_Settings::scenario(),
+			'personalAreaUrl' => esc_url_raw( Govetty_Rest_Routes::personal_area_page_url() ),
 		)
 	);
 }
