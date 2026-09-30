@@ -493,3 +493,149 @@
   display: block;
   margin: 0 auto 14px;
 }
+
+/* Personal Area dashboard --------------------------------------------------- */
+
+.gv-shell-wide {
+  max-width: 720px;
+}
+
+.gv-pa-section {
+  margin-top: 8px;
+  padding-top: 24px;
+  border-top: 1px solid var(--gv-border);
+}
+
+.gv-pa-section:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.gv-pa-heading {
+  font-family: var(--gv-font-display);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 14px;
+  color: var(--gv-text);
+}
+
+.gv-pa-account-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.gv-pa-account-grid dt {
+  color: var(--gv-text-muted);
+  font-size: 13px;
+}
+
+.gv-pa-account-grid dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.gv-pa-pet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gv-pa-pet-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--gv-bg);
+  border: 1px solid var(--gv-border);
+  border-radius: var(--gv-radius);
+  padding: 14px 16px;
+}
+
+.gv-pa-pet-name {
+  margin: 0 0 2px;
+  font-weight: 600;
+}
+
+.gv-pa-pet-meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--gv-text-muted);
+}
+
+.gv-pet-photo {
+  flex: 0 0 auto;
+}
+
+.gv-upload-dropzone-sm {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.gv-upload-preview-sm {
+  width: 40px;
+  height: 40px;
+  margin: 0 0 6px;
+  display: inline-block;
+}
+
+.gv-pa-table-wrap {
+  overflow-x: auto;
+}
+
+.gv-pa-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.gv-pa-table th,
+.gv-pa-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gv-border);
+  white-space: nowrap;
+}
+
+.gv-pa-table th {
+  color: var(--gv-text-muted);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.gv-pa-status {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gv-pa-status-returned_success {
+  background: var(--gv-accent-tint);
+  color: var(--gv-accent);
+}
+
+.gv-pa-status-initiated {
+  background: #fff3d6;
+  color: #8a6100;
+}
+
+.gv-pa-status-returned_cancelled {
+  background: var(--gv-error-bg);
+  color: var(--gv-error);
+}
+
+@media (max-width: 480px) {
+  .gv-pa-pet-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

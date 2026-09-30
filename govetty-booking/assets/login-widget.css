@@ -1,0 +1,82 @@
+/*
+ * Styles for the [govetty_login] account popup (logged-in state).
+ * Loaded sitewide (see Govetty_Shortcodes::maybe_enqueue_assets()) since
+ * this can appear in a template, like the theme header, on every page --
+ * kept deliberately small and independent of booking-app.css, which is
+ * only loaded on the booking/personal-area pages themselves.
+ *
+ * Colors match the palette already established in booking-app.css
+ * (deep maroon on warm white) so the popup doesn't look like a bolted-on
+ * component next to the rest of the site.
+ */
+
+.gv-login-menu {
+  position: relative;
+}
+
+/* Reset default <summary>/<button> chrome -- theme classes passed via the
+   shortcode's `class` attribute (e.g. frame-66) supply the actual look. */
+.gv-login-menu-btn {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.gv-login-menu-btn::-webkit-details-marker {
+  display: none;
+}
+
+.gv-login-menu-btn:focus-visible {
+  outline: 2px solid #8B0D1E;
+  outline-offset: 2px;
+}
+
+.gv-login-menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 100;
+  min-width: 180px;
+  background: #ffffff;
+  border: 1px solid #e7e0d5;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(38, 33, 29, 0.04), 0 10px 30px rgba(38, 33, 29, 0.12);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gv-login-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font: inherit;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: #26211d;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.gv-login-menu-item:hover,
+.gv-login-menu-item:focus-visible {
+  background: #FDF4F3;
+  color: #8B0D1E;
+  outline: none;
+}
+
+/* On small screens, a right-anchored panel can overflow the viewport if
+   the toggle sits near the left edge -- pin it to a safe inset instead of
+   letting it run off-screen. */
+@media (max-width: 480px) {
+  .gv-login-menu-panel {
+    right: -8px;
+    min-width: 160px;
+  }
+}

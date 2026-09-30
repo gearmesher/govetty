@@ -22,6 +22,7 @@ class Govetty_Rest_Routes {
 			array( 'POST', '/logout', array( __CLASS__, 'logout' ) ),
 			array( 'POST', '/register', array( __CLASS__, 'register_customer' ) ),
 			array( 'GET', '/info/user', array( __CLASS__, 'info_user' ) ),
+			array( 'GET', '/customer/dashboard', array( __CLASS__, 'customer_dashboard' ) ),
 			array( 'GET', '/info/breeds', array( __CLASS__, 'info_breeds' ) ),
 			array( 'POST', '/address/validate', array( __CLASS__, 'address_validate' ) ),
 			array( 'GET', '/billing/plans', array( __CLASS__, 'billing_get_plans' ) ),
@@ -108,9 +109,17 @@ class Govetty_Rest_Routes {
 			Govetty_Customer_Session::set_token( $token );
 
 			// Bridges customer_token -> phone/name/pets for later calls in
-			// this same session (e.g. billing_checkout logging) that only
+			// this same session (e.g. billing_checkout logging, and the
+			// customer_dashboard's payment-history lookup below) that only
 			// have the token to work with -- the CPP API never echoes phone
 			// back on any endpoint, so this is the only place it's available.
+			// TTL matches Govetty_Customer_Session's 30-day cookie lifetime
+			// (rather than a shorter one) so a returning customer's dashboard
+			// can still resolve their phone weeks into the same login,
+			// without a WP transient (this can be backed by object cache,
+			// which may evict early under memory pressure -- if that
+			// happens, the dashboard's payment history just comes back
+			// empty rather than erroring; nothing else depends on it).
 			set_transient(
 				'govetty_token_meta_' . md5( $token ),
 				array(
@@ -119,7 +128,7 @@ class Govetty_Rest_Routes {
 					'last_name'  => $customer['last_name'] ?? '',
 					'pets'       => $pets,
 				),
-				DAY_IN_SECONDS
+				30 * DAY_IN_SECONDS
 			);
 
 			Govetty_Data_Store::upsert_customer(
@@ -233,6 +242,73 @@ class Govetty_Rest_Routes {
 		}
 		$result = self::api_request( 'GET', '/info/user', array( 'customer_token' => $token ) );
 		return self::passthrough( $result );
+	}
+
+	/**
+	 * Consolidated payload for the Personal Area dashboard: live profile +
+	 * pets from the CPP API, plus this widget's own local payment/checkout
+	 * history (the CPP API has no purchase-history endpoint -- see
+	 * Govetty_Data_Store's docblock on why that log exists and what its
+	 * "returned_success" status does and doesn't mean).
+	 *
+	 * Pet detail is limited to whatever /info/user actually returns
+	 * (id, name, type, token_amount, image_id per the documented shape) --
+	 * fields collected only at registration time (breed, dob, microchip)
+	 * aren't echoed back by any endpoint and aren't persisted anywhere in
+	 * this plugin either, so they can't be shown here. Worth confirming
+	 * with the backend team whether a fuller pet record is available
+	 * before promising more than this on the dashboard.
+	 */
+	public static function customer_dashboard( WP_REST_Request $request ) {
+		$token = Govetty_Customer_Session::get_token();
+		if ( ! $token ) {
+			return self::unauthenticated();
+		}
+
+		$result = self::api_request( 'GET', '/info/user', array( 'customer_token' => $token ) );
+		if ( 200 !== $result['code'] || empty( $result['body']['customer'] ) ) {
+			return self::passthrough( $result );
+		}
+
+		$customer = $result['body']['customer'];
+		$pets     = $result['body']['pets'] ?? array();
+
+		// Phone isn't in /info/user's response at all (see
+		// Govetty_Data_Store's docblock) -- it's only available locally, via
+		// the transient otp_verify() stashed at login. If that's expired or
+		// missing for any reason, degrade to an empty payment history
+		// rather than failing the whole dashboard over it.
+		$meta     = get_transient( 'govetty_token_meta_' . md5( $token ) ) ?: array();
+		$phone    = (string) ( $meta['phone'] ?? '' );
+		$payments = array();
+
+		if ( $phone ) {
+			foreach ( Govetty_Data_Store::get_events_for_phone( $phone ) as $row ) {
+				// Only public-safe, customer-facing fields -- never expose
+				// is_mock or the internal row id.
+				$payments[] = array(
+					'pet_name'    => $row['pet_name'],
+					'plan_key'    => $row['plan_key'],
+					'price_cents' => null !== $row['price_cents'] ? (int) $row['price_cents'] : null,
+					'status'      => $row['status'],
+					'created_at'  => $row['created_at'],
+				);
+			}
+		}
+
+		return new WP_REST_Response(
+			array(
+				'status'   => 'ok',
+				'customer' => array(
+					'first_name' => $customer['first_name'] ?? '',
+					'last_name'  => $customer['last_name'] ?? '',
+					'phone'      => $phone,
+				),
+				'pets'     => $pets,
+				'payments' => $payments,
+			),
+			200
+		);
 	}
 
 	public static function info_breeds( WP_REST_Request $request ) {
@@ -591,6 +667,20 @@ class Govetty_Rest_Routes {
 	 */
 	public static function booking_page_url() {
 		$path = apply_filters( 'govetty_booking_page_path', '/book-a-vet/' );
+		return home_url( $path );
+	}
+
+	/**
+	 * URL of the page carrying the [govetty_personal_area] shortcode --
+	 * same pattern as booking_page_url() above. Defaults to
+	 * /personal-area/; override with the govetty_personal_area_page_path
+	 * filter, or create the page at that slug. This is where the
+	 * [govetty_login] popup's "Account" item links to -- if no page exists
+	 * at this path yet, create one with [govetty_personal_area] as its
+	 * content before that link goes live.
+	 */
+	public static function personal_area_page_url() {
+		$path = apply_filters( 'govetty_personal_area_page_path', '/personal-area/' );
 		return home_url( $path );
 	}
 

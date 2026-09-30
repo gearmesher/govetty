@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import PostPaymentApp from './PostPaymentApp';
 import ResumePlanSelection from './ResumePlanSelection';
-import PersonalAreaImageUpload from './PersonalAreaImageUpload';
+import PersonalArea from './PersonalArea';
 import { readContinuation, clearContinuation } from './api';
 
 function mountBookingRoot() {
@@ -38,7 +38,7 @@ function mountBookingRoot() {
 function mountPersonalArea() {
   const el = document.getElementById('govetty-personal-area-root');
   if (!el) return;
-  createRoot(el).render(<PersonalAreaImageUpload />);
+  createRoot(el).render(<PersonalArea />);
 }
 
 mountBookingRoot();
