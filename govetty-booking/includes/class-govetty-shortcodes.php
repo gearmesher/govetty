@@ -29,46 +29,63 @@ class Govetty_Shortcodes {
 	}
 
 	/**
-	 * Server-rendered login/logout link -- no React, so it's cheap enough
-	 * to sit in the header on every page. Login state is read straight from
-	 * the customer_token cookie (Govetty_Customer_Session), the same signal
-	 * PersonalAreaImageUpload.jsx's /info/user call relies on -- presence of
-	 * the cookie means "looks logged in", not a guarantee the token is still
-	 * valid upstream (that's only checked when it's actually used).
+	 * Server-rendered login link / account popup -- no React, so it's cheap
+	 * enough to sit in the header on every page. Login state is read
+	 * straight from the customer_token cookie (Govetty_Customer_Session),
+	 * the same signal the dashboard's /info/user call relies on -- presence
+	 * of the cookie means "looks logged in", not a guarantee the token is
+	 * still valid upstream (that's only checked when it's actually used).
 	 *
 	 * If this page is served from a full-page cache (e.g. a caching plugin)
 	 * for anonymous visitors, make sure that cache varies on the
 	 * govetty_customer_token cookie, or logged-in customers can get served a
 	 * cached "Log in" link.
 	 *
+	 * Logged out: a plain <a> to the booking page (OTP login happens there).
+	 *
+	 * Logged in: a native <details>/<summary> popup labeled with
+	 * dashboard_text ("Dashboard" by default) -- <details> works with tap
+	 * and keyboard with no JS at all (best-practice baseline for a mobile
+	 * disclosure widget); login-widget.js layers hover-to-open on top for
+	 * devices with real hover, plus outside-click/Escape-to-close. First
+	 * item in the popup is "Account" (links to the [govetty_personal_area]
+	 * page), then "Logout".
+	 *
 	 * Attributes:
-	 *   login_text, logout_text  -- link label for each state; also used as
-	 *                                the rendered <a>'s aria-label.
-	 *   login_url                -- defaults to the [govetty_booking] page
-	 *                                (Govetty_Rest_Routes::booking_page_url()),
-	 *                                since that's where OTP login happens.
-	 *   redirect                 -- where to land after logout; defaults to
-	 *                                the current URL.
-	 *   class                    -- class on the wrapping <a>.
-	 *   text_class                -- optional class wrapping just the label
-	 *                                text in its own <span> (e.g. to reuse a
-	 *                                theme's existing responsive show/hide
-	 *                                class on the text vs. an icon).
-	 *   icon                     -- raw HTML (e.g. an inline <svg>) rendered
-	 *                                alongside the label; only ever set this
-	 *                                from trusted template code, never from
-	 *                                user input.
+	 *   login_text                -- logged-out link label / aria-label.
+	 *   dashboard_text             -- logged-in popup toggle label
+	 *                                 (default "Dashboard").
+	 *   account_text, logout_text -- the two popup menu item labels.
+	 *   login_url                 -- defaults to the [govetty_booking] page
+	 *                                 (Govetty_Rest_Routes::booking_page_url()).
+	 *   account_url                -- defaults to the [govetty_personal_area]
+	 *                                 page (Govetty_Rest_Routes::personal_area_page_url()).
+	 *   redirect                  -- where to land after logout; defaults to
+	 *                                 the current URL.
+	 *   class                     -- class on the logged-out <a> / logged-in
+	 *                                 <summary> toggle.
+	 *   text_class                 -- optional class wrapping just the label
+	 *                                 text in its own <span> (e.g. to reuse a
+	 *                                 theme's existing responsive show/hide
+	 *                                 class on the text vs. an icon).
+	 *   icon                      -- raw HTML (e.g. an inline <svg>) rendered
+	 *                                 alongside the label; only ever set this
+	 *                                 from trusted template code, never from
+	 *                                 user input.
 	 */
 	public static function render_login( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'login_text'  => __( 'Log in', 'govetty-booking' ),
-				'logout_text' => __( 'Logout', 'govetty-booking' ),
-				'login_url'   => '',
-				'redirect'    => '',
-				'class'       => 'gv-login-link',
-				'text_class'  => '',
-				'icon'        => '',
+				'login_text'     => __( 'Log in', 'govetty-booking' ),
+				'dashboard_text' => __( 'Dashboard', 'govetty-booking' ),
+				'account_text'   => __( 'Account', 'govetty-booking' ),
+				'logout_text'    => __( 'Logout', 'govetty-booking' ),
+				'login_url'      => '',
+				'account_url'    => '',
+				'redirect'       => '',
+				'class'          => 'gv-login-link',
+				'text_class'     => '',
+				'icon'           => '',
 			),
 			$atts,
 			'govetty_login'
@@ -78,14 +95,25 @@ class Govetty_Shortcodes {
 		$icon      = $atts['icon']; // Raw HTML by design -- see docblock.
 
 		if ( $logged_in ) {
-			$redirect = $atts['redirect'] ? $atts['redirect'] : self::current_url();
+			$redirect    = $atts['redirect'] ? $atts['redirect'] : self::current_url();
+			$account_url = $atts['account_url'] ? $atts['account_url'] : Govetty_Rest_Routes::personal_area_page_url();
+
 			return sprintf(
-				'<a href="#" class="%1$s" aria-label="%2$s" data-govetty-logout="1" data-redirect="%3$s">%4$s%5$s</a>',
+				'<details class="gv-login-menu">' .
+					'<summary class="%1$s gv-login-menu-btn" aria-label="%2$s">%3$s%4$s</summary>' .
+					'<div class="gv-login-menu-panel" role="menu">' .
+						'<a href="%5$s" class="gv-login-menu-item" role="menuitem">%6$s</a>' .
+						'<button type="button" class="gv-login-menu-item" role="menuitem" data-govetty-logout="1" data-redirect="%7$s">%8$s</button>' .
+					'</div>' .
+				'</details>',
 				esc_attr( $atts['class'] ),
-				esc_attr( $atts['logout_text'] ),
-				esc_url( $redirect ),
+				esc_attr( $atts['dashboard_text'] ),
 				$icon,
-				self::label( $atts['logout_text'], $atts['text_class'] )
+				self::label( $atts['dashboard_text'], $atts['text_class'] ),
+				esc_url( $account_url ),
+				esc_html( $atts['account_text'] ),
+				esc_url( $redirect ),
+				esc_html( $atts['logout_text'] )
 			);
 		}
 
@@ -114,9 +142,16 @@ class Govetty_Shortcodes {
 
 	public static function maybe_enqueue_assets() {
 		// [govetty_login] is tiny (no React) and expected sitewide -- e.g.
-		// dropped into the theme header via do_shortcode() -- so it's
-		// enqueued unconditionally rather than gated behind has_shortcode()
-		// like the full booking app bundle below.
+		// dropped into the theme header via do_shortcode() -- so both its
+		// script and stylesheet are enqueued unconditionally rather than
+		// gated behind has_shortcode() like the full booking app bundle
+		// below.
+		wp_enqueue_style(
+			'govetty-login-widget',
+			GOVETTY_BOOKING_URL . 'assets/login-widget.css',
+			array(),
+			GOVETTY_BOOKING_VERSION
+		);
 		wp_enqueue_script(
 			'govetty-login-widget',
 			GOVETTY_BOOKING_URL . 'assets/login-widget.js',

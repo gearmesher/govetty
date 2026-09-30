@@ -56,6 +56,7 @@ export const api = {
   otpVerify: (phone, code) => call('POST', 'otp/verify', { phone, code }),
   register: (payload) => call('POST', 'register', payload),
   infoUser: () => call('GET', 'info/user'),
+  dashboard: () => call('GET', 'customer/dashboard'),
   infoBreeds: () => call('GET', 'info/breeds'),
   addressValidate: (address) => call('POST', 'address/validate', { address }),
   billingPlans: (petId) => call('GET', 'billing/plans', { pet_id: petId }),
