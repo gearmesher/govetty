@@ -86,6 +86,15 @@ class Govetty_Rest_Routes {
 			)
 		);
 
+		Govetty_Logger::log(
+			'otp_start',
+			array(
+				'phone'  => $phone,
+				'ip'     => $ip,
+				'status' => $result['code'],
+			)
+		);
+
 		return self::passthrough( $result );
 	}
 
@@ -148,6 +157,19 @@ class Govetty_Rest_Routes {
 		// every non-too_many_attempts failure into that one message; don't
 		// try to split it further client-side.
 
+		// Deliberately never logs `code` -- it's a short-lived auth secret,
+		// not transaction data, and has no business sitting in a plain-text
+		// file even for 3 minutes.
+		Govetty_Logger::log(
+			'otp_verify',
+			array(
+				'phone'      => $phone,
+				'status'     => $result['code'],
+				'recognized' => isset( $result['body']['customer'] ) && null !== $result['body']['customer'],
+				'message'    => $result['body']['message'] ?? null,
+			)
+		);
+
 		// Strip the raw token before the response reaches the browser --
 		// the frontend only needs to know it's logged in and see
 		// customer/pet details, not the token value itself.
@@ -167,6 +189,12 @@ class Govetty_Rest_Routes {
 	 * cookie is a no-op, not an error.
 	 */
 	public static function logout( WP_REST_Request $request ) {
+		$token = Govetty_Customer_Session::get_token();
+		if ( $token ) {
+			$meta = get_transient( 'govetty_token_meta_' . md5( $token ) ) ?: array();
+			Govetty_Logger::log( 'logout', array( 'phone' => $meta['phone'] ?? null ) );
+		}
+
 		Govetty_Customer_Session::clear_token();
 		return new WP_REST_Response( array( 'status' => 'ok' ), 200 );
 	}
@@ -212,6 +240,24 @@ class Govetty_Rest_Routes {
 				sanitize_text_field( (string) ( $payload['last_name'] ?? '' ) ),
 				$pets,
 				Govetty_Settings::is_mock_mode() ? 1 : 0
+			);
+
+			Govetty_Logger::log(
+				'register',
+				array(
+					'phone'     => $payload['phone'] ?? '',
+					'name'      => trim( ( $payload['first_name'] ?? '' ) . ' ' . ( $payload['last_name'] ?? '' ) ),
+					'pet_count' => count( $pets ),
+				)
+			);
+		} elseif ( 200 !== $result['code'] ) {
+			Govetty_Logger::log(
+				'register_failed',
+				array(
+					'phone'   => $payload['phone'] ?? '',
+					'status'  => $result['code'],
+					'message' => $result['body']['message'] ?? ( $result['body']['error'] ?? null ),
+				)
 			);
 		}
 
@@ -364,6 +410,15 @@ class Govetty_Rest_Routes {
 
 		$customer_name = trim( ( $meta['first_name'] ?? '' ) . ' ' . ( $meta['last_name'] ?? '' ) );
 		Govetty_Data_Store::create_phone_change_request( $current_phone, $requested_phone, $customer_name );
+
+		Govetty_Logger::log(
+			'phone_change_requested',
+			array(
+				'current_phone'   => $current_phone,
+				'requested_phone' => $requested_phone,
+				'customer_name'   => $customer_name,
+			)
+		);
 
 		return new WP_REST_Response(
 			array(
@@ -519,6 +574,17 @@ class Govetty_Rest_Routes {
 				'is_mock'       => Govetty_Settings::is_mock_mode() ? 1 : 0,
 			)
 		);
+
+		Govetty_Logger::log(
+			'checkout_started',
+			array(
+				'checkout_ref' => $checkout_ref,
+				'phone'        => $phone,
+				'pet_name'     => $pet_name,
+				'plan_key'     => $plan_key,
+				'price_cents'  => $price_cents,
+			)
+		);
 	}
 
 	/**
@@ -536,6 +602,7 @@ class Govetty_Rest_Routes {
 
 		if ( $ref && in_array( $outcome, array( 'success', 'cancelled' ), true ) ) {
 			Govetty_Data_Store::mark_checkout_returned( $ref, $outcome );
+			Govetty_Logger::log( 'checkout_returned', array( 'checkout_ref' => $ref, 'outcome' => $outcome ) );
 		}
 
 		return new WP_REST_Response( array( 'status' => 'ok' ), 200 );
@@ -573,13 +640,27 @@ class Govetty_Rest_Routes {
 		}
 		$payload = (array) $request->get_json_params();
 
+		$pet_id  = absint( $payload['pet_id'] ?? 0 );
+		$slot_id = absint( $payload['slot_id'] ?? 0 );
+
 		$result = self::api_request(
 			'POST',
 			'/slot/book',
 			array(
 				'customer_token' => $token,
-				'pet_id'         => absint( $payload['pet_id'] ?? 0 ),
-				'slot_id'        => absint( $payload['slot_id'] ?? 0 ),
+				'pet_id'         => $pet_id,
+				'slot_id'        => $slot_id,
+			)
+		);
+
+		$meta = get_transient( 'govetty_token_meta_' . md5( $token ) ) ?: array();
+		Govetty_Logger::log(
+			'slot_book',
+			array(
+				'phone'   => $meta['phone'] ?? null,
+				'pet_id'  => $pet_id,
+				'slot_id' => $slot_id,
+				'status'  => $result['code'],
 			)
 		);
 

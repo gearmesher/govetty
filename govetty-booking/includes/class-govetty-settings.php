@@ -12,6 +12,7 @@ class Govetty_Settings {
 
 	const OPTION_MOCK_MODE = 'govetty_booking_mock_mode';
 	const OPTION_SCENARIO  = 'govetty_booking_mock_scenario';
+	const OPTION_LOGGING   = 'govetty_booking_enable_logging';
 
 	public static function init() {
 		add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
@@ -27,13 +28,21 @@ class Govetty_Settings {
 		return in_array( $value, array( 'new_customer', 'existing_customer' ), true ) ? $value : 'new_customer';
 	}
 
+	public static function is_logging_enabled() {
+		return '1' === get_option( self::OPTION_LOGGING, '0' );
+	}
+
 	public static function register_settings() {
 		register_setting( 'govetty_booking_settings', self::OPTION_MOCK_MODE, array( 'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ) ) );
 		register_setting( 'govetty_booking_settings', self::OPTION_SCENARIO, array( 'sanitize_callback' => array( __CLASS__, 'sanitize_scenario' ) ) );
+		register_setting( 'govetty_booking_settings', self::OPTION_LOGGING, array( 'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ) ) );
 
 		add_settings_section( 'govetty_booking_main', 'Mock mode', array( __CLASS__, 'section_intro' ), 'govetty-booking-settings' );
 		add_settings_field( self::OPTION_MOCK_MODE, 'Enable mock mode', array( __CLASS__, 'field_mock_mode' ), 'govetty-booking-settings', 'govetty_booking_main' );
 		add_settings_field( self::OPTION_SCENARIO, 'Scenario to simulate', array( __CLASS__, 'field_scenario' ), 'govetty-booking-settings', 'govetty_booking_main' );
+
+		add_settings_section( 'govetty_booking_logging', 'Transaction logging', array( __CLASS__, 'section_logging_intro' ), 'govetty-booking-settings' );
+		add_settings_field( self::OPTION_LOGGING, 'Enable transaction logging', array( __CLASS__, 'field_logging' ), 'govetty-booking-settings', 'govetty_booking_logging' );
 	}
 
 	public static function sanitize_checkbox( $value ) {
@@ -78,6 +87,27 @@ class Govetty_Settings {
 			with a balance and one without, so you can reach both Pet Selection branches from a single test run.
 		</p>
 		<?php
+	}
+
+	public static function section_logging_intro() {
+		echo '<p>Writes one plain-text log file per day -- OTP sends/verifications, registrations, checkout sessions '
+			. 'and their success/cancel returns, bookings, and phone-change requests (approvals/rejections included) '
+			. '-- to <code>' . esc_html( str_replace( ABSPATH, '', Govetty_Logger::dir_path() ) ) . '</code>. '
+			. 'That folder lives alongside <code>wp-content/plugins/</code>, not inside this plugin\'s own folder, '
+			. 'so updating the plugin never touches or clears it.</p>'
+			. '<p class="description">Entries can include customer phone numbers and names (the same data already '
+			. 'stored in this plugin\'s own tables -- see the Customers screen). The folder is locked down from '
+			. 'direct web access via <code>.htaccess</code>, which protects it on Apache; if this site runs on '
+			. 'Nginx, ask whoever manages the server to add an equivalent deny rule for that path.</p>';
+	}
+
+	public static function field_logging() {
+		printf(
+			'<input type="hidden" name="%1$s" value="0">'
+			. '<label><input type="checkbox" name="%1$s" value="1" %2$s> Enable transaction logging</label>',
+			esc_attr( self::OPTION_LOGGING ),
+			checked( self::is_logging_enabled(), true, false )
+		);
 	}
 
 	public static function render_settings_page() {
