@@ -159,7 +159,17 @@ class Govetty_Admin_Phone_Requests {
 		$user   = wp_get_current_user();
 
 		if ( 'approve' === $action ) {
+			$request = Govetty_Data_Store::get_phone_change_request_by_id( $request_id );
 			Govetty_Data_Store::approve_phone_change_request( $request_id, $user->ID );
+			Govetty_Logger::log(
+				'phone_change_approved',
+				array(
+					'request_id'      => $request_id,
+					'current_phone'   => $request['current_phone'] ?? null,
+					'requested_phone' => $request['requested_phone'] ?? null,
+					'admin'           => $user->user_login,
+				)
+			);
 			add_action(
 				'admin_notices',
 				function () {
@@ -169,7 +179,17 @@ class Govetty_Admin_Phone_Requests {
 				}
 			);
 		} elseif ( 'reject' === $action ) {
+			$request = Govetty_Data_Store::get_phone_change_request_by_id( $request_id );
 			Govetty_Data_Store::reject_phone_change_request( $request_id, $user->ID );
+			Govetty_Logger::log(
+				'phone_change_rejected',
+				array(
+					'request_id'      => $request_id,
+					'current_phone'   => $request['current_phone'] ?? null,
+					'requested_phone' => $request['requested_phone'] ?? null,
+					'admin'           => $user->user_login,
+				)
+			);
 			add_action(
 				'admin_notices',
 				function () {
