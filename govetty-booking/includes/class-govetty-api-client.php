@@ -27,6 +27,12 @@ class Govetty_Api_Client {
 		$method = strtoupper( $method );
 		$url    = self::build_url( $path );
 
+		// Captured before any query string is appended -- GET calls carry
+		// customer_token there, which must never end up in a log. Returned
+		// as `endpoint` purely for diagnostics (e.g. spotting a doubled
+		// /api/cpp/api/cpp in the base URL when the upstream answers 404).
+		$endpoint = $url;
+
 		$args = array(
 			'method'  => $method,
 			'timeout' => 15,
@@ -46,13 +52,14 @@ class Govetty_Api_Client {
 
 		if ( is_wp_error( $response ) ) {
 			return array(
-				'code' => 502,
-				'body' => array(
+				'code'     => 502,
+				'body'     => array(
 					'status'  => 'error',
 					'message' => 'upstream_unreachable',
 					'detail'  => $response->get_error_message(),
 				),
-				'raw'  => '',
+				'raw'      => '',
+				'endpoint' => $endpoint,
 			);
 		}
 
@@ -61,9 +68,10 @@ class Govetty_Api_Client {
 		$body = json_decode( $raw, true );
 
 		return array(
-			'code' => $code,
-			'body' => is_array( $body ) ? $body : null,
-			'raw'  => $raw,
+			'code'     => $code,
+			'body'     => is_array( $body ) ? $body : null,
+			'raw'      => $raw,
+			'endpoint' => $endpoint,
 		);
 	}
 
