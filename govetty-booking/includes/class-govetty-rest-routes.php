@@ -86,14 +86,20 @@ class Govetty_Rest_Routes {
 			)
 		);
 
-		Govetty_Logger::log(
-			'otp_start',
-			array(
-				'phone'  => $phone,
-				'ip'     => $ip,
-				'status' => $result['code'],
-			)
+		$log = array(
+			'phone'  => $phone,
+			'ip'     => $ip,
+			'status' => $result['code'],
 		);
+		if ( 200 !== $result['code'] ) {
+			// On failure, record where the request actually went and what
+			// the upstream said (truncated) -- a bare status code can't tell
+			// a wrong base URL from an undeployed route. No OTP or token is
+			// in this POST's response, so this is safe to write out.
+			$log['endpoint'] = $result['endpoint'] ?? null;
+			$log['response'] = mb_substr( (string) ( $result['raw'] ?? '' ), 0, 300 );
+		}
+		Govetty_Logger::log( 'otp_start', $log );
 
 		return self::passthrough( $result );
 	}

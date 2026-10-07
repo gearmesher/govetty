@@ -6,7 +6,7 @@
  *                     (OTP login, registration, plans, Stripe checkout, slots, image
  *                     upload) to the external Marpet CPP API, so the ApiUser server
  *                     credential never has to be exposed to the browser.
- * Version:           1.9.0
+ * Version:           1.9.1
  * Requires PHP:      7.4
  * Requires at least: 6.0
  * License:           GPL v2 or later
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // No direct access.
 }
 
-define( 'GOVETTY_BOOKING_VERSION', '1.9.0' );
+define( 'GOVETTY_BOOKING_VERSION', '1.9.1' );
 define( 'GOVETTY_BOOKING_PATH', plugin_dir_path( __FILE__ ) );
 define( 'GOVETTY_BOOKING_URL', plugin_dir_url( __FILE__ ) );
 
