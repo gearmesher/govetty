@@ -440,6 +440,13 @@ class Govetty_Rest_Routes {
 
 	public static function info_breeds( WP_REST_Request $request ) {
 		$result = self::api_request( 'GET', '/info/breeds' );
+
+		// The API currently returns Hebrew labels with no locale option --
+		// see Govetty_Breed_Translator. Only labels change; ids are untouched.
+		if ( 200 === $result['code'] && is_array( $result['body'] ) ) {
+			$result['body'] = Govetty_Breed_Translator::translate_body( $result['body'] );
+		}
+
 		return self::passthrough( $result );
 	}
 
@@ -798,10 +805,60 @@ class Govetty_Rest_Routes {
 	 * branch point rather than a check duplicated in every handler.
 	 */
 	private static function api_request( $method, $path, $params = array() ) {
-		if ( Govetty_Settings::is_mock_mode() ) {
-			return Govetty_Mock_Api::request( $method, $path, $params );
+		$mock   = Govetty_Settings::is_mock_mode();
+		$result = $mock
+			? Govetty_Mock_Api::request( $method, $path, $params )
+			: Govetty_Api_Client::request( $method, $path, $params );
+
+		self::log_api_exchange( $method, $path, $params, $result, $mock );
+
+		return $result;
+	}
+
+	/**
+	 * One API_EXCHANGE line per upstream call: method, path, HTTP status,
+	 * the request params sent and the response received. Secrets are masked
+	 * (see redact()) and long bodies truncated, so the log stays readable
+	 * and never holds a customer token, OTP code or the ApiUser token.
+	 */
+	private static function log_api_exchange( $method, $path, $params, $result, $mock ) {
+		if ( ! Govetty_Settings::is_logging_enabled() ) {
+			return;
 		}
-		return Govetty_Api_Client::request( $method, $path, $params );
+
+		$response = null !== ( $result['body'] ?? null ) ? self::redact( $result['body'] ) : (string) ( $result['raw'] ?? '' );
+		$response = is_string( $response ) ? $response : wp_json_encode( $response );
+
+		Govetty_Logger::log(
+			'api_exchange',
+			array(
+				'method'   => strtoupper( $method ),
+				'path'     => '/' . ltrim( $path, '/' ),
+				'mock'     => $mock,
+				'status'   => $result['code'] ?? null,
+				'request'  => self::redact( $params ),
+				'response' => mb_substr( (string) $response, 0, 2000 ),
+			)
+		);
+	}
+
+	/**
+	 * Recursively masks secret-bearing keys. `code` is the OTP; the token
+	 * keys are the per-customer session token (rotates on every verify).
+	 */
+	private static function redact( $data ) {
+		if ( ! is_array( $data ) ) {
+			return $data;
+		}
+		$secret_keys = array( 'code', 'token', 'customer_token', 'api_token' );
+		foreach ( $data as $key => $value ) {
+			if ( is_string( $key ) && in_array( strtolower( $key ), $secret_keys, true ) ) {
+				$data[ $key ] = '[redacted]';
+			} elseif ( is_array( $value ) ) {
+				$data[ $key ] = self::redact( $value );
+			}
+		}
+		return $data;
 	}
 
 	private static function api_upload_image( $tmp_file_path, $original_name, $mime_type ) {
