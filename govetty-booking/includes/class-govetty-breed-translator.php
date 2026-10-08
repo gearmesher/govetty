@@ -165,20 +165,33 @@ class Govetty_Breed_Translator {
 				if ( ! self::has_hebrew( $label ) ) {
 					continue; // Already English (or empty) -- leave alone.
 				}
-				$lookup = self::normalize( $label );
-				if ( isset( $map[ $lookup ] ) ) {
-					$body[ $key ][ $i ]['label'] = $map[ $lookup ];
+				$lookup  = self::normalize( $label );
+				$english = $map[ $lookup ] ?? null;
+
+				// Retry without a leading species word ("כלב "/"חתול ") or a
+				// leading definite article, which the API's labels may carry.
+				if ( null === $english ) {
+					$stripped = preg_replace( '/^(כלב|חתול)\s+/u', '', $lookup );
+					$english  = $map[ $stripped ] ?? ( $map[ preg_replace( '/^ה/u', '', $stripped ) ] ?? null );
+				}
+
+				if ( null !== $english ) {
+					// Hebrew first, English alongside: 'פודל (Poodle)'.
+					$body[ $key ][ $i ]['label'] = $label . ' (' . $english . ')';
+					$body[ $key ][ $i ]['label_en'] = $english;
 				} else {
 					$untranslated[] = array( 'type' => $key, 'id' => $breed['id'] ?? null, 'label' => $label );
 				}
 			}
 
 			// The API sorts by its own (Hebrew) label; re-sort by what the
-			// customer actually sees. Hebrew leftovers sort after Latin ones.
+			// English name where known. Hebrew-only leftovers sort after Latin ones.
 			usort(
 				$body[ $key ],
 				static function ( $a, $b ) {
-					return strcasecmp( (string) ( $a['label'] ?? '' ), (string) ( $b['label'] ?? '' ) );
+					$la = (string) ( $a['label_en'] ?? $a['label'] ?? '' );
+					$lb = (string) ( $b['label_en'] ?? $b['label'] ?? '' );
+					return strcasecmp( $la, $lb );
 				}
 			);
 		}
