@@ -6,7 +6,7 @@
  *                     (OTP login, registration, plans, Stripe checkout, slots, image
  *                     upload) to the external Marpet CPP API, so the ApiUser server
  *                     credential never has to be exposed to the browser.
- * Version:           1.10.2
+ * Version:           1.10.3
  * Requires PHP:      7.4
  * Requires at least: 6.0
  * License:           GPL v2 or later
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // No direct access.
 }
 
-define( 'GOVETTY_BOOKING_VERSION', '1.10.2' );
+define( 'GOVETTY_BOOKING_VERSION', '1.10.3' );
 define( 'GOVETTY_BOOKING_PATH', plugin_dir_path( __FILE__ ) );
 define( 'GOVETTY_BOOKING_URL', plugin_dir_url( __FILE__ ) );
 
@@ -44,7 +44,6 @@ require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-api-client.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-customer-session.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-logger.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-settings.php';
-require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-breed-translator.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-mock-api.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-mock-checkout.php';
 require_once GOVETTY_BOOKING_PATH . 'includes/class-govetty-data-store.php';

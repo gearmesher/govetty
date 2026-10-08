@@ -441,12 +441,6 @@ class Govetty_Rest_Routes {
 	public static function info_breeds( WP_REST_Request $request ) {
 		$result = self::api_request( 'GET', '/info/breeds' );
 
-		// The API currently returns Hebrew labels with no locale option --
-		// see Govetty_Breed_Translator. Only labels change; ids are untouched.
-		if ( 200 === $result['code'] && is_array( $result['body'] ) ) {
-			$result['body'] = Govetty_Breed_Translator::translate_body( $result['body'] );
-		}
-
 		return self::passthrough( $result );
 	}
 
