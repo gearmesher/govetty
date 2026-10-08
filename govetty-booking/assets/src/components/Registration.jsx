@@ -186,7 +186,7 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
           </label>
           <input id="gv-pet-photo" type="file" accept="image/jpeg,image/png" style={{ display: 'none' }} onChange={handleImageChange} />
           {uploadError && <p className="gv-hint">Couldn't upload that image -- you can add one later from your Personal Area.</p>}
-          <p className="gv-hint">You can also add or change this anytime from your Personal Area, within the allowed window.</p>
+          <p className="gv-hint gv-hint--spaced">You can also add or change this anytime from your Personal Area, within the allowed window.</p>
         </div>
 
         <div className="gv-actions">
