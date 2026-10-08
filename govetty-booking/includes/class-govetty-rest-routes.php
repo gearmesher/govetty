@@ -221,21 +221,6 @@ class Govetty_Rest_Routes {
 		// intentionally omitted by the frontend when no photo was taken
 		// (see Registration.jsx) -- do not add/remove fields here beyond
 		// what's confirmed.
-		// The API doc lists pets[].image_id as required (and each id may be
-		// used by only one pet), so any pet submitted without a photo gets
-		// its own freshly uploaded placeholder image. If that upload fails
-		// we fall back to omitting image_id, i.e. the previous behaviour.
-		if ( ! empty( $payload['pets'] ) && is_array( $payload['pets'] ) ) {
-			foreach ( $payload['pets'] as $i => $pet ) {
-				if ( empty( $pet['image_id'] ) ) {
-					$placeholder_id = self::upload_placeholder_image();
-					if ( $placeholder_id ) {
-						$payload['pets'][ $i ]['image_id'] = $placeholder_id;
-					}
-				}
-			}
-		}
-
 		$result = self::api_request( 'POST', '/register', $payload );
 
 		if ( 200 === $result['code'] && ! empty( $result['body']['pets'] ) ) {
@@ -768,35 +753,6 @@ class Govetty_Rest_Routes {
 	}
 
 	/**
-	 * Uploads the bundled neutral placeholder photo and returns its image_id
-	 * (or 0 on failure). One upload per pet -- the API allows each image_id
-	 * to be used by a single pet only.
-	 */
-	private static function upload_placeholder_image() {
-		$file = GOVETTY_BOOKING_PATH . 'assets/img/pet-placeholder.png';
-		if ( Govetty_Settings::is_mock_mode() ) {
-			return 0; // Mock /register doesn't need one.
-		}
-		if ( ! is_readable( $file ) ) {
-			return 0;
-		}
-
-		$result = self::api_upload_image( $file, 'pet-placeholder.png', 'image/png' );
-		$id     = (int) ( $result['body']['image_id'] ?? 0 );
-
-		Govetty_Logger::log(
-			'placeholder_image',
-			array(
-				'status'   => $result['code'],
-				'image_id' => $id ?: null,
-				'response' => $id ? null : mb_substr( (string) ( $result['raw'] ?? '' ), 0, 300 ),
-			)
-		);
-
-		return 200 === (int) $result['code'] ? $id : 0;
-	}
-
-	/**
 	 * Assigns a previously uploaded image to a pet -- used by the Personal
 	 * Area's one-time upload flow (Registration's own optional upload goes
 	 * straight into /register instead, since it already has an image_id
@@ -867,6 +823,12 @@ class Govetty_Rest_Routes {
 	 */
 	private static function log_api_exchange( $method, $path, $params, $result, $mock ) {
 		if ( ! Govetty_Settings::is_logging_enabled() ) {
+			return;
+		}
+
+		// The breed list is large, static reference data -- not worth a line
+		// in the transaction log on every registration-form load.
+		if ( '/info/breeds' === '/' . ltrim( $path, '/' ) ) {
 			return;
 		}
 
