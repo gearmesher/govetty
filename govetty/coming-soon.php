@@ -13,6 +13,13 @@
     <?php wp_head(); ?>
     <style>
         /* Inline styles specifically for the logo layout to avoid cache layout delays */
+        @font-face {
+            font-family: "Archivo";
+            font-style: normal;
+            font-display: swap;
+            font-weight: 100 900;
+            src: url("<?php echo esc_url( get_template_directory_uri() . '/assets/fonts/archivo-latin-wght.woff2' ); ?>") format("woff2");
+        }
         .coming-soon-wrapper {
             display: flex;
             flex-direction: column;
@@ -21,7 +28,7 @@
             height: 100vh;
             text-align: center;
             padding: 20px;
-            background: #f9f9f9;
+            background: #fff8f0; /* cream-50 */
             box-sizing: border-box;
         }
         .coming-soon-logo {
@@ -32,15 +39,16 @@
         }
         .coming-soon-wrapper p {
             font-size: 1.1rem;
-            color: #555;
+            color: #525353; /* ink-500 */
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+            font-weight: 300;
         }
     </style>
 </head>
 <body>
     <div class="coming-soon-wrapper">
-        <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/site-logo.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?> Logo" class="coming-soon-logo">
+        <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/brand/vetty-logo-maroon.svg' ); ?>" width="195" height="79" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?> Logo" class="coming-soon-logo">
         <p>Our new website is currently under construction. We will be launching soon!</p>
     </div>
     <?php wp_footer(); ?>

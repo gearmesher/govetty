@@ -33,13 +33,13 @@ get_header(); ?>
 
       <div class="faq__category reveal">
         <h2 class="faq__heading">General Questions</h2>
-        <img class="faq__leaf" src="https://www.figma.com/api/mcp/asset/6c3ad17b-01a9-40a2-98d3-d012af196c1b.svg" alt="" aria-hidden="true">
+        <img class="faq__leaf" src="/wp-content/uploads/2026/08/leaf.svg" alt="" aria-hidden="true">
         <div class="faq__list">
 
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>What is Vetty?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Vetty is a Canadian virtual veterinary care service that connects you with
@@ -51,7 +51,7 @@ get_header(); ?>
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>How does it work?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Book an appointment, join a video call with a licensed Canadian veterinarian,
@@ -63,7 +63,7 @@ get_header(); ?>
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>Who are the veterinarians?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Every Vetty veterinarian is fully licensed in Canada, with hands-on clinical
@@ -76,13 +76,13 @@ get_header(); ?>
 
       <div class="faq__category reveal">
         <h2 class="faq__heading">Services &amp; Consultations</h2>
-        <img class="faq__leaf" src="https://www.figma.com/api/mcp/asset/6c3ad17b-01a9-40a2-98d3-d012af196c1b.svg" alt="" aria-hidden="true">
+        <img class="faq__leaf" src="/wp-content/uploads/2026/08/leaf.svg" alt="" aria-hidden="true">
         <div class="faq__list">
 
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>What conditions can be treated?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Vetty can help with everyday concerns like skin issues, digestive upset,
@@ -94,7 +94,7 @@ get_header(); ?>
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>Can the vet prescribe medication?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Yes &mdash; when clinically appropriate, your vet can prescribe medication and
@@ -105,7 +105,7 @@ get_header(); ?>
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>How long is a consultation</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Most video consultations run about 15&ndash;20 minutes, with extra time
@@ -118,13 +118,13 @@ get_header(); ?>
 
       <div class="faq__category reveal">
         <h2 class="faq__heading">Booking &amp; Appointments</h2>
-        <img class="faq__leaf" src="https://www.figma.com/api/mcp/asset/6c3ad17b-01a9-40a2-98d3-d012af196c1b.svg" alt="" aria-hidden="true">
+        <img class="faq__leaf" src="/wp-content/uploads/2026/08/leaf.svg" alt="" aria-hidden="true">
         <div class="faq__list">
 
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>Do i need to book in advance?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Not necessarily &mdash; same-day appointments are often available, and our
@@ -135,7 +135,7 @@ get_header(); ?>
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>Can i choose my veterinarian?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Yes &mdash; you can request a specific veterinarian for your appointment, or
@@ -148,13 +148,13 @@ get_header(); ?>
 
       <div class="faq__category reveal">
         <h2 class="faq__heading">Pricing &amp; Payments</h2>
-        <img class="faq__leaf" src="https://www.figma.com/api/mcp/asset/6c3ad17b-01a9-40a2-98d3-d012af196c1b.svg" alt="" aria-hidden="true">
+        <img class="faq__leaf" src="/wp-content/uploads/2026/08/leaf.svg" alt="" aria-hidden="true">
         <div class="faq__list">
 
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>What is the cost?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Plans start at $49/month, with annual and premium options available for more
@@ -165,7 +165,7 @@ get_header(); ?>
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>Do you accept insurance?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>We don&rsquo;t bill pet insurance directly, but we&rsquo;ll provide a detailed
@@ -178,13 +178,13 @@ get_header(); ?>
 
       <div class="faq__category reveal">
         <h2 class="faq__heading">Technical Questions</h2>
-        <img class="faq__leaf" src="https://www.figma.com/api/mcp/asset/6c3ad17b-01a9-40a2-98d3-d012af196c1b.svg" alt="" aria-hidden="true">
+        <img class="faq__leaf" src="/wp-content/uploads/2026/08/leaf.svg" alt="" aria-hidden="true">
         <div class="faq__list">
 
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>What are the system requirements?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Vetty works right in your browser on any modern phone, tablet, or computer with
@@ -195,7 +195,7 @@ get_header(); ?>
           <div class="faq-item">
             <button class="faq-item__question" aria-expanded="false">
               <span>Is my data secure?</span>
-              <img class="faq-item__icon" src="https://www.figma.com/api/mcp/asset/a5d75726-6da7-4ddf-ae41-2e3a4fd71601.svg" alt="">
+              <img class="faq-item__icon" src="/wp-content/uploads/2026/08/toggle-icon.svg" alt="">
             </button>
             <div class="faq-item__answer">
               <p>Yes &mdash; your information and consultation records are encrypted and handled

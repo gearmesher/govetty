@@ -44,7 +44,7 @@ get_header(); ?>
     <div class="steps__frame reveal">
       <img
         class="steps__img"
-        src="https://www.figma.com/api/mcp/asset/ed56b256-8326-4340-8d8c-686f9ec82a68.png"
+        src="/wp-content/uploads/2026/08/steps-graphic.webp"
         alt="Illustration of Vetty's 4-step process: book an appointment, video call a licensed vet, receive a treatment plan, and follow up on your pet's recovery"
         loading="lazy"
       >
@@ -63,42 +63,42 @@ get_header(); ?>
   <!-- ============ KEY BENEFITS ============ -->
   <section class="benefits">
     <div class="benefits__inner">
-      <img class="benefits__leaf reveal" src="https://www.figma.com/api/mcp/asset/b28a4b51-2764-4778-9939-0eff925477d5.svg" alt="" aria-hidden="true">
+      <img class="benefits__leaf reveal" src="/wp-content/uploads/2026/08/leaf.svg" alt="" aria-hidden="true">
       <h2 class="section-heading section-heading--center reveal">Key Benefits of Vetty Care</h2>
 
       <ul class="benefits-grid" role="list">
         <li class="benefit reveal">
-          <img class="benefit__icon" src="https://www.figma.com/api/mcp/asset/ecb9b8c4-3d43-4982-bb39-6d9b73969aad.svg" alt="" aria-hidden="true">
+          <img class="benefit__icon" src="/wp-content/uploads/2026/08/icon-24-7-access.svg" alt="" aria-hidden="true">
           <h3 class="benefit__title">24/7 Access</h3>
           <p class="benefit__desc">Daily and alias schedule your video call with Vet.</p>
         </li>
 
         <li class="benefit reveal">
-          <img class="benefit__icon" src="https://www.figma.com/api/mcp/asset/dad8a060-2434-4e77-a11b-527c18438793.svg" alt="" aria-hidden="true">
+          <img class="benefit__icon" src="/wp-content/uploads/2026/08/icon-pharmacy-pickup.svg" alt="" aria-hidden="true">
           <h3 class="benefit__title">Local Pharmacy Pickup</h3>
           <p class="benefit__desc">Convenient prescription pickup near you.</p>
         </li>
 
         <li class="benefit reveal">
-          <img class="benefit__icon" src="https://www.figma.com/api/mcp/asset/d95929e7-6ffd-4385-b77b-e604898441d2.svg" alt="" aria-hidden="true">
+          <img class="benefit__icon" src="/wp-content/uploads/2026/08/icon-verified-vets-1.svg" alt="" aria-hidden="true">
           <h3 class="benefit__title">Verified Canadian Vets</h3>
           <p class="benefit__desc">Connect with fully licensed and experienced Canadian professionals.</p>
         </li>
 
         <li class="benefit reveal">
-          <img class="benefit__icon" src="https://www.figma.com/api/mcp/asset/a762b381-f7e4-4474-983f-af3270fc7332.svg" alt="" aria-hidden="true">
+          <img class="benefit__icon" src="/wp-content/uploads/2026/08/icon-followup.svg" alt="" aria-hidden="true">
           <h3 class="benefit__title">Follow-up Works</h3>
           <p class="benefit__desc">We are here to support your follow-up care.</p>
         </li>
 
         <li class="benefit reveal">
-          <img class="benefit__icon" src="https://www.figma.com/api/mcp/asset/60349fb8-7ae1-4597-b1d1-fe095cbd622e.svg" alt="" aria-hidden="true">
+          <img class="benefit__icon" src="/wp-content/uploads/2026/08/icon-care-plans.svg" alt="" aria-hidden="true">
           <h3 class="benefit__title">Personalized Care Plans</h3>
           <p class="benefit__desc">Get a clear plan for your pet&rsquo;s recovery and long-term health.</p>
         </li>
 
         <li class="benefit reveal">
-          <img class="benefit__icon" src="https://www.figma.com/api/mcp/asset/5916dbce-e303-4dbc-906b-d891a470dfde.svg" alt="" aria-hidden="true">
+          <img class="benefit__icon" src="/wp-content/uploads/2026/08/icon-verified-vets-2.svg" alt="" aria-hidden="true">
           <h3 class="benefit__title">Verified Canadian Vets</h3>
           <p class="benefit__desc">Connect with a fully licensed professional for you.</p>
         </li>
