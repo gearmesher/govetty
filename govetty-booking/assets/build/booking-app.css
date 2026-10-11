@@ -1,40 +1,66 @@
 /*
  * GoVetty Booking -- styles
  *
- * Design direction: grounded in the "Vetty" wordmark and warm, calm
- * homepage seen in the Figma mockups (deep maroon on warm white), rather
- * than inventing an unrelated new palette. A slab serif carries the
- * step titles -- sturdy and dependable, the way a vet clinic's signage
- * reads -- while Inter handles body copy and form controls, where
- * legibility matters more than personality. The signature element is
- * the progress ribbon: a single filling line that's honest about how
- * many real steps this flow branches through, rather than a numbered
- * 1-2-3 that would misrepresent a flow that forks.
+ * Vetty brand system ("Vetty -- Branding", arnold street.): the maroon /
+ * rose / cream palette and Archivo type, self-hosted (assets/fonts) so the
+ * flow matches the theme without a third-party font request. Archivo 300
+ * for body copy, 600 for UI and kickers, 800 for headlines. Instrument
+ * Serif is reserved by the brand for a single standalone phrase and is
+ * deliberately not used anywhere in this flow.
+ *
+ * The signature element is the progress ribbon: a single filling line
+ * that's honest about how many real steps this flow branches through,
+ * rather than a numbered 1-2-3 that would misrepresent a flow that forks.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600&family=Inter:wght@400;500;600;700&display=swap');
+/* Archivo variable font (wght 100-900), latin subset, OFL. */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../fonts/archivo-latin-wght.woff2') format('woff2-variations'),
+       url('../fonts/archivo-latin-wght.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 .gv-root {
-  --gv-bg: #f7f4ee;
+  /* Brand palette */
+  --gv-maroon-950: #2b0709;
+  --gv-maroon-800: #5e0710;
+  --gv-maroon-600: #8b1020;
+  --gv-maroon-400: #c04b57;
+  --gv-rose-300: #c6878b;
+  --gv-rose-100: #f7e4e1;
+  --gv-cream-50: #fff8f0;
+  --gv-sand-100: #f2e7dc;
+  --gv-ink-900: #1a1614;
+  --gv-ink-500: #525353;
+  --gv-ink-200: #dcd8d6;
+
+  /* Roles */
+  --gv-bg: var(--gv-cream-50);
   --gv-surface: #ffffff;
-  --gv-text: #26211d;
-  --gv-text-muted: #7c7368;
-  --gv-border: #e7e0d5;
-  --gv-primary: #7a2e2a;
-  --gv-primary-hover: #611f1c;
-  --gv-primary-tint: #f3e6e4;
-  --gv-accent: #4f7a6b;
-  --gv-accent-tint: #e8f0ec;
-  --gv-error: #c43d3d;
+  --gv-text: var(--gv-ink-900);
+  --gv-heading: var(--gv-maroon-950);
+  --gv-text-muted: var(--gv-ink-500);
+  --gv-border: var(--gv-ink-200);
+  --gv-primary: var(--gv-maroon-800);
+  --gv-primary-hover: var(--gv-maroon-950);
+  --gv-primary-tint: var(--gv-rose-100);
+  --gv-accent: var(--gv-maroon-600);
+  --gv-accent-tint: var(--gv-rose-100);
+  --gv-error: #b3261e;
   --gv-error-bg: #fbeaea;
   --gv-radius-lg: 16px;
   --gv-radius: 10px;
   --gv-radius-sm: 6px;
-  --gv-shadow: 0 1px 2px rgba(38, 33, 29, 0.04), 0 10px 30px rgba(38, 33, 29, 0.07);
-  --gv-font-display: 'Zilla Slab', Georgia, 'Times New Roman', serif;
-  --gv-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --gv-shadow: 0 1px 2px rgba(43, 7, 9, 0.05), 0 10px 30px rgba(43, 7, 9, 0.08);
+  --gv-font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --gv-font-body: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
 
   font-family: var(--gv-font-body);
+  font-weight: 300;
   color: var(--gv-text);
   background: var(--gv-bg);
   padding: 32px 16px;
@@ -58,6 +84,13 @@
   border-radius: var(--gv-radius-lg);
   box-shadow: var(--gv-shadow);
   padding: 28px 28px 32px;
+}
+
+.gv-logo {
+  display: block;
+  height: 30px;
+  width: auto;
+  margin: 0 auto 18px;
 }
 
 .gv-mock-banner {
@@ -101,19 +134,19 @@
 .gv-eyebrow {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--gv-accent);
+  color: var(--gv-maroon-600);
   margin: 0 0 6px;
 }
 
 .gv-title {
   font-family: var(--gv-font-display);
-  font-weight: 600;
+  font-weight: 800;
   font-size: 24px;
-  line-height: 1.25;
+  line-height: 1.2;
   margin: 0 0 6px;
-  color: var(--gv-text);
+  color: var(--gv-heading);
 }
 
 .gv-subtitle {
@@ -387,13 +420,13 @@
 }
 
 .gv-badge-empty {
-  background: #f1ece3;
+  background: var(--gv-sand-100);
   color: var(--gv-text-muted);
 }
 
 .gv-plan-price {
   font-family: var(--gv-font-display);
-  font-weight: 600;
+  font-weight: 800;
   font-size: 18px;
 }
 
@@ -519,9 +552,9 @@
 .gv-pa-heading {
   font-family: var(--gv-font-display);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 800;
   margin: 0 0 14px;
-  color: var(--gv-text);
+  color: var(--gv-heading);
 }
 
 .gv-pa-account-grid {
