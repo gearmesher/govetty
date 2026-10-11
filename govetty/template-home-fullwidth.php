@@ -54,11 +54,11 @@ get_header(); ?>
                     <p class="p">Connect with licensed Canadian veterinarians 24/7 from the comfort of your home.</p>
                 </div>
                 <div class="frame-8">
-                    <a class="frame-9" href="#" aria-label="Talk to a vet now">
+                    <a class="frame-9" href="/talk-to-a-vet">
                     <p class="text-wrapper-3">Talk to a Vet Now</p>
                     <img class="img-2" src="/wp-content/uploads/2026/07/ArrowRightWhite.svg" alt="" aria-hidden="true" />
                     </a>
-                    <a class="frame-10" href="#how-it-works" aria-label="Learn how it works">
+                    <a class="frame-10" href="#how-it-works">
                     <div class="text-wrapper-4">How It Works</div>
                     <img class="img-2" src="/wp-content/uploads/2026/07/PlayCircle.webp" alt="" aria-hidden="true" />
                     </a>
@@ -101,7 +101,7 @@ get_header(); ?>
                     <img class="fi" src="/wp-content/uploads/2026/07/Lock.webp" alt="" aria-hidden="true" />
                     <div class="frame-4">
                         <h2 class="text-wrapper">Secure &amp; Private</h2>
-                        <p class="text-wrapper-2">Your pet's health informa-tion is always protected.</p>
+                        <p class="text-wrapper-2">Your pet's health information is always protected.</p>
                     </div>
                 </div>
             </div>
@@ -154,7 +154,7 @@ get_header(); ?>
                         <p class="text-wrapper-11">WHY CHOOSE CANADIAN PET PROTECT?</p>
                         <h2 class="text-wrapper-12" id="why-choose-heading">Trusted care. Anytime. Anywhere.</h2>
                     </div>
-                    <p class="text-wrapper-13">We make it easy to get professional veterin advice when you need it most.</p>
+                    <p class="text-wrapper-13">We make it easy to get professional veterinarian advice when you need it most.</p>
                 </div>
                 <div class="frame-25" role="list" aria-label="Benefits">
                     <div class="frame-26" role="listitem">
@@ -307,7 +307,7 @@ get_header(); ?>
                             <img class="fi-4" src="/wp-content/uploads/2026/07/Vector_8.svg" alt="" aria-hidden="true" />
                             <p class="all-our">All our veterinarians are licensed in Canada<br />and passionate about<br />animal health.</p>
                         </div>
-                        <a class="div-wrapper" href="#" aria-label="View all veterinarians">
+                        <a class="div-wrapper" href="#">
                             <div class="text-wrapper-18">View all Vets</div>
                         </a>
                     </div>
@@ -321,11 +321,11 @@ get_header(); ?>
         <section class="frame-42" aria-labelledby="testimonials-heading">
             <img class="vector" src="/wp-content/uploads/2026/07/Vector_7.svg" alt="" aria-hidden="true" />
             <div class="frame-43">
-                <p class="text-wrapper-6">WHAT PET OWNERS ARE SAYING</p>
+                <h2 class="text-wrapper-6" id="testimonials-heading">WHAT PET OWNERS ARE SAYING</h2>
                 <div class="frame-30">
                     <article class="frame-44">
                         <div class="frame-45">
-                            <div class="group-2" aria-label="5 out of 5 stars">
+                            <div class="group-2" role="img" aria-label="5 out of 5 stars">
                                 <img class="star" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
                                 <img class="star-2" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
                                 <img class="star-3" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
@@ -344,7 +344,7 @@ get_header(); ?>
                     </article>
                     <article class="frame-44">
                         <div class="frame-45">
-                            <div class="group-2" aria-label="5 out of 5 stars">
+                            <div class="group-2" role="img" aria-label="5 out of 5 stars">
                                 <img class="star" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
                                 <img class="star-2" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
                                 <img class="star-3" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
@@ -363,7 +363,7 @@ get_header(); ?>
                     </article>
                     <article class="frame-44">
                         <div class="frame-45">
-                            <div class="group-2" aria-label="5 out of 5 stars">
+                            <div class="group-2" role="img" aria-label="5 out of 5 stars">
                                 <img class="star" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
                                 <img class="star-2" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
                                 <img class="star-3" src="/wp-content/uploads/2026/07/Star_1.svg" alt="" aria-hidden="true" />
@@ -381,12 +381,12 @@ get_header(); ?>
                         </div>
                     </article>
                 </div>
-                <div class="frame-8" aria-label="Testimonial pagination">
-                    <div class="ellipse-4" aria-current="true"></div>
-                    <div class="ellipse-5"></div>
-                    <div class="ellipse-5"></div>
-                    <div class="ellipse-5"></div>
-                    <div class="ellipse-5"></div>
+                <div class="frame-8" role="group" aria-label="Testimonial pagination">
+                    <button type="button" class="ellipse-4" aria-current="true" aria-label="Testimonial slide 1"></button>
+                    <button type="button" class="ellipse-5" aria-label="Testimonial slide 2"></button>
+                    <button type="button" class="ellipse-5" aria-label="Testimonial slide 3"></button>
+                    <button type="button" class="ellipse-5" aria-label="Testimonial slide 4"></button>
+                    <button type="button" class="ellipse-5" aria-label="Testimonial slide 5"></button>
                 </div>
             </div>
         </section>
@@ -400,25 +400,25 @@ get_header(); ?>
                 <div class="frame-30">
                     <details class="frame-39">
                         <summary class="frame-40">
-                            <p class="text-wrapper-19">Is this a replacement for<br />an in-person visit?</p>
+                            <span class="text-wrapper-19">Is this a replacement for<br />an in-person visit?</span>
                             <img class="img-2" src="/wp-content/uploads/2026/07/CaretDownRed.svg" alt="" aria-hidden="true" />
                         </summary>
                     </details>
                     <details class="frame-39">
                         <summary class="frame-40">
-                            <p class="text-wrapper-19">Are your veterinarians licensed in Canada?</p>
+                            <span class="text-wrapper-19">Are your veterinarians licensed in Canada?</span>
                             <img class="img-2" src="/wp-content/uploads/2026/07/CaretDownRed.svg" alt="" aria-hidden="true" />
                         </summary>
                     </details>
                     <details class="frame-39">
                         <summary class="frame-40">
-                            <div class="text-wrapper-19">What happens after<br />the consultation?</div>
+                            <span class="text-wrapper-19">What happens after<br />the consultation?</span>
                             <img class="img-2" src="/wp-content/uploads/2026/07/CaretDownRed.svg" alt="" aria-hidden="true" />
                         </summary>
                     </details>
                     <details class="frame-39">
                         <summary class="frame-41">
-                            <p class="how-much-does-a"><span class="span">How much does a consultation cost?</span><span class="text-wrapper-20">(Taxes?)</span></p>
+                            <span class="how-much-does-a"><span class="span">How much does a consultation cost?</span><span class="text-wrapper-20">(Taxes?)</span></span>
                             <img class="img-2" src="/wp-content/uploads/2026/07/CaretDownRed.svg" alt="" aria-hidden="true" />
                         </summary>
                     </details>
@@ -433,10 +433,10 @@ get_header(); ?>
                     <img class="frame-51" src="/wp-content/uploads/2026/07/WhiteHeartCircle.webp" alt="" aria-hidden="true" />
                     <div class="frame-52">
                         <h2 class="we-re-here-for-you" id="cta-heading">We're here for you and your pet.</h2>
-                        <p class="text-wrapper-24">Talk to a licensed Canadian veterinaian 24/7.</p>
+                        <p class="text-wrapper-24">Talk to a licensed Canadian veterinarian 24/7.</p>
                     </div>
                 </div>
-                <a class="frame-53" href="#" aria-label="Talk to a vet now">
+                <a class="frame-53" href="#">
                     <p class="text-wrapper-25">Talk to a Vet Now</p>
                     <img class="img-2" src="/wp-content/uploads/2026/07/ArrowRighRed.svg" alt="" aria-hidden="true" />
                 </a>

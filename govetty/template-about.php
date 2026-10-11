@@ -33,7 +33,7 @@ get_header(); ?>
 
       <div class="mission-vision__media reveal">
         <img
-          src="https://www.figma.com/api/mcp/asset/e4c23502-29d0-4c8e-a85b-0cf7e1b08a73.png"
+          src="/wp-content/uploads/2026/08/mission-vision.webp"
           alt="Two veterinarians examining a dog and a cat together in an exam room"
           loading="lazy"
           width="683"
@@ -76,8 +76,8 @@ get_header(); ?>
 
         <li class="value-card reveal">
           <span class="value-card__icon">
-            <img class="value-card__circle" src="https://www.figma.com/api/mcp/asset/b23f05ce-b4aa-4a79-9b6d-f0600461633b.svg" alt="" aria-hidden="true">
-            <img class="value-card__glyph" src="https://www.figma.com/api/mcp/asset/ebfb6acd-e345-44f1-9f01-a091afadd93f.svg" alt="" aria-hidden="true">
+            <img class="value-card__circle" src="/wp-content/uploads/2026/08/icon-circle-bg.svg" alt="" aria-hidden="true">
+            <img class="value-card__glyph" src="/wp-content/uploads/2026/08/icon-specialized-care.svg" alt="" aria-hidden="true">
           </span>
           <h3 class="value-card__title">Specialized Care<br>for Every Pet</h3>
           <p class="value-card__desc">Convenient prescription<br>pickup near you.</p>
@@ -85,8 +85,8 @@ get_header(); ?>
 
         <li class="value-card reveal">
           <span class="value-card__icon">
-            <img class="value-card__circle" src="https://www.figma.com/api/mcp/asset/b23f05ce-b4aa-4a79-9b6d-f0600461633b.svg" alt="" aria-hidden="true">
-            <img class="value-card__glyph" src="https://www.figma.com/api/mcp/asset/56b8e343-f3b6-4591-a39d-144736919edf.svg" alt="" aria-hidden="true">
+            <img class="value-card__circle" src="/wp-content/uploads/2026/08/icon-circle-bg.svg" alt="" aria-hidden="true">
+            <img class="value-card__glyph" src="/wp-content/uploads/2026/08/icon-compassion.svg" alt="" aria-hidden="true">
           </span>
           <h3 class="value-card__title">Compassion</h3>
           <p class="value-card__desc">Passionate about simplifying pet care access with empathy, care, and accessibility at the core.</p>
@@ -94,8 +94,8 @@ get_header(); ?>
 
         <li class="value-card reveal">
           <span class="value-card__icon">
-            <img class="value-card__circle" src="https://www.figma.com/api/mcp/asset/b23f05ce-b4aa-4a79-9b6d-f0600461633b.svg" alt="" aria-hidden="true">
-            <img class="value-card__glyph" src="https://www.figma.com/api/mcp/asset/8d3a1349-a9ef-4cf7-bd98-c132cb523632.svg" alt="" aria-hidden="true">
+            <img class="value-card__circle" src="/wp-content/uploads/2026/08/icon-circle-bg.svg" alt="" aria-hidden="true">
+            <img class="value-card__glyph" src="/wp-content/uploads/2026/08/icon-accessibility.svg" alt="" aria-hidden="true">
           </span>
           <h3 class="value-card__title">Accessibility</h3>
           <p class="value-card__desc">Committed to creating accessible solutions and delivering seamless care for pet owners everywhere.</p>
@@ -103,8 +103,8 @@ get_header(); ?>
 
         <li class="value-card reveal">
           <span class="value-card__icon">
-            <img class="value-card__circle" src="https://www.figma.com/api/mcp/asset/b23f05ce-b4aa-4a79-9b6d-f0600461633b.svg" alt="" aria-hidden="true">
-            <img class="value-card__glyph" src="https://www.figma.com/api/mcp/asset/bd75ef81-088c-4c9a-b856-3649be227210.svg" alt="" aria-hidden="true">
+            <img class="value-card__circle" src="/wp-content/uploads/2026/08/icon-circle-bg.svg" alt="" aria-hidden="true">
+            <img class="value-card__glyph" src="/wp-content/uploads/2026/08/icon-innovation.svg" alt="" aria-hidden="true">
           </span>
           <h3 class="value-card__title">Innovation</h3>
           <p class="value-card__desc">Pioneering modern solutions and innovative connections to enhance potential health outcomes.</p>
@@ -121,16 +121,16 @@ get_header(); ?>
 
         <ul class="partners__logos reveal" role="list">
           <li>
-            <img src="https://www.figma.com/api/mcp/asset/8b70d3b1-aca6-457b-a187-576378da54e2.png" alt="Canadian Veterinary Medical Association" loading="lazy">
+            <img src="/wp-content/uploads/2026/08/partner-cvma.webp" alt="Canadian Veterinary Medical Association" loading="lazy">
           </li>
           <li>
-            <img src="https://www.figma.com/api/mcp/asset/6f05fd56-62f0-48b0-8edd-26afafef9bae.png" alt="American Animal Hospital Association (AAHA)" loading="lazy">
+            <img src="/wp-content/uploads/2026/08/partner-aaha.webp" alt="American Animal Hospital Association (AAHA)" loading="lazy">
           </li>
           <li>
-            <img src="https://www.figma.com/api/mcp/asset/f96d96d3-fcca-4c93-959f-1956582ba256.png" alt="College of Veterinarians of Ontario" loading="lazy">
+            <img src="/wp-content/uploads/2026/08/partner-cvo.webp" alt="College of Veterinarians of Ontario" loading="lazy">
           </li>
           <li>
-            <img src="https://www.figma.com/api/mcp/asset/5a29ea2a-da55-49b5-a146-81ba7a993338.png" alt="Fear Free Certified Professional" loading="lazy">
+            <img src="/wp-content/uploads/2026/08/partner-fearfree.webp" alt="Fear Free Certified Professional" loading="lazy">
           </li>
         </ul>
       </div>

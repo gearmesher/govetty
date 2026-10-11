@@ -34,7 +34,7 @@ get_header(); ?>
 
         <!-- Monthly -->
         <li class="plan plan--monthly reveal">
-          <img class="plan__leaf" src="https://www.figma.com/api/mcp/asset/a16e23dd-0ffb-48c4-911a-ef7446d69515.svg" alt="" aria-hidden="true">
+          <img class="plan__leaf" src="/wp-content/uploads/2026/08/leaf-monthly-testimonial.svg" alt="" aria-hidden="true">
           <h3 class="plan__name">Monthly Plan</h3>
           <p class="plan__subtitle">4 virtual vet appointments</p>
           <p class="plan__price">
@@ -42,12 +42,12 @@ get_header(); ?>
           </p>
 
           <ul class="plan__features" role="list">
-            <li><img src="https://www.figma.com/api/mcp/asset/a524645e-388e-477b-94e4-0479fb71bcbe.svg" alt="" aria-hidden="true">4 Virtual vet appointments</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/a524645e-388e-477b-94e4-0479fb71bcbe.svg" alt="" aria-hidden="true">Accident &amp; Illness Coverage</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/a524645e-388e-477b-94e4-0479fb71bcbe.svg" alt="" aria-hidden="true">Access to 24/7 Vet Consultation</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/a524645e-388e-477b-94e4-0479fb71bcbe.svg" alt="" aria-hidden="true">Medications Coverage</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/a524645e-388e-477b-94e4-0479fb71bcbe.svg" alt="" aria-hidden="true">Claims &amp; Reimbursements</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/a524645e-388e-477b-94e4-0479fb71bcbe.svg" alt="" aria-hidden="true">Cancel Anytime</li>
+            <li><img src="/wp-content/uploads/2026/08/check-light.svg" alt="" aria-hidden="true">4 Virtual vet appointments</li>
+            <li><img src="/wp-content/uploads/2026/08/check-light.svg" alt="" aria-hidden="true">Accident &amp; Illness Coverage</li>
+            <li><img src="/wp-content/uploads/2026/08/check-light.svg" alt="" aria-hidden="true">Access to 24/7 Vet Consultation</li>
+            <li><img src="/wp-content/uploads/2026/08/check-light.svg" alt="" aria-hidden="true">Medications Coverage</li>
+            <li><img src="/wp-content/uploads/2026/08/check-light.svg" alt="" aria-hidden="true">Claims &amp; Reimbursements</li>
+            <li><img src="/wp-content/uploads/2026/08/check-light.svg" alt="" aria-hidden="true">Cancel Anytime</li>
           </ul>
 
           <a class="plan__cta plan__cta--light" href="#">CHOOSE MONTHLY</a>
@@ -55,7 +55,7 @@ get_header(); ?>
 
         <!-- Annual (featured) -->
         <li class="plan plan--annual plan--featured reveal">
-          <img class="plan__leaf" src="https://www.figma.com/api/mcp/asset/8f3a563b-7bb6-40c5-a246-b49acef158db.svg" alt="" aria-hidden="true">
+          <img class="plan__leaf" src="/wp-content/uploads/2026/08/leaf-annual-premium.svg" alt="" aria-hidden="true">
           <h3 class="plan__name">Annual Plan</h3>
           <p class="plan__subtitle">6 virtual vet appointments</p>
           <p class="plan__price">
@@ -65,12 +65,12 @@ get_header(); ?>
           <p class="plan__badge plan__badge--solid">Save 15% compared to monthly</p>
 
           <ul class="plan__features" role="list">
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">6 Virtual vet appointments</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Everything in Monthly Plan</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">1 Month Free (Save 15%)</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Priority Claim Processing</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Annual Check-up Benefit</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Cancel Anytime</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">6 Virtual vet appointments</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Everything in Monthly Plan</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">1 Month Free (Save 15%)</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Priority Claim Processing</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Annual Check-up Benefit</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Cancel Anytime</li>
           </ul>
 
           <a class="plan__cta plan__cta--solid" href="#">CHOOSE ANNUAL</a>
@@ -78,7 +78,7 @@ get_header(); ?>
 
         <!-- Premium -->
         <li class="plan plan--premium reveal">
-          <img class="plan__leaf" src="https://www.figma.com/api/mcp/asset/8f3a563b-7bb6-40c5-a246-b49acef158db.svg" alt="" aria-hidden="true">
+          <img class="plan__leaf" src="/wp-content/uploads/2026/08/leaf-annual-premium.svg" alt="" aria-hidden="true">
           <h3 class="plan__name">Premium Plan</h3>
           <p class="plan__subtitle">8 virtual vet appointments</p>
           <p class="plan__price">
@@ -88,13 +88,13 @@ get_header(); ?>
           <p class="plan__badge plan__badge--outline">Save 15% compared to monthly</p>
 
           <ul class="plan__features" role="list">
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">8 Virtual vet appointments</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Claims &amp; Reimbursements</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Everything in Annual Plan</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Accident &amp; Illness Coverage</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Access to 24/7 Vet Consultation</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Medications Coverage</li>
-            <li><img src="https://www.figma.com/api/mcp/asset/01c902a5-da25-41fe-bdde-fa8ae550a806.svg" alt="" aria-hidden="true">Cancel Anytime</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">8 Virtual vet appointments</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Claims &amp; Reimbursements</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Everything in Annual Plan</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Accident &amp; Illness Coverage</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Access to 24/7 Vet Consultation</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Medications Coverage</li>
+            <li><img src="/wp-content/uploads/2026/08/check-dark.svg" alt="" aria-hidden="true">Cancel Anytime</li>
           </ul>
 
           <a class="plan__cta plan__cta--solid" href="#">CHOOSE PREMIUM</a>
@@ -112,8 +112,8 @@ get_header(); ?>
       <ul class="included-grid" role="list">
         <li class="included-item reveal">
           <span class="included-item__icon">
-            <img class="included-item__circle" src="https://www.figma.com/api/mcp/asset/914278e0-50a5-409b-bd70-eefcaa0d0d37.svg" alt="" aria-hidden="true">
-            <img class="included-item__glyph" src="https://www.figma.com/api/mcp/asset/96dabb22-a5fa-49f1-a08c-5a9d3fae037b.svg" alt="" aria-hidden="true">
+            <img class="included-item__circle" src="/wp-content/uploads/2026/08/icon-circle-bg-1.svg" alt="" aria-hidden="true">
+            <img class="included-item__glyph" src="/wp-content/uploads/2026/08/icon-video-call.svg" alt="" aria-hidden="true">
           </span>
           <h3 class="included-item__title">Video Call with Vet</h3>
           <p class="included-item__desc">Daily and alias schedule your video call with Vet.</p>
@@ -121,8 +121,8 @@ get_header(); ?>
 
         <li class="included-item reveal">
           <span class="included-item__icon">
-            <img class="included-item__circle" src="https://www.figma.com/api/mcp/asset/914278e0-50a5-409b-bd70-eefcaa0d0d37.svg" alt="" aria-hidden="true">
-            <img class="included-item__glyph" src="https://www.figma.com/api/mcp/asset/f236361d-3d3c-4051-90e9-af8d8d01a3ae.svg" alt="" aria-hidden="true">
+            <img class="included-item__circle" src="/wp-content/uploads/2026/08/icon-circle-bg-1.svg" alt="" aria-hidden="true">
+            <img class="included-item__glyph" src="/wp-content/uploads/2026/08/icon-followup-1.svg" alt="" aria-hidden="true">
           </span>
           <h3 class="included-item__title">Follow-up Support</h3>
           <p class="included-item__desc">We have to up support your follow-up support.</p>
@@ -130,8 +130,8 @@ get_header(); ?>
 
         <li class="included-item reveal">
           <span class="included-item__icon">
-            <img class="included-item__circle" src="https://www.figma.com/api/mcp/asset/914278e0-50a5-409b-bd70-eefcaa0d0d37.svg" alt="" aria-hidden="true">
-            <img class="included-item__glyph" src="https://www.figma.com/api/mcp/asset/1e525558-d915-4255-a49b-ca7db2eed7e5.svg" alt="" aria-hidden="true">
+            <img class="included-item__circle" src="/wp-content/uploads/2026/08/icon-circle-bg-1.svg" alt="" aria-hidden="true">
+            <img class="included-item__glyph" src="/wp-content/uploads/2026/08/icon-prescription.svg" alt="" aria-hidden="true">
           </span>
           <h3 class="included-item__title">Prescription Routing</h3>
           <p class="included-item__desc">Prescribe the medication and manage prescription routing.</p>
@@ -139,8 +139,8 @@ get_header(); ?>
 
         <li class="included-item reveal">
           <span class="included-item__icon">
-            <img class="included-item__circle" src="https://www.figma.com/api/mcp/asset/914278e0-50a5-409b-bd70-eefcaa0d0d37.svg" alt="" aria-hidden="true">
-            <img class="included-item__glyph" src="https://www.figma.com/api/mcp/asset/1fc4d4fc-3df5-4a60-93a2-0cb37b017899.svg" alt="" aria-hidden="true">
+            <img class="included-item__circle" src="/wp-content/uploads/2026/08/icon-circle-bg-1.svg" alt="" aria-hidden="true">
+            <img class="included-item__glyph" src="/wp-content/uploads/2026/08/icon-pdf.svg" alt="" aria-hidden="true">
           </span>
           <h3 class="included-item__title">Care Summary PDF</h3>
           <p class="included-item__desc">Get access to answers and your care summary PDF.</p>
@@ -152,16 +152,16 @@ get_header(); ?>
   <!-- ============ TESTIMONIAL ============ -->
   <section class="testimonial">
     <div class="testimonial__inner">
-      <img class="testimonial__leaf reveal" src="https://www.figma.com/api/mcp/asset/a16e23dd-0ffb-48c4-911a-ef7446d69515.svg" alt="" aria-hidden="true">
+      <img class="testimonial__leaf reveal" src="/wp-content/uploads/2026/08/leaf-monthly-testimonial.svg" alt="" aria-hidden="true">
 
       <h2 class="testimonial__heading reveal">Pet parents says it best</h2>
 
       <div class="testimonial__stars reveal" role="img" aria-label="5 out of 5 stars">
-        <img src="https://www.figma.com/api/mcp/asset/a44bdcc0-1278-4969-a2c0-7d0572ff7c2f.svg" alt="" aria-hidden="true">
-        <img src="https://www.figma.com/api/mcp/asset/a44bdcc0-1278-4969-a2c0-7d0572ff7c2f.svg" alt="" aria-hidden="true">
-        <img src="https://www.figma.com/api/mcp/asset/a44bdcc0-1278-4969-a2c0-7d0572ff7c2f.svg" alt="" aria-hidden="true">
-        <img src="https://www.figma.com/api/mcp/asset/a44bdcc0-1278-4969-a2c0-7d0572ff7c2f.svg" alt="" aria-hidden="true">
-        <img src="https://www.figma.com/api/mcp/asset/a44bdcc0-1278-4969-a2c0-7d0572ff7c2f.svg" alt="" aria-hidden="true">
+        <img src="/wp-content/uploads/2026/08/icon-star.svg" alt="" aria-hidden="true">
+        <img src="/wp-content/uploads/2026/08/icon-star.svg" alt="" aria-hidden="true">
+        <img src="/wp-content/uploads/2026/08/icon-star.svg" alt="" aria-hidden="true">
+        <img src="/wp-content/uploads/2026/08/icon-star.svg" alt="" aria-hidden="true">
+        <img src="/wp-content/uploads/2026/08/icon-star.svg" alt="" aria-hidden="true">
       </div>
 
       <blockquote class="testimonial__quote reveal">

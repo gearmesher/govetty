@@ -2,6 +2,14 @@
    GO VETTY - FOOTER STYLES
    ========================================================================== */
 
+/* Same self-contained box-sizing reset as header.css (front page has no style.css) */
+footer,
+footer *,
+footer *::before,
+footer *::after {
+  box-sizing: border-box;
+}
+
 /* Main Outer Footer Element (<footer class="frame-54">) */
 footer,
 footer.frame-54 {
@@ -13,8 +21,8 @@ footer.frame-54 {
   gap: clamp(50px, 4.167vw, 80px);
   padding: clamp(55px, 4.583vw, 88px) clamp(43.75px, 3.646vw, 70px) clamp(30px, 2.5vw, 48px);
   position: relative;
-  background-color: #ffffff;
-  border-top: 1px solid #ececec;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
   box-sizing: border-box;
   max-width: clamp(1100px, 91.667vw, 1760px);
   margin: 0 auto;
@@ -41,8 +49,9 @@ footer .frame-56 {
 }
 
 footer .frame-56 img {
-  width: 245px;
+  width: clamp(150px, 11.198vw, 215px);
   height: auto;
+  display: block;
 }
 
 /* Branding Logo Image (<img class="group-3">) */
@@ -58,9 +67,9 @@ footer .text-wrapper-28 {
   position: relative;
   width: fit-content;
   margin-top: -1px;
-  font-family: "Inter", Helvetica, sans-serif;
+  font-family: var(--font-sans);
   font-weight: 600;
-  color: #600209;
+  color: var(--color-primary);
   font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
   line-height: clamp(18.75px, 1.562vw, 30px);
@@ -73,9 +82,9 @@ footer .text-wrapper-26 {
   width: auto;
   margin-top: -1px;
   margin-bottom: 0;
-  font-family: "Inter", Helvetica, sans-serif;
-  font-weight: 500;
-  color: #333333;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-body);
+  color: var(--color-text);
   font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.2px;
   line-height: clamp(15px, 1.25vw, 24px);
@@ -92,11 +101,22 @@ footer .frame-57 {
   flex: 0 0 auto;
 }
 
+/* Menu <li> wrappers — no bullets/indent on any page */
+footer .frame-57 li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+footer .frame-57 li::marker {
+  content: none;
+}
+
 /* Nav Link Anchors Styling */
 footer .frame-57 a {
-  font-family: "Inter", Helvetica, sans-serif;
-  font-weight: 500;
-  color: #000000;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-body);
+  color: var(--color-text);
   font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.2px;
   line-height: clamp(15px, 1.25vw, 24px);
@@ -105,7 +125,7 @@ footer .frame-57 a {
 }
 
 footer .frame-57 a:hover {
-  color: #600209;
+  color: var(--color-primary);
 }
 
 /* "FOLLOW US" Header (<div class="text-wrapper-27">) */
@@ -113,13 +133,14 @@ footer .text-wrapper-27 {
   position: relative;
   width: fit-content;
   margin-top: -1px;
-  font-family: "Inter", Helvetica, sans-serif;
-  font-weight: 600;
-  color: #600209;
-  font-size: clamp(12.5px, 1.042vw, 20px);
-  letter-spacing: -0.25px;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-ui);
+  color: var(--color-kicker);
+  font-size: clamp(10.62px, 0.885vw, 17px);
+  letter-spacing: var(--kicker-tracking);
   line-height: clamp(18.75px, 1.562vw, 30px);
   white-space: nowrap;
+  text-transform: uppercase;
 }
 
 /* Social & Localized Identity Block (<div class="frame-58">) */
@@ -179,9 +200,9 @@ footer .text-wrapper-30 {
   position: relative;
   width: fit-content;
   margin-top: -1px;
-  font-family: "Inter", Helvetica, sans-serif;
+  font-family: var(--font-sans);
   font-weight: 600;
-  color: #600209;
+  color: var(--color-primary);
   font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.2px;
   line-height: clamp(15px, 1.25vw, 24px);
@@ -194,9 +215,9 @@ footer .text-wrapper-29 {
   width: fit-content;
   margin-top: -1px;
   margin: 0;
-  font-family: "Inter", Helvetica, sans-serif;
-  font-weight: 500;
-  color: #000;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-body);
+  color: var(--color-text);
   font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.18px;
   line-height: clamp(12.5px, 1.042vw, 20px);
@@ -207,13 +228,19 @@ footer .text-wrapper-29 {
 footer .copyright {
   position: relative;
   width: fit-content;
-  font-family: "Inter", Helvetica, sans-serif;
-  font-weight: 400;
-  color: #777777;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-body);
+  color: var(--color-text-muted);
   font-size: clamp(8.75px, 0.729vw, 14px);
   letter-spacing: -0.18px;
   line-height: clamp(12.5px, 1.042vw, 20px);
   white-space: nowrap;
+}
+
+footer a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* ==========================================================================

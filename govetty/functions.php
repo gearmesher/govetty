@@ -8,6 +8,27 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+/**
+ * Theme version — read from the "Version:" header in style.css, so bumping it
+ * there is the single place to version a release.
+ */
+if ( ! defined( 'GO_VETTY_VERSION' ) ) {
+    $go_vetty_theme = wp_get_theme( get_template() );
+    define( 'GO_VETTY_VERSION', $go_vetty_theme->get( 'Version' ) ? $go_vetty_theme->get( 'Version' ) : '1.1.0' );
+}
+
+/**
+ * Asset version string: "<theme version>.<file mtime>".
+ * The theme version busts caches on every release even when a deploy preserves
+ * file timestamps; the mtime part still catches hot-fixes made between releases.
+ *
+ * @param string $path Absolute path to the asset file.
+ * @return string
+ */
+function go_vetty_asset_version( $path ) {
+    return file_exists( $path ) ? GO_VETTY_VERSION . '.' . filemtime( $path ) : GO_VETTY_VERSION;
+}
+
 if ( ! function_exists( 'go_vetty_setup' ) ) :
     function go_vetty_setup() {
         // Core Gutenberg & Layout support
@@ -39,16 +60,11 @@ function go_vetty_purged_assets() {
     $theme_uri = get_template_directory_uri();
 
     if ( is_front_page() || is_home() ) {
-		$home_css_path = $theme_dir . '/home.min.css';
-
-		if ( file_exists( $home_css_path ) ) {
-			// Option 1: Read the CSS file contents directly and print in head
-			add_action( 'wp_head', function() use ( $home_css_path ) {
-				echo '<style id="govetty-home-inline-css">' . file_get_contents( $home_css_path ) . '</style>';
-			}, 5 );
-		}
+		// Front page: brand tokens, header, footer and home styles are all printed inline (no render-blocking requests).
+		add_action( 'wp_head', 'go_vetty_print_inline_home_css', 5 );
 	} else {  
         $style_css  = $theme_dir . '/style.css';
+        $brand_css  = $theme_dir . '/brand.css';
         $header_css = $theme_dir . '/header.css';
         $footer_css = $theme_dir . '/footer.css';
 
@@ -56,22 +72,53 @@ function go_vetty_purged_assets() {
             'govetty-style', 
             get_stylesheet_uri(), 
             [], 
-            file_exists( $style_css ) ? filemtime( $style_css ) : '1.0.0'
+            go_vetty_asset_version( $style_css )
         ); 
+
+        // Vetty brand tokens (colours, fonts) — loads after style.css so it wins over any legacy --x-* values.
+        wp_enqueue_style(
+            'govetty-brand',
+            $theme_uri . '/brand.css',
+            [ 'govetty-style' ],
+            go_vetty_asset_version( $brand_css )
+        );
 
         wp_enqueue_style( 
             'govetty-header', 
             $theme_uri . '/header.css', 
-            [ 'govetty-style' ], 
-            file_exists( $header_css ) ? filemtime( $header_css ) : '1.0.0'
+            [ 'govetty-brand' ], 
+            go_vetty_asset_version( $header_css )
         ); 
          
         wp_enqueue_style( 
             'govetty-footer', 
             $theme_uri . '/footer.css', 
-            [ 'govetty-style' ], 
-            file_exists( $footer_css ) ? filemtime( $footer_css ) : '1.0.0'
+            [ 'govetty-brand' ], 
+            go_vetty_asset_version( $footer_css )
         ); 
+
+        // Page-specific stylesheets (previously hard-coded <link> tags in header.php).
+        // Enqueued here so they load after the brand/header/footer CSS and get a
+        // filemtime() version — browsers fetch the new file as soon as it changes.
+        $page_styles = array(
+            'about-us'     => 'about.css',
+            'prices'       => 'prices.css',
+            'how-it-works' => 'how-it-works.css',
+            'our-vets'     => 'our-vets.css',
+            'faq'          => 'faq.css',
+        );
+
+        foreach ( $page_styles as $slug => $file ) {
+            if ( is_page( $slug ) ) {
+                $path = $theme_dir . '/' . $file;
+                wp_enqueue_style(
+                    'govetty-page-' . $slug,
+                    $theme_uri . '/' . $file,
+                    [ 'govetty-header', 'govetty-footer' ],
+                    go_vetty_asset_version( $path )
+                );
+            }
+        }
     } 
 
     // Remove Gutenberg global inline styles
@@ -83,6 +130,91 @@ function go_vetty_purged_assets() {
     } 
 } 
 add_action( 'wp_enqueue_scripts', 'go_vetty_purged_assets', 100 );
+
+/**
+ * Front page: print brand + header + footer + home CSS inline (minified copies of the .css sources).
+ * Relative font URLs in brand CSS ("assets/fonts/…") are rewritten to absolute theme URLs,
+ * because inline CSS resolves relative URLs against the page, not the theme folder.
+ */
+function go_vetty_print_inline_home_css() {
+	$theme_dir = get_stylesheet_directory();
+	$theme_uri = trailingslashit( get_template_directory_uri() );
+	$css       = '';
+
+	// Order matters: tokens/fonts → header → footer → page.
+	foreach ( array( 'brand.min.css', 'header.min.css', 'footer.min.css', 'home.min.css' ) as $file ) {
+		$path = $theme_dir . '/' . $file;
+		if ( file_exists( $path ) ) {
+			$css .= file_get_contents( $path );
+		}
+	}
+
+	if ( '' === $css ) {
+		return;
+	}
+
+	$css = str_replace(
+		array( 'url("assets/', "url('assets/", 'url(assets/' ),
+		array( 'url("' . $theme_uri . 'assets/', "url('" . $theme_uri . 'assets/', 'url(' . $theme_uri . 'assets/' ),
+		$css
+	);
+
+	echo '<style id="govetty-home-inline-css">' . $css . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- theme-owned CSS file.
+}
+
+/**
+ * Preload the Archivo variable font (used for every weight: 300 body, 600 UI, 800 display).
+ */
+function go_vetty_resource_hints() {
+	printf(
+		'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n",
+		esc_url( get_template_directory_uri() . '/assets/fonts/archivo-latin-wght.woff2' )
+	);
+}
+add_action( 'wp_head', 'go_vetty_resource_hints', 1 );
+
+/**
+ * Output the Vetty wordmark from the theme's assets/brand folder.
+ *
+ * @param string $variant  maroon | black | white | white-on-maroon
+ * @param string $class    CSS class for the <img>.
+ * @param bool   $priority True for the above-the-fold header logo (fetchpriority=high, eager).
+ */
+function go_vetty_brand_logo( $variant = 'maroon', $class = '', $priority = false ) {
+	$allowed = array( 'maroon', 'black', 'white', 'white-on-maroon' );
+	if ( ! in_array( $variant, $allowed, true ) ) {
+		$variant = 'maroon';
+	}
+
+	// Intrinsic size of the SVG artboards (keeps CLS at zero).
+	$dims = ( 'white-on-maroon' === $variant ) ? array( 231, 115 ) : array( 195, 79 );
+
+	printf(
+		'<img class="%1$s" src="%2$s" width="%3$d" height="%4$d" alt="%5$s" decoding="async"%6$s />',
+		esc_attr( $class ),
+		esc_url( add_query_arg( 'ver', GO_VETTY_VERSION, get_template_directory_uri() . '/assets/brand/vetty-logo-' . $variant . '.svg' ) ),
+		(int) $dims[0],
+		(int) $dims[1],
+		esc_attr__( 'Vetty', 'go-vetty' ),
+		$priority ? ' fetchpriority="high" loading="eager"' : ' loading="lazy"'
+	);
+}
+
+/**
+ * Favicons — only used when no Site Icon is set in Appearance → Customize → Site Identity
+ * (WordPress' own Site Icon always takes precedence).
+ */
+function go_vetty_favicons() {
+	if ( has_site_icon() ) {
+		return;
+	}
+	$base = get_template_directory_uri() . '/assets/brand/';
+	printf( '<link rel="icon" href="%s" sizes="any">' . "\n", esc_url( add_query_arg( 'ver', GO_VETTY_VERSION, $base . 'vetty-favicon-red.ico' ) ) );
+	printf( '<link rel="icon" href="%s" type="image/svg+xml">' . "\n", esc_url( add_query_arg( 'ver', GO_VETTY_VERSION, $base . 'vetty-favicon-red.svg' ) ) );
+	printf( '<link rel="apple-touch-icon" href="%s">' . "\n", esc_url( add_query_arg( 'ver', GO_VETTY_VERSION, $base . 'vetty-favicon-red-180.png' ) ) );
+	echo '<meta name="theme-color" content="#5e0710">' . "\n";
+}
+add_action( 'wp_head', 'go_vetty_favicons', 2 );
 
 remove_action('wp_head', 'wp_oembed_add_discovery_links');
 remove_action('wp_head', 'wp_oembed_add_host_js');
@@ -255,3 +387,8 @@ function go_vetty_footer_legal_fallback() {
     echo '<a class="text-wrapper-29" href="#">Data Security</a>';
     echo '<a class="text-wrapper-29" href="#">Cookies Policy</a>';
 }
+
+// Set booking path to "talk to a vet" link
+add_filter( 'marpet_booking_page_path', function () {
+    return '/talk-to-a-vet/'; // whatever slug you actually used
+} );

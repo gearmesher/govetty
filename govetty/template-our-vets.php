@@ -39,8 +39,8 @@ get_header(); ?>
 
       <li class="vet reveal">
         <div class="vet__media">
-          <img class="vet__leaf" src="https://www.figma.com/api/mcp/asset/4f25b3fc-185c-4b0d-8bf3-b78e8f7a38b7.svg" alt="" aria-hidden="true">
-          <img class="vet__photo" src="https://www.figma.com/api/mcp/asset/5affdd00-e7ce-4269-b4ed-4a41835078b0.png" alt="Dr. Sarah Mitchell, DVM" loading="lazy">
+          <img class="vet__leaf" src="/wp-content/uploads/2026/08/icon-maple-leaf.svg" alt="" aria-hidden="true">
+          <img class="vet__photo" src="/wp-content/uploads/2026/08/vet-sarah-mitchell.webp" alt="Dr. Sarah Mitchell, DVM" loading="lazy">
         </div>
         <div class="vet__info">
           <h2 class="vet__name">Dr. Sarah Mitchell</h2>
@@ -58,8 +58,8 @@ get_header(); ?>
 
       <li class="vet reveal">
         <div class="vet__media">
-          <img class="vet__leaf" src="https://www.figma.com/api/mcp/asset/4f25b3fc-185c-4b0d-8bf3-b78e8f7a38b7.svg" alt="" aria-hidden="true">
-          <img class="vet__photo" src="https://www.figma.com/api/mcp/asset/a93db87a-2dd0-4c5e-b514-93519db573c4.png" alt="Dr. Michael Lee, DVM" loading="lazy">
+          <img class="vet__leaf" src="/wp-content/uploads/2026/08/icon-maple-leaf.svg" alt="" aria-hidden="true">
+          <img class="vet__photo" src="/wp-content/uploads/2026/08/vet-michael-lee.webp" alt="Dr. Michael Lee, DVM" loading="lazy">
         </div>
         <div class="vet__info">
           <h2 class="vet__name">Dr. Michael Lee</h2>
@@ -78,8 +78,8 @@ get_header(); ?>
 
       <li class="vet reveal">
         <div class="vet__media">
-          <img class="vet__leaf" src="https://www.figma.com/api/mcp/asset/4f25b3fc-185c-4b0d-8bf3-b78e8f7a38b7.svg" alt="" aria-hidden="true">
-          <img class="vet__photo" src="https://www.figma.com/api/mcp/asset/857556a9-94fd-4069-b4c9-2910c9577384.png" alt="Dr. James Carter, DVM" loading="lazy">
+          <img class="vet__leaf" src="/wp-content/uploads/2026/08/icon-maple-leaf.svg" alt="" aria-hidden="true">
+          <img class="vet__photo" src="/wp-content/uploads/2026/08/vet-james-carter.webp" alt="Dr. James Carter, DVM" loading="lazy">
         </div>
         <div class="vet__info">
           <h2 class="vet__name">Dr. James Carter</h2>
@@ -98,8 +98,8 @@ get_header(); ?>
 
       <li class="vet reveal">
         <div class="vet__media">
-          <img class="vet__leaf" src="https://www.figma.com/api/mcp/asset/4f25b3fc-185c-4b0d-8bf3-b78e8f7a38b7.svg" alt="" aria-hidden="true">
-          <img class="vet__photo" src="https://www.figma.com/api/mcp/asset/803e8184-bd48-4aa7-9cb4-285750f63589.png" alt="Dr. Priya Sharma, DVM" loading="lazy">
+          <img class="vet__leaf" src="/wp-content/uploads/2026/08/icon-maple-leaf.svg" alt="" aria-hidden="true">
+          <img class="vet__photo" src="/wp-content/uploads/2026/08/vet-priya-sharma.webp" alt="Dr. Priya Sharma, DVM" loading="lazy">
         </div>
         <div class="vet__info">
           <h2 class="vet__name">Dr. Priya Sharma</h2>

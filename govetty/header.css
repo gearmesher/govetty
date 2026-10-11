@@ -2,20 +2,30 @@
    GO VETTY - HEADER STYLES
    ========================================================================== */
 
+/* Height of the fixed desktop header (padding-top + wordmark height + padding-bottom).
+   Inner-page heroes use this as their top offset so nothing hides under the header.
+   0.405 = the wordmark's height/width ratio (79/195). */
+:root {
+  --header-offset: calc(
+    clamp(18.75px, 1.562vw, 30px) +
+    clamp(150px, 11.198vw, 215px) * 0.405 +
+    clamp(10.5px, 1.125vw, 60px)
+  );
+}
+
 /* --- Core Header Structure & Cloud Fade Engine --- */
-header,
-header.frame-62 {
+:not(.home) header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   max-width: 100%;
   z-index: 9999;
-  background-color: #ffffff;
+  background-color: var(--color-surface);
 
   /* Cloudy soft edge engine */
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
+  /*-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);*/
 
   transition: all 0.3s ease-in-out;
   display: flex;
@@ -23,8 +33,32 @@ header.frame-62 {
   height: auto;
   align-items: flex-start;
   gap: clamp(6.25px, 0.521vw, 10px);
-  padding: clamp(18.75px, 1.562vw, 30px) clamp(43.75px, 3.646vw, 70px) clamp(37.5px, 3.125vw, 60px);
+  padding: clamp(18.75px, 1.562vw, 30px) clamp(43.75px, 3.646vw, 70px) clamp(10.5px, 1.125vw, 60px);
   box-sizing: border-box;
+}
+
+/* Size boxes the same way on every page. style.css normally provides this
+   reset, but the front page doesn't load style.css — without it the button
+   padding/border were added on top of their height (Log In / Talk to a Vet Now
+   rendered ~17px taller on the homepage). */
+header,
+header *,
+header *::before,
+header *::after {
+  box-sizing: border-box;
+}
+
+/* Nav menu items: WordPress outputs <li> elements (the <ul> is stripped by
+   items_wrap), so remove their bullets/spacing on every page — including the
+   front page, where style.css's ::marker reset is not loaded. */
+header .frame-65 li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+header .frame-65 li::marker {
+  content: none;
 }
 
 /* Hidden system checkbox for mobile navigation toggle */
@@ -54,7 +88,7 @@ header .group-wrapper {
 
 header .group-4 {
   position: relative;
-  top: -7px; /* fine-tuning offset, kept fixed — negligible at any scale */
+  top: 0; /* was -7px for the old raster logo; the SVG wordmark is cropped tight */
   width: auto;
   height: auto;
   display: flex;
@@ -63,9 +97,10 @@ header .group-4 {
 
 header .group-5 {
   margin-top: -0.9px; /* fine-tuning offset, kept fixed */
-  width: clamp(215px, 5.534vw, 106.26px);
-  height: clamp(91px, 4.881vw, 93.72px);
+  width: clamp(150px, 11.198vw, 215px);
+  height: auto;
   margin-left: -1.1px; /* fine-tuning offset, kept fixed */
+  display: block;
 }
 
 /* Actions & Navigation Wrappers */
@@ -96,17 +131,16 @@ header .frame-65 {
 /* Action Buttons (Log In & Talk to a Vet) */
 header .frame-66 {
   display: flex;
-  width: clamp(62.5px, 5.208vw, 100px);
+  width: clamp(92.5px, 5.208vw, 100px);
   height: clamp(37.5px, 3.125vw, 60px);
   align-items: center;
   justify-content: center;
   gap: clamp(6.25px, 0.521vw, 10px);
   padding: clamp(6.25px, 0.521vw, 10px);
   position: relative;
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   border-radius: 10px;
-  border: 1px solid;
-  border-color: var(--x-1);
+  border: 1px solid var(--color-primary);
   cursor: pointer;
   text-decoration: none;
 }
@@ -115,7 +149,7 @@ header .frame-67 {
   display: flex;
   width: auto;
   height: clamp(37.5px, 3.125vw, 60px);
-  background-color: var(--x-1);
+  background-color: var(--color-primary);
   align-items: center;
   justify-content: center;
   gap: clamp(6.25px, 0.521vw, 10px);
@@ -137,9 +171,9 @@ header .frame-8 {
 header .text-wrapper-25 {
   position: relative;
   width: fit-content;
-  font-family: "Inter", Helvetica;
+  font-family: var(--font-sans);
   font-weight: 600;
-  color: var(--x-1);
+  color: var(--color-primary);
   font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
   line-height: clamp(18.75px, 1.562vw, 30px);
@@ -150,9 +184,9 @@ header .text-wrapper-25 {
 header .text-wrapper-18 {
   position: relative;
   width: fit-content;
-  font-family: "Inter", Helvetica;
+  font-family: var(--font-sans);
   font-weight: 600;
-  color: #ffffff;
+  color: var(--white);
   font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
   line-height: clamp(18.75px, 1.562vw, 30px);
@@ -164,14 +198,29 @@ header .text-wrapper-31 {
   position: relative;
   width: fit-content;
   margin-top: -1px;
-  font-family: "Inter", Helvetica;
+  font-family: var(--font-sans);
   font-weight: 600;
-  color: #000000;
+  color: var(--color-text);
   font-size: clamp(12.5px, 1.042vw, 20px);
   letter-spacing: -0.25px;
   line-height: clamp(18.75px, 1.562vw, 30px);
   white-space: nowrap;
   cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+header .text-wrapper-31:hover,
+header .text-wrapper-31:focus-visible,
+header .current-menu-item > .text-wrapper-31 {
+  color: var(--color-primary);
+}
+
+header a:focus-visible,
+header label:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 10px;
 }
 
 /* ==========================================================================
@@ -189,6 +238,10 @@ header .text-wrapper-31 {
    ========================================================================== */
 
 @media (max-width: 767px) {
+  :root {
+    --header-offset: 0px; /* header is in normal flow on mobile */
+  }
+
   header,
   header.frame-62 {
     position: relative !important;
@@ -283,7 +336,7 @@ header .text-wrapper-31 {
     display: block !important;
     width: 28px !important;
     height: 28px !important;
-    fill: #600209 !important;
+    fill: var(--color-primary) !important;
   }
 
   /* Navigation dropdown is hidden by default on mobile */
@@ -305,7 +358,8 @@ header .text-wrapper-31 {
   .hamburger-icon {
     width: 26px;
     height: 26px;
-    color: #333333;
+    color: var(--color-primary);
+    fill: currentColor;
     transition: transform 0.25s ease-in-out;
   }
 
@@ -328,7 +382,7 @@ header .text-wrapper-31 {
 
   .menu-toggle:checked ~ .frame-64-parent .hamburger-icon .menu-close {
     display: block !important;
-    fill: #600209 !important;
+    fill: var(--maroon-800) !important;
   }
 
   /* Show Dropdown Menu when Checked */
@@ -341,14 +395,18 @@ header .text-wrapper-31 {
     right: 0 !important;
     width: 100vw !important;
     margin-left: calc(-50vw + 50%) !important;
-    background: #ffffff !important;
+    background: var(--color-surface) !important;
     z-index: 99999 !important;
     padding: 20px 24px !important;
-    border-top: 1px solid #ececec !important;
-    border-bottom: 1px solid #ececec !important;
+    border-top: 1px solid var(--color-border) !important;
+    border-bottom: 1px solid var(--color-border) !important;
     gap: 16px !important;
     box-sizing: border-box !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 25px rgb(43 7 9 / 8%);
+  }
+
+  header .frame-65 li {
+    width: 100%;
   }
 
   header .frame-65 a {
@@ -357,9 +415,9 @@ header .text-wrapper-31 {
     text-align: left;
     font-size: 16px !important;
     line-height: 24px !important;
-    color: #000000 !important;
+    color: var(--color-text) !important;
     padding: 8px 0;
-    font-weight: 500;
+    font-weight: var(--fw-ui);
     text-decoration: none;
   }
 }
