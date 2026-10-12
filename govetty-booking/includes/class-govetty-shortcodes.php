@@ -95,7 +95,15 @@ class Govetty_Shortcodes {
 		$icon      = $atts['icon']; // Raw HTML by design -- see docblock.
 
 		if ( $logged_in ) {
-			$redirect    = $atts['redirect'] ? $atts['redirect'] : self::current_url();
+			$redirect = $atts['redirect'];
+			if ( ! $redirect ) {
+				// Logging out from the Personal Area itself would land the
+				// visitor back on a page that needs a login -- send them
+				// home instead. Anywhere else, stay on the current page.
+				$on_personal_area = untrailingslashit( (string) wp_parse_url( self::current_url(), PHP_URL_PATH ) )
+					=== untrailingslashit( (string) wp_parse_url( Govetty_Rest_Routes::personal_area_page_url(), PHP_URL_PATH ) );
+				$redirect         = $on_personal_area ? home_url( '/' ) : self::current_url();
+			}
 			$account_url = $atts['account_url'] ? $atts['account_url'] : Govetty_Rest_Routes::personal_area_page_url();
 
 			return sprintf(
