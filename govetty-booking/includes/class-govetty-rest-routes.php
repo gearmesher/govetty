@@ -47,7 +47,11 @@ class Govetty_Rest_Routes {
 				array(
 					'methods'             => $method,
 					'callback'            => $handler,
-					'permission_callback' => array( __CLASS__, 'check_nonce' ),
+					// Logout only clears the caller's own cookie, so it
+					// deliberately skips the nonce: a page served from a
+					// cache carries an expired nonce, and a nonce failure
+					// here silently left visitors logged in.
+					'permission_callback' => '/logout' === $path ? '__return_true' : array( __CLASS__, 'check_nonce' ),
 				)
 			);
 		}
@@ -196,11 +200,17 @@ class Govetty_Rest_Routes {
 	 * cookie is a no-op, not an error.
 	 */
 	public static function logout( WP_REST_Request $request ) {
+		nocache_headers();
+
 		$token = Govetty_Customer_Session::get_token();
-		if ( $token ) {
-			$meta = get_transient( 'govetty_token_meta_' . md5( $token ) ) ?: array();
-			Govetty_Logger::log( 'logout', array( 'phone' => $meta['phone'] ?? null ) );
-		}
+		$meta  = $token ? ( get_transient( 'govetty_token_meta_' . md5( $token ) ) ?: array() ) : array();
+		Govetty_Logger::log(
+			'logout',
+			array(
+				'had_cookie' => (bool) $token,
+				'phone'      => $meta['phone'] ?? null,
+			)
+		);
 
 		Govetty_Customer_Session::clear_token();
 		return new WP_REST_Response( array( 'status' => 'ok' ), 200 );

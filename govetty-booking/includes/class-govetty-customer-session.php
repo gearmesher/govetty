@@ -48,6 +48,21 @@ class Govetty_Customer_Session {
 	}
 
 	public static function clear_token() {
-		setcookie( self::COOKIE_NAME, '', time() - HOUR_IN_SECONDS, '/' );
+		// Same name/path/domain AND flags as set_token() -- an expiry sent
+		// with different attributes can fail to match the cookie it's meant
+		// to remove on some browsers.
+		setcookie(
+			self::COOKIE_NAME,
+			'',
+			array(
+				'expires'  => time() - HOUR_IN_SECONDS,
+				'path'     => '/',
+				'domain'   => '',
+				'secure'   => true,
+				'httponly' => true,
+				'samesite' => 'Strict',
+			)
+		);
+		unset( $_COOKIE[ self::COOKIE_NAME ] );
 	}
 }
