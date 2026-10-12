@@ -82,6 +82,12 @@ const ERROR_MESSAGES = {
   too_many_pets_for_profile: "That's more pets than this plan allows -- pick a different plan.",
   validation_error: 'Double-check the highlighted fields and try again.',
   not_found: "We couldn't find that -- try again.",
+  plans_load_failed: "We couldn't load the plans just now. Try again in a moment.",
+  not_logged_in: 'Your session has ended. Please log in again.',
+  invalid_customer_token: 'Your session has ended. Please log in again.',
+  customer_not_found: "We couldn't find your account. Please log in again.",
+  pet_not_found: "We couldn't find that pet on your account.",
+  invalid_pet_id: "We couldn't find that pet on your account.",
 };
 
 export function errorMessage(code) {

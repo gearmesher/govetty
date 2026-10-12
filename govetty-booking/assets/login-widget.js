@@ -133,4 +133,52 @@
         }
       });
   });
+
+  // "You've been logged out" notice. The logout handler above redirects with
+  // ?govetty_logged_out=<timestamp>; show a small fixed popup once, then strip
+  // the parameter so a refresh clears it (it stays until then -- no timer).
+  (function showLoggedOutNotice() {
+    var url;
+    try {
+      url = new URL(window.location.href);
+    } catch (e) {
+      return;
+    }
+    if (!url.searchParams.has('govetty_logged_out')) {
+      return;
+    }
+
+    url.searchParams.delete('govetty_logged_out');
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }
+
+    function render() {
+      var note = document.createElement('div');
+      note.className = 'gv-toast';
+      note.setAttribute('role', 'status');
+
+      var text = document.createElement('span');
+      text.textContent = "You've been logged out.";
+      note.appendChild(text);
+
+      var close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'gv-toast-close';
+      close.setAttribute('aria-label', 'Dismiss');
+      close.textContent = '\u00d7';
+      close.addEventListener('click', function () {
+        note.remove();
+      });
+      note.appendChild(close);
+
+      document.body.appendChild(note);
+    }
+
+    if (document.body) {
+      render();
+    } else {
+      document.addEventListener('DOMContentLoaded', render);
+    }
+  })();
 })();
