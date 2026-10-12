@@ -228,6 +228,17 @@ export default function PersonalArea() {
     <Shell eyebrow="Personal Area" wide>
       {loading ? (
         <Loading label="Loading your account…" />
+      ) : error === 'not_logged_in' ? (
+        <div>
+          <p className="gv-subtitle">You're logged out. Log in with your phone number to see your account.</p>
+          <a
+            className="gv-btn gv-btn-primary"
+            style={{ display: 'inline-block', textDecoration: 'none', textAlign: 'center' }}
+            href={(window.GovettyBooking && window.GovettyBooking.loginUrl) || '/'}
+          >
+            Log in
+          </a>
+        </div>
       ) : error ? (
         <ErrorBanner code={error} />
       ) : (
