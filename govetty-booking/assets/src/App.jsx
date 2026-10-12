@@ -62,7 +62,9 @@ export default function App() {
     return (
       <PlanSelection
         plans={context.plans}
-        loading={state.matches('planSelection')}
+        plansStatus={context.plansStatus}
+        plansError={context.plansError}
+        onRetry={() => send({ type: 'RETRY_PLANS' })}
         checkoutLoading={state.matches('checkingOut')}
         error={context.checkoutError}
         onSelect={(planKey) => send({ type: 'SELECT_PLAN', planKey })}

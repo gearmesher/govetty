@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shell, ErrorBanner, Loading, PROGRESS_BY_STATE } from './shared/UI';
+import { Shell, ErrorBanner, Loading, LinkButton, PROGRESS_BY_STATE } from './shared/UI';
 
 // The API only returns plan_key + price -- friendly copy lives here so it's
 // easy to update without touching the machine or the API layer. Keys
@@ -28,7 +28,7 @@ function formatPrice(cents, planKey) {
   return planKey.includes('monthly') ? `$${amount}/mo` : `$${amount}`;
 }
 
-export default function PlanSelection({ plans, loading, error, onSelect, checkoutLoading, onBack }) {
+export default function PlanSelection({ plans, plansStatus, plansError, error, onSelect, onRetry, checkoutLoading, onBack }) {
   return (
     <Shell
       progress={PROGRESS_BY_STATE.planSelection}
@@ -38,8 +38,18 @@ export default function PlanSelection({ plans, loading, error, onSelect, checkou
       subtitle="Pick the option that fits how often you'll need a vet."
     >
       <ErrorBanner code={error} />
-      {loading && plans.length === 0 ? (
+      {plansStatus === 'loading' || plansStatus === 'idle' ? (
         <Loading label="Loading plans…" />
+      ) : plansStatus === 'error' ? (
+        <div>
+          <ErrorBanner code={plansError} />
+          <LinkButton onClick={onRetry}>Try again</LinkButton>
+        </div>
+      ) : plans.length === 0 ? (
+        <div>
+          <p className="gv-subtitle">No plans are available for this pet right now.</p>
+          <LinkButton onClick={onRetry}>Try again</LinkButton>
+        </div>
       ) : (
         <div className="gv-list">
           {plans.map((plan) => {

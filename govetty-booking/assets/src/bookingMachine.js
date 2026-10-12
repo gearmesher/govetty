@@ -99,6 +99,8 @@ const machine = setup({
     slots: [],
     slotError: null,
     checkoutError: null,
+    plansStatus: 'idle',
+    plansError: null,
   },
   states: {
     phoneEntry: {
@@ -304,14 +306,35 @@ const machine = setup({
     // -----------------------------------------------------------------
 
     planSelection: {
+      // plansStatus is what the screen actually renders from. It used to key
+      // off "are we in this state" alone, which is true for the whole time
+      // the screen is up -- so a failed or empty /billing/getPlans response
+      // left "Loading plans..." on screen forever instead of an error.
+      entry: assign({ plansStatus: 'loading', plansError: null }),
       invoke: {
         src: 'loadPlans',
         input: ({ context }) => ({ petId: context.selectedPetId }),
-        onDone: {
-          actions: assign({ plans: ({ event }) => event.output.data.plans || [] }),
+        onDone: [
+          {
+            guard: ({ event }) => event.output.status !== 200 || !Array.isArray(event.output.data.plans),
+            actions: assign({
+              plansStatus: 'error',
+              plansError: ({ event }) => event.output.data.message || event.output.data.error || 'plans_load_failed',
+            }),
+          },
+          {
+            actions: assign({
+              plans: ({ event }) => event.output.data.plans,
+              plansStatus: 'ready',
+            }),
+          },
+        ],
+        onError: {
+          actions: assign({ plansStatus: 'error', plansError: 'plans_load_failed' }),
         },
       },
       on: {
+        RETRY_PLANS: { target: 'planSelection', reenter: true },
         SELECT_PLAN: {
           target: 'checkingOut',
           actions: assign({ selectedPlanKey: ({ event }) => event.planKey }),
