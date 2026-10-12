@@ -34,6 +34,7 @@ class Govetty_Rest_Routes {
 			array( 'POST', '/customer/detach-pet', array( __CLASS__, 'detach_pet' ) ),
 			array( 'GET', '/conference-token', array( __CLASS__, 'conference_token' ) ),
 			array( 'POST', '/image/upload', array( __CLASS__, 'image_upload' ) ),
+			array( 'GET', '/image/(?P<image_id>\\d+)', array( __CLASS__, 'image_get' ) ),
 			array( 'POST', '/image/assign', array( __CLASS__, 'image_assign' ) ),
 			array( 'POST', '/billing/confirm-return', array( __CLASS__, 'billing_confirm_return' ) ),
 		);
@@ -744,6 +745,49 @@ class Govetty_Rest_Routes {
 		$result = self::api_upload_image( $file['tmp_name'], $file['name'], $file['type'] );
 
 		return self::passthrough( $result );
+	}
+
+	/**
+	 * Streams one of the logged-in customer's own pet photos. The CPP API's
+	 * GET /image/{id} needs the server-side token, so the browser can't load
+	 * it directly -- the Personal Area fetches this route (with the REST
+	 * nonce) and shows the result as a blob URL.
+	 *
+	 * Only image ids that appear on the caller's own pets (per /info/user)
+	 * are served, so ids can't be enumerated across customers.
+	 */
+	public static function image_get( WP_REST_Request $request ) {
+		$token = Govetty_Customer_Session::get_token();
+		if ( ! $token ) {
+			return self::unauthenticated();
+		}
+
+		$image_id = absint( $request['image_id'] );
+		$user     = self::api_request( 'GET', '/info/user', array( 'customer_token' => $token ) );
+		$owns     = false;
+		if ( 200 === $user['code'] && ! empty( $user['body']['pets'] ) ) {
+			foreach ( $user['body']['pets'] as $pet ) {
+				if ( (int) ( $pet['image_id'] ?? 0 ) === $image_id && $image_id > 0 ) {
+					$owns = true;
+					break;
+				}
+			}
+		}
+		if ( ! $owns || Govetty_Settings::is_mock_mode() ) {
+			return new WP_REST_Response( array( 'status' => 'error', 'message' => 'image_not_found' ), 404 );
+		}
+
+		$image = Govetty_Api_Client::fetch_binary( '/image/' . $image_id );
+		if ( 200 !== $image['code'] || 0 !== stripos( $image['content_type'], 'image/' ) ) {
+			return new WP_REST_Response( array( 'status' => 'error', 'message' => 'image_not_found' ), 404 );
+		}
+
+		status_header( 200 );
+		header( 'Content-Type: ' . $image['content_type'] );
+		header( 'X-Content-Type-Options: nosniff' );
+		header( 'Cache-Control: private, max-age=3600' );
+		echo $image['body']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw image bytes.
+		exit;
 	}
 
 	/**

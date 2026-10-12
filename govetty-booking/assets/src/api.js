@@ -83,6 +83,22 @@ export const api = {
       return { ok: res.ok, status: res.status, data };
     });
   },
+  // Streams a stored pet photo through the plugin (the CPP API needs the
+  // server-side token, so <img src> can't hit it directly). Resolves to a
+  // blob: URL, or null if the image isn't available.
+  petImage: async (imageId) => {
+    const { root, nonce } = getConfig();
+    try {
+      const res = await fetch(root + 'image/' + encodeURIComponent(imageId), {
+        credentials: 'same-origin',
+        headers: { 'X-WP-Nonce': nonce },
+      });
+      if (!res.ok) return null;
+      return URL.createObjectURL(await res.blob());
+    } catch (e) {
+      return null;
+    }
+  },
   imageAssign: (imageId, petId) =>
     call('POST', 'image/assign', { image_id: imageId, pet_id: petId }),
   confirmReturn: (checkoutRef, outcome) =>

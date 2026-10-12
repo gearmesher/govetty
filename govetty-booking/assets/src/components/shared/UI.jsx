@@ -24,11 +24,9 @@ export const PROGRESS_BY_STATE = {
 
 export function Shell({ progress, eyebrow, title, subtitle, children, onBack, wide }) {
   const mockMode = typeof window !== 'undefined' && window.GovettyBooking && window.GovettyBooking.mockMode;
-  const logoUrl = typeof window !== 'undefined' && window.GovettyBooking && window.GovettyBooking.logoUrl;
   return (
     <div className="gv-root">
       <div className={wide ? 'gv-shell gv-shell-wide' : 'gv-shell'}>
-        {logoUrl && <img className="gv-logo" src={logoUrl} alt="Vetty" />}
         {mockMode && (
           <div className="gv-mock-banner">
             Mock mode &mdash; no real API, SMS, or Stripe calls. Any 6-digit code works.
