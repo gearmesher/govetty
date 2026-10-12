@@ -117,7 +117,32 @@ function PetImageUpload({ pet, onUpdated }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [savedUrl, setSavedUrl] = useState(null);
   const hasImage = !!pet.image_id;
+
+  // Load the photo already on file (if any) so it can sit at the top of
+  // the pet card. Falls back to the initial-letter tile when there isn't
+  // one or it can't be fetched.
+  useEffect(() => {
+    let cancelled = false;
+    let objectUrl = null;
+    if (!pet.image_id) {
+      setSavedUrl(null);
+      return undefined;
+    }
+    api.petImage(pet.image_id).then((url) => {
+      objectUrl = url;
+      if (cancelled) {
+        if (url) URL.revokeObjectURL(url);
+      } else {
+        setSavedUrl(url);
+      }
+    });
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [pet.image_id]);
 
   const handleFile = async (e) => {
     const file = e.target.files[0];
@@ -142,23 +167,33 @@ function PetImageUpload({ pet, onUpdated }) {
     }
   };
 
+  const shownUrl = preview || savedUrl;
+
   return (
-    <div className="gv-pet-photo">
-      {preview ? (
-        <img src={preview} alt="" className="gv-upload-preview gv-upload-preview-sm" />
-      ) : null}
-      <label className="gv-upload-dropzone gv-upload-dropzone-sm" htmlFor={`gv-pa-photo-${pet.id}`}>
-        {uploading ? 'Uploading…' : hasImage || preview ? 'Photo on file -- tap to replace' : 'Add a photo'}
-      </label>
-      <input
-        id={`gv-pa-photo-${pet.id}`}
-        type="file"
-        accept="image/jpeg,image/png"
-        style={{ display: 'none' }}
-        onChange={handleFile}
-      />
-      {error && <p className="gv-hint">Couldn't upload that image -- try again in a moment.</p>}
-    </div>
+    <>
+      <div className="gv-pa-pet-photo">
+        {shownUrl ? (
+          <img src={shownUrl} alt={pet.name ? `Photo of ${pet.name}` : 'Pet photo'} />
+        ) : (
+          <span className="gv-pa-pet-initial" aria-hidden="true">
+            {(pet.name || '?').trim().charAt(0).toUpperCase()}
+          </span>
+        )}
+      </div>
+      <div className="gv-pet-photo">
+        <label className="gv-upload-dropzone gv-upload-dropzone-sm" htmlFor={`gv-pa-photo-${pet.id}`}>
+          {uploading ? 'Uploading…' : hasImage || preview ? 'Replace photo' : 'Add a photo'}
+        </label>
+        <input
+          id={`gv-pa-photo-${pet.id}`}
+          type="file"
+          accept="image/jpeg,image/png"
+          style={{ display: 'none' }}
+          onChange={handleFile}
+        />
+        {error && <p className="gv-hint">Couldn't upload that image -- try again in a moment.</p>}
+      </div>
+    </>
   );
 }
 
@@ -190,7 +225,7 @@ export default function PersonalArea() {
   };
 
   return (
-    <Shell eyebrow="Personal Area" title="Your account" wide>
+    <Shell eyebrow="Personal Area" wide>
       {loading ? (
         <Loading label="Loading your account…" />
       ) : error ? (
@@ -221,17 +256,16 @@ export default function PersonalArea() {
               <div className="gv-pa-pet-list">
                 {pets.map((pet) => (
                   <div key={pet.id} className="gv-pa-pet-card">
+                    <PetImageUpload pet={pet} onUpdated={handlePetImageUpdated} />
                     <div className="gv-pa-pet-info">
                       <p className="gv-pa-pet-name">{pet.name}</p>
+                      <p className="gv-pa-pet-meta">{pet.type === 'dog' ? 'Dog' : pet.type === 'cat' ? 'Cat' : pet.type}</p>
                       <p className="gv-pa-pet-meta">
-                        {pet.type === 'dog' ? 'Dog' : pet.type === 'cat' ? 'Cat' : pet.type}
-                        {' · '}
                         {pet.token_amount > 0
                           ? `${pet.token_amount} call${pet.token_amount === 1 ? '' : 's'} available`
                           : 'No calls available'}
                       </p>
                     </div>
-                    <PetImageUpload pet={pet} onUpdated={handlePetImageUpdated} />
                   </div>
                 ))}
               </div>

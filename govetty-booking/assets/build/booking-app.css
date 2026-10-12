@@ -86,13 +86,6 @@
   padding: 28px 28px 32px;
 }
 
-.gv-logo {
-  display: block;
-  height: 30px;
-  width: auto;
-  margin: 0 auto 18px;
-}
-
 .gv-mock-banner {
   background: #ffe58f;
   color: #7a5b00;
@@ -576,26 +569,67 @@
 }
 
 .gv-pa-pet-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
 .gv-pa-pet-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
   background: var(--gv-bg);
   border: 1px solid var(--gv-border);
   border-radius: var(--gv-radius);
-  padding: 14px 16px;
+  padding: 12px;
+  min-width: 0;
+}
+
+.gv-pa-pet-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--gv-radius-sm);
+  background: var(--gv-sand-100);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gv-pa-pet-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gv-pa-pet-initial {
+  font-family: var(--gv-font-display);
+  font-weight: 800;
+  font-size: clamp(36px, 12vw, 56px);
+  color: var(--gv-rose-300);
+  line-height: 1;
+}
+
+.gv-pa-pet-photo { order: 1; }
+
+.gv-pa-pet-info {
+  order: 2;
+  min-width: 0;
+}
+
+.gv-pa-pet-card .gv-pet-photo {
+  order: 3;
+  margin-top: auto;
 }
 
 .gv-pa-pet-name {
-  margin: 0 0 2px;
-  font-weight: 600;
+  margin: 0 0 4px;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--gv-heading);
+  overflow-wrap: anywhere;
 }
 
 .gv-pa-pet-meta {
@@ -606,6 +640,12 @@
 
 .gv-pet-photo {
   flex: 0 0 auto;
+}
+
+.gv-pa-pet-card .gv-upload-dropzone-sm {
+  display: block;
+  text-align: center;
+  white-space: normal;
 }
 
 .gv-upload-dropzone-sm {
@@ -670,10 +710,10 @@
   color: var(--gv-error);
 }
 
-@media (max-width: 480px) {
-  .gv-pa-pet-card {
-    flex-direction: column;
-    align-items: flex-start;
+/* Two pet columns down to small phones; single column below that. */
+@media (max-width: 340px) {
+  .gv-pa-pet-list {
+    grid-template-columns: 1fr;
   }
 }
 

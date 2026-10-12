@@ -76,6 +76,31 @@ class Govetty_Api_Client {
 	}
 
 	/**
+	 * GET raw bytes (e.g. a stored pet image) from the CPP API.
+	 *
+	 * @return array{code:int,body:string,content_type:string}
+	 */
+	public static function fetch_binary( $path ) {
+		$response = wp_remote_get(
+			self::build_url( $path ),
+			array(
+				'timeout' => 15,
+				'headers' => self::auth_headers(),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return array( 'code' => 502, 'body' => '', 'content_type' => '' );
+		}
+
+		return array(
+			'code'         => (int) wp_remote_retrieve_response_code( $response ),
+			'body'         => wp_remote_retrieve_body( $response ),
+			'content_type' => (string) wp_remote_retrieve_header( $response, 'content-type' ),
+		);
+	}
+
+	/**
 	 * Proxy a multipart image upload straight through to the CPP API.
 	 *
 	 * Uses cURL directly rather than wp_remote_request(), because the WP
