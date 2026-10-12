@@ -122,7 +122,15 @@
         // the redirect below either way so the visitor isn't stuck.
       })
       .then(function () {
-        window.location.href = redirect;
+        // A changing query value defeats page caches that would otherwise
+        // hand back the cached logged-in header after the redirect.
+        try {
+          var target = new URL(redirect, window.location.href);
+          target.searchParams.set('govetty_logged_out', String(Date.now()));
+          window.location.href = target.toString();
+        } catch (e) {
+          window.location.href = redirect;
+        }
       });
   });
 })();
