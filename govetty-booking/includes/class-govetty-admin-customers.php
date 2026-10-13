@@ -24,7 +24,7 @@ class Govetty_Customers_List_Table extends WP_List_Table {
 			'name'       => 'Name',
 			'phone'      => 'Phone',
 			'pets'       => 'Pets',
-			'first_seen' => 'First seen',
+			'first_seen' => 'Registered',
 			'last_seen'  => 'Last seen',
 		);
 	}
@@ -36,6 +36,7 @@ class Govetty_Customers_List_Table extends WP_List_Table {
 			array(
 				'per_page' => $per_page,
 				'offset'   => ( $current_page - 1 ) * $per_page,
+				'search'   => self::search_term(),
 			)
 		);
 
@@ -49,7 +50,15 @@ class Govetty_Customers_List_Table extends WP_List_Table {
 		);
 	}
 
+	public static function search_term() {
+		return isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+
 	public function no_items() {
+		if ( '' !== self::search_term() ) {
+			esc_html_e( 'No customers match your search.', 'govetty-booking' );
+			return;
+		}
 		esc_html_e( 'No customers have logged in or registered through the booking widget yet.', 'govetty-booking' );
 	}
 
@@ -58,7 +67,7 @@ class Govetty_Customers_List_Table extends WP_List_Table {
 			case 'phone':
 				return esc_html( $item['phone'] );
 			case 'first_seen':
-				return esc_html( mysql2date( 'M j, Y', $item['first_seen'] ) );
+				return esc_html( mysql2date( 'M j, Y g:ia', $item['first_seen'] ) );
 			case 'last_seen':
 				return esc_html( mysql2date( 'M j, Y g:ia', $item['last_seen'] ) );
 			default:
@@ -119,6 +128,7 @@ class Govetty_Admin_Customers {
 			<?php self::render_caveat(); ?>
 			<form method="get">
 				<input type="hidden" name="page" value="<?php echo esc_attr( Govetty_Admin_Menu::SLUG ); ?>">
+				<?php $table->search_box( 'Search customers', 'govetty-customer' ); ?>
 				<?php $table->display(); ?>
 			</form>
 		</div>
@@ -146,7 +156,7 @@ class Govetty_Admin_Customers {
 			</h1>
 			<p>
 				<strong>Phone:</strong> <?php echo esc_html( $customer['phone'] ); ?><br>
-				<strong>First seen:</strong> <?php echo esc_html( mysql2date( 'M j, Y g:ia', $customer['first_seen'] ) ); ?><br>
+				<strong>Registered:</strong> <?php echo esc_html( mysql2date( 'M j, Y g:ia', $customer['first_seen'] ) ); ?><br>
 				<strong>Last seen:</strong> <?php echo esc_html( mysql2date( 'M j, Y g:ia', $customer['last_seen'] ) ); ?>
 			</p>
 
