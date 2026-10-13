@@ -79,13 +79,7 @@ class Govetty_Mock_Api {
 				);
 
 			case '/info/user':
-				return self::ok(
-					array(
-						'status'   => 'ok',
-						'customer' => self::mock_customer(),
-						'pets'     => self::mock_pets(),
-					)
-				);
+				return self::info_user( $params );
 
 			case '/billing/getPlans':
 				return self::ok(
@@ -172,36 +166,98 @@ class Govetty_Mock_Api {
 		);
 	}
 
-	private static function mock_customer() {
-		return array(
-			'token'      => 'mock-token-' . wp_generate_password( 12, false ),
-			'first_name' => 'Jamie',
-			'last_name'  => 'Rivera',
+	/**
+	 * Mock customers are chosen by the LAST DIGIT of the phone number, so
+	 * every branch of the booking flow can be exercised without a settings
+	 * switch (mirrors the "Customer Status" diamond on the Figma board):
+	 *
+	 *   1 -> existing, two pets: Biscuit has calls, Whiskers has none
+	 *   2 -> existing, one pet (Whiskers), no calls   -> straight to Plan Selection
+	 *   3 -> existing, one pet (Biscuit), has calls   -> Pet Selection
+	 *   4 -> existing, two pets, neither has calls    -> Pet Selection, then Plans
+	 *   anything else -> not recognized (new customer -> Registration)
+	 *
+	 * A number that has been through mock /register is recognized from then
+	 * on, whatever its last digit.
+	 */
+	private static function scenario_pets( $phone ) {
+		$biscuit_calls = array( 'id' => 101, 'name' => 'Biscuit', 'type' => 'dog', 'token_amount' => 3, 'image_id' => null );
+		$biscuit_none  = array( 'id' => 101, 'name' => 'Biscuit', 'type' => 'dog', 'token_amount' => 0, 'image_id' => null );
+		$whiskers      = array( 'id' => 102, 'name' => 'Whiskers', 'type' => 'cat', 'token_amount' => 0, 'image_id' => null );
+
+		switch ( substr( preg_replace( '/\D/', '', (string) $phone ), -1 ) ) {
+			case '1':
+				return array( $biscuit_calls, $whiskers );
+			case '2':
+				return array( $whiskers );
+			case '3':
+				return array( $biscuit_calls );
+			case '4':
+				return array( $biscuit_none, $whiskers );
+		}
+		return null;
+	}
+
+	private static function session_key( $token ) {
+		return 'govetty_mock_session_' . md5( (string) $token );
+	}
+
+	/**
+	 * Starts a mock session: the token the browser will hold maps to this
+	 * customer/pets, so /info/user (and balance changes) work per login.
+	 */
+	private static function start_session( $phone, $customer, $pets ) {
+		$token             = 'mock-token-' . wp_generate_password( 12, false );
+		$customer['token'] = $token;
+		set_transient(
+			self::session_key( $token ),
+			array(
+				'phone'    => (string) $phone,
+				'customer' => $customer,
+				'pets'     => $pets,
+			),
+			12 * HOUR_IN_SECONDS
+		);
+		return $customer;
+	}
+
+	private static function info_user( $params ) {
+		$token   = (string) ( $params['customer_token'] ?? '' );
+		$session = $token ? get_transient( self::session_key( $token ) ) : false;
+		if ( ! $session ) {
+			return self::error( 422, array( 'status' => 'error', 'message' => 'customer_not_found' ) );
+		}
+		return self::ok(
+			array(
+				'status'   => 'ok',
+				'customer' => $session['customer'],
+				'pets'     => $session['pets'],
+			)
 		);
 	}
 
 	/**
-	 * One pet with a balance, one without -- so both Pet Selection
-	 * branches are reachable from the single "existing customer" scenario
-	 * without needing more settings.
+	 * Mock stand-in for a successful purchase: adds call balance to the pet
+	 * so "has balance" branches can be reached by buying a plan in mock mode.
 	 */
-	private static function mock_pets() {
-		return array(
-			array(
-				'id'            => 101,
-				'name'          => 'Biscuit',
-				'type'          => 'dog',
-				'token_amount'  => 3,
-				'image_id'      => null,
-			),
-			array(
-				'id'            => 102,
-				'name'          => 'Whiskers',
-				'type'          => 'cat',
-				'token_amount'  => 0,
-				'image_id'      => null,
-			),
-		);
+	public static function grant_balance( $token, $pet_id, $plan_key ) {
+		$session = $token ? get_transient( self::session_key( $token ) ) : false;
+		if ( ! $session ) {
+			return;
+		}
+		$calls = false !== strpos( (string) $plan_key, 'monthly' ) ? 10 : 1;
+		foreach ( $session['pets'] as $i => $pet ) {
+			if ( (int) $pet['id'] === (int) $pet_id ) {
+				$session['pets'][ $i ]['token_amount'] = (int) $pet['token_amount'] + $calls;
+			}
+		}
+		set_transient( self::session_key( $token ), $session, 12 * HOUR_IN_SECONDS );
+
+		$registered = self::get_registered( $session['phone'] );
+		if ( $registered ) {
+			$registered['pets'] = $session['pets'];
+			self::set_registered( $session['phone'], $registered );
+		}
 	}
 
 	private static function otp_verify( $params ) {
@@ -213,29 +269,38 @@ class Govetty_Mock_Api {
 			) );
 		}
 
-		// If this phone already went through mock /register in this
-		// session, always recognize it now -- regardless of the configured
-		// scenario. Without this, re-verifying right after registration
-		// (see the bookingMachine's postRegistration purpose) would
-		// incorrectly still look like an unrecognized number under the
-		// "new customer" scenario.
-		$registered = self::get_registered( $params['phone'] ?? '' );
+		$phone = (string) ( $params['phone'] ?? '' );
+
+		// A phone that already went through mock /register is recognized
+		// from then on (this is also what the post-registration OTP re-run
+		// relies on).
+		$registered = self::get_registered( $phone );
 		if ( $registered ) {
+			$customer = self::start_session( $phone, $registered['customer'], $registered['pets'] );
 			return self::ok(
 				array(
 					'status'   => 'ok',
-					'customer' => $registered['customer'],
+					'customer' => $customer,
 					'pets'     => $registered['pets'],
 				)
 			);
 		}
 
-		if ( 'existing_customer' === Govetty_Settings::scenario() ) {
+		$pets = self::scenario_pets( $phone );
+		if ( null !== $pets ) {
+			$customer = self::start_session(
+				$phone,
+				array(
+					'first_name' => 'Jamie',
+					'last_name'  => 'Rivera',
+				),
+				$pets
+			);
 			return self::ok(
 				array(
 					'status'   => 'ok',
-					'customer' => self::mock_customer(),
-					'pets'     => self::mock_pets(),
+					'customer' => $customer,
+					'pets'     => $pets,
 				)
 			);
 		}
@@ -261,7 +326,6 @@ class Govetty_Mock_Api {
 			$params['phone'] ?? '',
 			array(
 				'customer' => array(
-					'token'      => 'mock-token-' . wp_generate_password( 12, false ),
 					'first_name' => $params['first_name'] ?? 'New',
 					'last_name'  => $params['last_name'] ?? 'Customer',
 				),

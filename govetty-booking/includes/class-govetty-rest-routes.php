@@ -620,6 +620,15 @@ class Govetty_Rest_Routes {
 
 		if ( $ref && in_array( $outcome, array( 'success', 'cancelled' ), true ) ) {
 			Govetty_Data_Store::mark_checkout_returned( $ref, $outcome );
+
+			// Mock mode has no Stripe webhook to credit a purchase, so a
+			// simulated successful payment adds calls to the pet directly.
+			if ( 'success' === $outcome && Govetty_Settings::is_mock_mode() ) {
+				$event = Govetty_Data_Store::get_checkout_event_by_ref( $ref );
+				if ( $event ) {
+					Govetty_Mock_Api::grant_balance( Govetty_Customer_Session::get_token(), (int) $event['pet_id'], $event['plan_key'] );
+				}
+			}
 			Govetty_Logger::log( 'checkout_returned', array( 'checkout_ref' => $ref, 'outcome' => $outcome ) );
 		}
 

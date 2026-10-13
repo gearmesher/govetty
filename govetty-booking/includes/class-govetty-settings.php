@@ -4,14 +4,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Settings > GoVetty Booking. A single toggle plus a scenario picker so the
- * whole flow can be clicked through without a live CPP API connection or
- * real Stripe/SMS costs.
+ * Settings > GoVetty Booking. A mock-mode toggle so the whole flow can be
+ * clicked through without a live CPP API connection or real Stripe/SMS
+ * costs (which customer you get is decided by the phone number's last
+ * digit -- see Govetty_Mock_Api), plus the transaction-logging toggle.
  */
 class Govetty_Settings {
 
 	const OPTION_MOCK_MODE = 'govetty_booking_mock_mode';
-	const OPTION_SCENARIO  = 'govetty_booking_mock_scenario';
 	const OPTION_LOGGING   = 'govetty_booking_enable_logging';
 
 	public static function init() {
@@ -23,23 +23,16 @@ class Govetty_Settings {
 		return '1' === get_option( self::OPTION_MOCK_MODE, '0' );
 	}
 
-	public static function scenario() {
-		$value = get_option( self::OPTION_SCENARIO, 'new_customer' );
-		return in_array( $value, array( 'new_customer', 'existing_customer' ), true ) ? $value : 'new_customer';
-	}
-
 	public static function is_logging_enabled() {
 		return '1' === get_option( self::OPTION_LOGGING, '0' );
 	}
 
 	public static function register_settings() {
 		register_setting( 'govetty_booking_settings', self::OPTION_MOCK_MODE, array( 'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ) ) );
-		register_setting( 'govetty_booking_settings', self::OPTION_SCENARIO, array( 'sanitize_callback' => array( __CLASS__, 'sanitize_scenario' ) ) );
 		register_setting( 'govetty_booking_settings', self::OPTION_LOGGING, array( 'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ) ) );
 
 		add_settings_section( 'govetty_booking_main', 'Mock mode', array( __CLASS__, 'section_intro' ), 'govetty-booking-settings' );
 		add_settings_field( self::OPTION_MOCK_MODE, 'Enable mock mode', array( __CLASS__, 'field_mock_mode' ), 'govetty-booking-settings', 'govetty_booking_main' );
-		add_settings_field( self::OPTION_SCENARIO, 'Scenario to simulate', array( __CLASS__, 'field_scenario' ), 'govetty-booking-settings', 'govetty_booking_main' );
 
 		add_settings_section( 'govetty_booking_logging', 'Transaction logging', array( __CLASS__, 'section_logging_intro' ), 'govetty-booking-settings' );
 		add_settings_field( self::OPTION_LOGGING, 'Enable transaction logging', array( __CLASS__, 'field_logging' ), 'govetty-booking-settings', 'govetty_booking_logging' );
@@ -49,14 +42,19 @@ class Govetty_Settings {
 		return '1' === $value ? '1' : '0';
 	}
 
-	public static function sanitize_scenario( $value ) {
-		return in_array( $value, array( 'new_customer', 'existing_customer' ), true ) ? $value : 'new_customer';
-	}
-
 	public static function section_intro() {
 		echo '<p>When mock mode is on, the booking flow (' . esc_html__( '[govetty_booking] / [govetty_personal_area]', 'govetty-booking' )
 			. ') never calls the real CPP API or Stripe. OTP sending is skipped, any 6-digit code is accepted, '
-			. 'and Stripe checkout is replaced with a simple test page so you can click through the full flow end to end.</p>';
+			. 'and Stripe checkout is replaced with a simple test page so you can click through the full flow end to end.</p>'
+			. '<p>Every scenario is available at once -- which customer you get depends on the <strong>last digit of the phone number</strong> you enter:</p>'
+			. '<ul style="list-style:disc;margin-left:20px">'
+			. '<li><strong>1</strong> &mdash; existing customer, two pets: Biscuit has calls, Whiskers has none</li>'
+			. '<li><strong>2</strong> &mdash; existing customer, one pet (Whiskers) with no calls &rarr; goes straight to Plan Selection</li>'
+			. '<li><strong>3</strong> &mdash; existing customer, one pet (Biscuit) with calls &rarr; Pet Selection</li>'
+			. '<li><strong>4</strong> &mdash; existing customer, two pets, neither has calls &rarr; Pet Selection, then Plan Selection</li>'
+			. '<li><strong>any other digit</strong> &mdash; new customer &rarr; Registration (and recognized as existing afterwards)</li>'
+			. '</ul>'
+			. '<p>Buying a plan on the mock checkout page adds calls to that pet, so you can walk from &ldquo;no balance&rdquo; into &ldquo;has balance&rdquo;.</p>';
 	}
 
 	public static function field_mock_mode() {
@@ -73,20 +71,6 @@ class Govetty_Settings {
 			esc_attr( self::OPTION_MOCK_MODE ),
 			checked( self::is_mock_mode(), true, false )
 		);
-	}
-
-	public static function field_scenario() {
-		$current = self::scenario();
-		?>
-		<select name="<?php echo esc_attr( self::OPTION_SCENARIO ); ?>">
-			<option value="new_customer" <?php selected( $current, 'new_customer' ); ?>>New customer (registration flow)</option>
-			<option value="existing_customer" <?php selected( $current, 'existing_customer' ); ?>>Existing customer -- 2 pets, one with a call balance and one without</option>
-		</select>
-		<p class="description">
-			Controls what a successful OTP verification returns. The "existing customer" scenario has one pet
-			with a balance and one without, so you can reach both Pet Selection branches from a single test run.
-		</p>
-		<?php
 	}
 
 	public static function section_logging_intro() {

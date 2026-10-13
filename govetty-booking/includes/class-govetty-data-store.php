@@ -171,6 +171,17 @@ class Govetty_Data_Store {
 		);
 	}
 
+	/**
+	 * Local checkout row for a ref (pet/plan the checkout was started for),
+	 * or null. Used by mock mode to credit a pet after a simulated payment.
+	 */
+	public static function get_checkout_event_by_ref( $checkout_ref ) {
+		global $wpdb;
+		$table = $wpdb->prefix . self::EVENTS_TABLE;
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE checkout_ref = %s", $checkout_ref ), ARRAY_A );
+		return $row ?: null;
+	}
+
 	public static function mark_checkout_returned( $checkout_ref, $outcome ) {
 		global $wpdb;
 		$table  = $wpdb->prefix . self::EVENTS_TABLE;
