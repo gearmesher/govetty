@@ -125,7 +125,8 @@ class Govetty_Shortcodes {
 				esc_url( $account_url ),
 				esc_html( $atts['account_text'] ),
 				esc_url( $redirect ),
-				esc_html( $atts['logout_text'] )
+				esc_html( $atts['logout_text'] ),
+				esc_html__( 'Call balance', 'govetty-booking' )
 			);
 		}
 
