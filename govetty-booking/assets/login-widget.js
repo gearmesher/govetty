@@ -85,6 +85,58 @@
     });
   }
 
+  // Call balance in the dropdown. Fetched the first time the menu opens (not
+  // on every page load, to keep the sitewide header cheap), summed across the
+  // customer's pets from /info/user. Failures just leave the row hidden.
+  var balanceState = 'idle';
+
+  function renderBalance(menu, total) {
+    var row = menu.querySelector('[data-govetty-balance]');
+    var value = menu.querySelector('[data-govetty-balance-value]');
+    if (!row || !value) return;
+    value.textContent = total === 1 ? '1 call' : total + ' calls';
+    row.hidden = false;
+  }
+
+  function loadBalance(menu) {
+    var config = window.GovettyBooking;
+    if (balanceState !== 'idle' || !config || !config.root) return;
+    balanceState = 'loading';
+    fetch(config.root + 'info/user', {
+      credentials: 'same-origin',
+      headers: { 'X-WP-Nonce': config.nonce },
+    })
+      .then(function (res) {
+        return res.ok ? res.json() : null;
+      })
+      .then(function (data) {
+        var pets = data && (data.pets || (data.data && data.data.pets));
+        if (!Array.isArray(pets)) {
+          balanceState = 'idle'; // Try again next time it opens.
+          return;
+        }
+        var total = pets.reduce(function (sum, pet) {
+          return sum + (parseInt(pet.token_amount, 10) || 0);
+        }, 0);
+        balanceState = 'done';
+        renderBalance(menu, total);
+      })
+      .catch(function () {
+        balanceState = 'idle';
+      });
+  }
+
+  document.addEventListener(
+    'toggle',
+    function (event) {
+      var menu = event.target;
+      if (menu.matches && menu.matches('.gv-login-menu') && menu.open) {
+        loadBalance(menu);
+      }
+    },
+    true
+  );
+
   // Logout: works whether the [data-govetty-logout] control is the plain
   // link from the logged-out... er, logged-in-without-a-popup case, or the
   // menu item button inside the new popup -- same handler either way.

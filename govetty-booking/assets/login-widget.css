@@ -22,6 +22,20 @@
   user-select: none;
 }
 
+/* The theme gives .frame-66 a fixed narrow width with no side padding, so
+   "Dashboard" sits flush against its edges. Match the "Talk to a Vet Now"
+   button's horizontal padding and let the width follow the content. Desktop
+   only: below 768px the theme swaps both buttons for icon-only squares. */
+@media (min-width: 768px) {
+  .gv-login-menu-btn.frame-66 {
+    width: auto;
+    min-width: clamp(92.5px, 5.208vw, 100px);
+    box-sizing: border-box;
+    padding: clamp(6.25px, .521vw, 10px) clamp(9.38px, .781vw, 15px);
+    white-space: nowrap;
+  }
+}
+
 .gv-login-menu-btn::-webkit-details-marker {
   display: none;
 }
@@ -69,6 +83,32 @@
   background: #f7e4e1;
   color: #8b1020;
   outline: none;
+}
+
+/* Call balance row at the top of the dropdown. */
+.gv-login-menu-balance {
+  padding: 10px 12px 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #f2e7dc;
+  font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.gv-login-menu-balance-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #525353;
+}
+
+.gv-login-menu-balance-value {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #5e0710;
 }
 
 /* On small screens, a right-anchored panel can overflow the viewport if

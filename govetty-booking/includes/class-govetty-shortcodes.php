@@ -110,6 +110,10 @@ class Govetty_Shortcodes {
 				'<details class="gv-login-menu">' .
 					'<summary class="%1$s gv-login-menu-btn" aria-label="%2$s">%3$s%4$s</summary>' .
 					'<div class="gv-login-menu-panel" role="menu">' .
+						'<div class="gv-login-menu-balance" data-govetty-balance hidden>' .
+							'<span class="gv-login-menu-balance-label">%9$s</span>' .
+							'<span class="gv-login-menu-balance-value" data-govetty-balance-value></span>' .
+						'</div>' .
 						'<a href="%5$s" class="gv-login-menu-item" role="menuitem">%6$s</a>' .
 						'<button type="button" class="gv-login-menu-item" role="menuitem" data-govetty-logout="1" data-redirect="%7$s">%8$s</button>' .
 					'</div>' .

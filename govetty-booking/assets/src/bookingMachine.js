@@ -46,19 +46,31 @@ function readLoginOnly() {
  * so logging in from the site header goes straight to the Personal Area
  * dashboard instead of into this booking flow.
  *
- * One deliberate implementation choice, since the two written accounts of
- * the existing-customer branch differ slightly in emphasis: existing
- * customers always see Pet Selection first (a customer can have several
- * pets with different balances), and the balance check runs against
- * whichever pet they select there -- not against the customer as a whole.
- * That matches the fuller original description; the shorthand summary in
- * the follow-up email is consistent with it, just less explicit.
+ * Existing-customer routing (after OTP, or on page load with a live session)
+ * follows the board's "Customer Status" diamond: any pet with a call balance ->
+ * Pet Selection (balance is then checked for the chosen pet); no balance at
+ * all -> Plan Selection. Plans are priced per pet, so the plan screen is
+ * reached directly only when there's exactly one pet; with several pets and
+ * no balance, Pet Selection comes first so a pet can be chosen.
  */
+
+// "Customer Status" diamond on the board, applied to an already-identified
+// customer (just verified, or an existing session): any pet with a call
+// balance -> Pet Selection; no balance at all -> Plan Selection. Plan Selection
+// is priced per pet, so it can only be skipped straight to when there is
+// exactly one pet to buy for; several pets with no balance still pick one first.
+function hasAnyBalance(pets) {
+  return (pets || []).some((p) => p.token_amount > 0);
+}
+function isSingleNoBalancePet(pets) {
+  return Array.isArray(pets) && pets.length === 1 && !hasAnyBalance(pets);
+}
 
 const machine = setup({
   actors: {
     startOtp: fromPromise(({ input }) => api.otpStart(input.phone)),
     verifyOtp: fromPromise(({ input }) => api.otpVerify(input.phone, input.code)),
+    loadSession: fromPromise(() => api.infoUser()),
     loadBreeds: fromPromise(() => api.infoBreeds()),
     submitRegistration: fromPromise(({ input }) => api.register(input.payload)),
     loadPlans: fromPromise(({ input }) => api.billingPlans(input.petId)),
@@ -75,10 +87,15 @@ const machine = setup({
     },
     canResend: ({ context }) => context.canResend,
     isLoginOnly: ({ context }) => context.loginOnly,
+    // Existing-session check (page load while already logged in).
+    noActiveSession: ({ event }) => event.output.status !== 200 || !event.output.data.customer,
+    sessionSingleNoBalancePet: ({ event }) => isSingleNoBalancePet(event.output.data.pets),
+    // Right after OTP verification of a recognized customer.
+    otpSingleNoBalancePet: ({ event }) => isSingleNoBalancePet(event.output.data.pets),
   },
 }).createMachine({
   id: 'booking',
-  initial: 'phoneEntry',
+  initial: 'checkingSession',
   context: {
     phone: '',
     code: '',
@@ -103,6 +120,45 @@ const machine = setup({
     plansError: null,
   },
   states: {
+    // Already logged in (valid customer_token cookie) and clicking "Talk to a
+    // Vet Now"? Skip the phone/OTP steps and route by call balance. Anyone
+    // without a session gets a quick 401 from our own route (no upstream
+    // call) and lands on phone entry as before.
+    checkingSession: {
+      invoke: {
+        src: 'loadSession',
+        onDone: [
+          { guard: 'noActiveSession', target: 'phoneEntry' },
+          {
+            guard: 'isLoginOnly',
+            target: 'redirectingToAccount',
+            actions: () => {
+              window.location.href =
+                (typeof window.GovettyBooking !== 'undefined' && window.GovettyBooking.personalAreaUrl) || '/';
+            },
+          },
+          {
+            guard: 'sessionSingleNoBalancePet',
+            target: 'planSelection',
+            actions: assign({
+              customer: ({ event }) => event.output.data.customer,
+              pets: ({ event }) => event.output.data.pets,
+              selectedPetId: ({ event }) => event.output.data.pets[0].id,
+              flowVariant: 'existingNoBalance',
+            }),
+          },
+          {
+            target: 'petSelection',
+            actions: assign({
+              customer: ({ event }) => event.output.data.customer,
+              pets: ({ event }) => event.output.data.pets,
+            }),
+          },
+        ],
+        onError: { target: 'phoneEntry' },
+      },
+    },
+
     phoneEntry: {
       on: {
         SUBMIT_PHONE: {
@@ -205,6 +261,17 @@ const machine = setup({
                   (typeof window.GovettyBooking !== 'undefined' && window.GovettyBooking.personalAreaUrl) || '/';
               },
             ],
+          },
+          {
+            guard: 'otpSingleNoBalancePet',
+            target: 'planSelection',
+            actions: assign({
+              customer: ({ event }) => event.output.data.customer,
+              pets: ({ event }) => event.output.data.pets,
+              selectedPetId: ({ event }) => event.output.data.pets[0].id,
+              flowVariant: 'existingNoBalance',
+              otpError: null,
+            }),
           },
           {
             target: 'petSelection',

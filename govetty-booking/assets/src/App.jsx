@@ -17,6 +17,14 @@ export default function App() {
   const [state, send] = useMachine(machine);
   const { context } = state;
 
+  if (state.matches('checkingSession')) {
+    return (
+      <Shell>
+        <Loading label="One moment…" />
+      </Shell>
+    );
+  }
+
   if (state.matches('phoneEntry') || state.matches('otpSending')) {
     return (
       <PhoneEntry

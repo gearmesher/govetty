@@ -30,6 +30,10 @@ export function Shell({ progress, eyebrow, title, subtitle, children, onBack, wi
         {mockMode && (
           <div className="gv-mock-banner">
             Mock mode &mdash; no real API, SMS, or Stripe calls. Any 6-digit code works.
+            <span className="gv-mock-banner-hint">
+              Phone ends in 1: existing, one pet with calls &amp; one without &middot; 2: existing, no calls &middot;
+              3: existing, has calls &middot; 4: two pets, no calls &middot; anything else: new customer
+            </span>
           </div>
         )}
         <div className="gv-card">
