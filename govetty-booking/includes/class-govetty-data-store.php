@@ -199,14 +199,37 @@ class Govetty_Data_Store {
 	public static function get_customers( $args = array() ) {
 		global $wpdb;
 		$table    = $wpdb->prefix . self::CUSTOMERS_TABLE;
-		$per_page = $args['per_page'] ?? 20;
-		$offset   = $args['offset'] ?? 0;
+		$per_page = (int) ( $args['per_page'] ?? 20 );
+		$offset   = (int) ( $args['offset'] ?? 0 );
+		$search   = trim( (string) ( $args['search'] ?? '' ) );
 
-		$rows  = $wpdb->get_results(
-			$wpdb->prepare( "SELECT * FROM $table ORDER BY last_seen DESC LIMIT %d OFFSET %d", $per_page, $offset ),
+		$where  = '';
+		$params = array();
+		if ( '' !== $search ) {
+			// Matches name (first, last or "first last"), phone (also with
+			// punctuation stripped, so "416-889" finds 4168898779) and the
+			// pet snapshot (pet name, species).
+			$like   = '%' . $wpdb->esc_like( $search ) . '%';
+			$digits = preg_replace( '/\D+/', '', $search );
+			$where  = 'WHERE (first_name LIKE %s OR last_name LIKE %s OR CONCAT(first_name, \' \', last_name) LIKE %s OR phone LIKE %s OR pets_json LIKE %s';
+			$params = array( $like, $like, $like, $like, $like );
+			if ( '' !== $digits ) {
+				$where   .= ' OR phone LIKE %s';
+				$params[] = '%' . $wpdb->esc_like( $digits ) . '%';
+			}
+			$where .= ')';
+		}
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM $table $where ORDER BY last_seen DESC LIMIT %d OFFSET %d",
+				array_merge( $params, array( $per_page, $offset ) )
+			),
 			ARRAY_A
 		);
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table" );
+		$total = (int) ( $params
+			? $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $table $where", $params ) )
+			: $wpdb->get_var( "SELECT COUNT(*) FROM $table" ) );
 		return array(
 			'rows'  => $rows,
 			'total' => $total,
