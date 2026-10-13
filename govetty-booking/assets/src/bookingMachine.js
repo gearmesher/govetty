@@ -81,8 +81,10 @@ const machine = setup({
   guards: {
     isNewCustomer: ({ event }) => event.output.data.customer === null,
     isPostRegistrationPurpose: ({ context }) => context.otpPurpose === 'postRegistration',
-    selectedPetHasBalance: ({ context }) => {
-      const pet = context.pets.find((p) => p.id === context.selectedPetId);
+    // Evaluated on SELECT_PET *before* its assign runs, so it must read the
+    // pet from the event, not context.selectedPetId (still the old value).
+    selectedPetHasBalance: ({ context, event }) => {
+      const pet = context.pets.find((p) => p.id === event.petId);
       return !!pet && pet.token_amount > 0;
     },
     canResend: ({ context }) => context.canResend,
