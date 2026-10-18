@@ -61,6 +61,8 @@ export const api = {
     call('POST', 'customer/phone-change-request', { requested_phone: requestedPhone }),
   infoBreeds: () => call('GET', 'info/breeds'),
   addressValidate: (address) => call('POST', 'address/validate', { address }),
+  addressSuggest: (input, session) => call('GET', 'address/suggest', { input, session }),
+  addressPlace: (placeId, session) => call('GET', 'address/place', { place_id: placeId, session }),
   billingPlans: (petId) => call('GET', 'billing/plans', { pet_id: petId }),
   billingCheckout: (planKey, petIds) =>
     call('POST', 'billing/checkout', { plan_key: planKey, pet_ids: petIds }),

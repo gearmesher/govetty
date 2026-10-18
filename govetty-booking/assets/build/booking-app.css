@@ -770,3 +770,36 @@
   font-size: 14px;
   line-height: 1.5;
 }
+
+/* Address autocomplete suggestion list */
+.gv-ac {
+  position: relative;
+}
+.gv-ac-list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--gv-surface);
+  border: 1px solid var(--gv-border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(43, 7, 9, 0.12);
+  max-height: 260px;
+  overflow-y: auto;
+}
+.gv-ac-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--gv-ink-900, #1a1614);
+  cursor: pointer;
+}
+.gv-ac-item--active {
+  background: var(--gv-rose-100, #f7e4e1);
+  color: var(--gv-maroon-600, #8b1020);
+}

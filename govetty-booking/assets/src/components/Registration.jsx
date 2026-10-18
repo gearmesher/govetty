@@ -1,11 +1,39 @@
 import React, { useState } from 'react';
 import { Shell, Button, LinkButton, ErrorBanner, PROGRESS_BY_STATE } from './shared/UI';
 import { api } from '../api';
+import AddressAutocomplete from './AddressAutocomplete';
+
+const PROVINCES = [
+  ['AB', 'Alberta'],
+  ['BC', 'British Columbia'],
+  ['MB', 'Manitoba'],
+  ['NB', 'New Brunswick'],
+  ['NL', 'Newfoundland and Labrador'],
+  ['NS', 'Nova Scotia'],
+  ['NT', 'Northwest Territories'],
+  ['NU', 'Nunavut'],
+  ['ON', 'Ontario'],
+  ['PE', 'Prince Edward Island'],
+  ['QC', 'Quebec'],
+  ['SK', 'Saskatchewan'],
+  ['YT', 'Yukon'],
+];
+const POSTAL_PATTERN = '[A-Za-z][0-9][A-Za-z] ?[0-9][A-Za-z][0-9]';
+
+// The CPP API takes one `address` string plus `zip_code`, so the separate form
+// fields are joined back into the same shape it has always accepted
+// ("81 Rimmington Drive, Thornhill, ON L4J6J9, Canada").
+function composeAddress(a) {
+  const street = [a.street.trim(), a.unit.trim()].filter(Boolean).join(', ');
+  return `${street}, ${a.city.trim()}, ${a.province} ${a.postal_code.trim().toUpperCase()}, Canada`;
+}
 
 const emptyPet = { name: '', dob: '', chip: '', gender: 'female', type: 'dog', breed_id: '' };
 
 export default function Registration({ phone, breeds, loading, error, onSubmit }) {
-  const [owner, setOwner] = useState({ first_name: '', last_name: '', email: '', address: '', zip_code: '' });
+  const [owner, setOwner] = useState({ first_name: '', last_name: '', email: '' });
+  const [addr, setAddr] = useState({ street: '', unit: '', city: '', province: '', postal_code: '' });
+  const autocompleteOn = !!(window.GovettyBooking && window.GovettyBooking.addressAutocomplete);
   const [pet, setPet] = useState(emptyPet);
   const [imageId, setImageId] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -16,6 +44,10 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
   const breedList = pet.type === 'dog' ? breeds.dog_breeds : breeds.cat_breeds;
 
   const updateOwner = (field) => (e) => setOwner((o) => ({ ...o, [field]: e.target.value }));
+  const updateAddr = (field) => (e) => {
+    setAddressCheck(null);
+    setAddr((a) => ({ ...a, [field]: e.target.value }));
+  };
   const updatePet = (field) => (e) => setPet((p) => ({ ...p, [field]: e.target.value, ...(field === 'type' ? { breed_id: '' } : {}) }));
 
   const handleImageChange = async (e) => {
@@ -34,9 +66,9 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
   };
 
   const checkAddress = async () => {
-    if (!owner.address.trim()) return;
+    if (!addr.street.trim()) return;
     setAddressCheck({ checking: true, result: null });
-    const res = await api.addressValidate(owner.address);
+    const res = await api.addressValidate(composeAddress(addr));
     setAddressCheck({ checking: false, result: res.data });
   };
 
@@ -44,6 +76,8 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
     e.preventDefault();
     const payload = {
       ...owner,
+      address: composeAddress(addr),
+      zip_code: addr.postal_code.trim().toUpperCase().replace(/[\s-]/g, ''),
       phone,
       pets: [
         {
@@ -91,14 +125,93 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
 
         <div className="gv-field">
           <label className="gv-label" htmlFor="gv-address">
-            Address
+            Street address
           </label>
-          <input id="gv-address" className="gv-input" required value={owner.address} onChange={updateOwner('address')} />
-          <div style={{ marginTop: 6 }}>
-            <LinkButton type="button" onClick={checkAddress} disabled={!owner.address.trim() || addressCheck?.checking}>
-              {addressCheck?.checking ? 'Checking address…' : 'Check address'}
-            </LinkButton>
+          <AddressAutocomplete
+            id="gv-address"
+            enabled={autocompleteOn}
+            value={addr.street}
+            onChange={(street) => {
+              setAddressCheck(null);
+              setAddr((a) => ({ ...a, street }));
+            }}
+            onPick={(p) => {
+              setAddressCheck(null);
+              setAddr((a) => ({
+                street: p.street || a.street,
+                unit: p.unit || a.unit,
+                city: p.city || '',
+                province: PROVINCES.some(([code]) => code === p.province) ? p.province : '',
+                postal_code: p.postal_code || '',
+              }));
+            }}
+          />
+          {autocompleteOn && <p className="gv-hint">Start typing and pick your address from the list.</p>}
+        </div>
+
+        <div className="gv-field">
+          <label className="gv-label" htmlFor="gv-unit">
+            Apartment / unit / suite (optional)
+          </label>
+          <input id="gv-unit" className="gv-input" autoComplete="off" value={addr.unit} onChange={updateAddr('unit')} />
+        </div>
+
+        <div className="gv-row-2">
+          <div className="gv-field">
+            <label className="gv-label" htmlFor="gv-city">
+              City
+            </label>
+            <input id="gv-city" className="gv-input" required value={addr.city} onChange={updateAddr('city')} />
           </div>
+          <div className="gv-field">
+            <label className="gv-label" htmlFor="gv-province">
+              Province
+            </label>
+            <select id="gv-province" className="gv-select" required value={addr.province} onChange={updateAddr('province')}>
+              <option value="" disabled>
+                Select a province
+              </option>
+              {PROVINCES.map(([code, name]) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="gv-row-2">
+          <div className="gv-field">
+            <label className="gv-label" htmlFor="gv-zip">
+              Postal code
+            </label>
+            <input
+              id="gv-zip"
+              className="gv-input"
+              required
+              pattern={POSTAL_PATTERN}
+              title="Canadian postal code, for example L3R 6G2"
+              autoComplete="postal-code"
+              value={addr.postal_code}
+              onChange={updateAddr('postal_code')}
+            />
+          </div>
+          <div className="gv-field">
+            <label className="gv-label" htmlFor="gv-country">
+              Country
+            </label>
+            <input id="gv-country" className="gv-input" value="Canada" disabled readOnly />
+          </div>
+        </div>
+
+        <div className="gv-field">
+          <LinkButton
+            type="button"
+            onClick={checkAddress}
+            disabled={!addr.street.trim() || !addr.city.trim() || !addr.province || addressCheck?.checking}
+          >
+            {addressCheck?.checking ? 'Checking address…' : 'Check address'}
+          </LinkButton>
           {addressCheck?.result && (
             <p className="gv-hint">
               {addressCheck.result.valid
@@ -106,13 +219,6 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
                 : "We couldn't confirm that address -- double-check it before continuing."}
             </p>
           )}
-        </div>
-
-        <div className="gv-field">
-          <label className="gv-label" htmlFor="gv-zip">
-            ZIP / postal code
-          </label>
-          <input id="gv-zip" className="gv-input" required value={owner.zip_code} onChange={updateOwner('zip_code')} />
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid var(--gv-border)', margin: '22px 0' }} />

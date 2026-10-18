@@ -26,6 +26,8 @@ class Govetty_Rest_Routes {
 			array( 'POST', '/customer/phone-change-request', array( __CLASS__, 'phone_change_request' ) ),
 			array( 'GET', '/info/breeds', array( __CLASS__, 'info_breeds' ) ),
 			array( 'POST', '/address/validate', array( __CLASS__, 'address_validate' ) ),
+			array( 'GET', '/address/suggest', array( __CLASS__, 'address_suggest' ) ),
+			array( 'GET', '/address/place', array( __CLASS__, 'address_place' ) ),
 			array( 'GET', '/billing/plans', array( __CLASS__, 'billing_get_plans' ) ),
 			array( 'POST', '/billing/checkout', array( __CLASS__, 'billing_checkout' ) ),
 			array( 'GET', '/slot/available', array( __CLASS__, 'slot_available' ) ),
@@ -459,6 +461,37 @@ class Govetty_Rest_Routes {
 		$address = sanitize_text_field( (string) $request->get_param( 'address' ) );
 		$result  = self::api_request( 'POST', '/address/validate', array( 'address' => $address ) );
 		return self::passthrough( $result );
+	}
+
+	/**
+	 * Address autocomplete (see Govetty_Places) -- served by this plugin, not
+	 * the CPP API, which has no autocomplete endpoint.
+	 */
+	public static function address_suggest( WP_REST_Request $request ) {
+		$result = Govetty_Places::suggest(
+			sanitize_text_field( (string) $request->get_param( 'input' ) ),
+			sanitize_text_field( (string) $request->get_param( 'session' ) )
+		);
+		return is_wp_error( $result ) ? self::places_error( $result ) : new WP_REST_Response( $result, 200 );
+	}
+
+	public static function address_place( WP_REST_Request $request ) {
+		$result = Govetty_Places::details(
+			sanitize_text_field( (string) $request->get_param( 'place_id' ) ),
+			sanitize_text_field( (string) $request->get_param( 'session' ) )
+		);
+		return is_wp_error( $result ) ? self::places_error( $result ) : new WP_REST_Response( $result, 200 );
+	}
+
+	private static function places_error( WP_Error $error ) {
+		$data = $error->get_error_data();
+		return new WP_REST_Response(
+			array(
+				'status'  => 'error',
+				'message' => $error->get_error_message(),
+			),
+			$data['status'] ?? 502
+		);
 	}
 
 	// ---------------------------------------------------------------------
