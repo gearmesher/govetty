@@ -7,10 +7,8 @@ import OtpEntry from './components/OtpEntry';
 import Registration from './components/Registration';
 import PetSelection from './components/PetSelection';
 import PlanSelection from './components/PlanSelection';
-import RedirectingToStripe from './components/RedirectingToStripe';
 import RedirectingToAccount from './components/RedirectingToAccount';
-import SlotSelection from './components/SlotSelection';
-import { BookingConfirmation, BookingCompleteNoCall } from './components/BookingConfirmation';
+import { SlotSelectionPlaceholder, PaymentPlaceholder, AppointmentConfirmationPlaceholder } from './components/Placeholders';
 import { Shell, Loading } from './components/shared/UI';
 
 export default function App() {
@@ -66,47 +64,41 @@ export default function App() {
     return <PetSelection customer={context.customer} pets={context.pets} onSelect={(petId) => send({ type: 'SELECT_PET', petId })} />;
   }
 
-  if (state.matches('planSelection') || state.matches('checkingOut')) {
+  if (state.matches('slotSelection')) {
+    return <SlotSelectionPlaceholder onContinue={() => send({ type: 'CONTINUE' })} />;
+  }
+
+  if (state.matches('planSelection')) {
     return (
       <PlanSelection
         plans={context.plans}
         plansStatus={context.plansStatus}
         plansError={context.plansError}
         onRetry={() => send({ type: 'RETRY_PLANS' })}
-        checkoutLoading={state.matches('checkingOut')}
-        error={context.checkoutError}
         onSelect={(planKey) => send({ type: 'SELECT_PLAN', planKey })}
       />
     );
   }
 
-  if (state.matches('redirectingToStripe')) {
-    return <RedirectingToStripe />;
+  if (state.matches('paymentPlaceholder')) {
+    const plan = context.plans.find((p) => p.plan_key === context.selectedPlanKey);
+    return (
+      <PaymentPlaceholder
+        plan={plan}
+        onPaid={() => send({ type: 'PAYMENT_COMPLETE' })}
+        onBack={() => send({ type: 'BACK_TO_PLANS' })}
+      />
+    );
   }
 
   if (state.matches('redirectingToAccount')) {
     return <RedirectingToAccount />;
   }
 
-  if (state.matches('slotSelection') || state.matches('booking')) {
-    return (
-      <SlotSelection
-        slots={context.slots}
-        loading={state.matches('slotSelection')}
-        booking={state.matches('booking')}
-        error={context.slotError}
-        onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
-      />
-    );
-  }
-
-  if (state.matches('bookingConfirmation')) {
-    const slot = context.slots.find((s) => s.slot_id === context.selectedSlotId);
-    return <BookingConfirmation slot={slot} />;
-  }
-
-  if (state.matches('bookingCompleteNoCall')) {
-    return <BookingCompleteNoCall />;
+  if (state.matches('appointmentConfirmation')) {
+    const pet = context.pets.find((p) => p.id === context.selectedPetId);
+    const paid = context.flowVariant !== 'existingHasBalance';
+    return <AppointmentConfirmationPlaceholder petName={pet && pet.name} paid={paid} />;
   }
 
   return (
