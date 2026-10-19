@@ -229,7 +229,7 @@ class Govetty_Rest_Routes {
 		}
 
 		// Confirmed field set (per client): customer -- name, email, phone,
-		// address, zip; pet -- name, species (sent as `type`: dog/cat),
+		// address, flat_number (optional), city, province, country (optional), zip; pet -- name, species (sent as `type`: dog/cat),
 		// breed_id, dob, chip, gender. image_id is optional and
 		// intentionally omitted by the frontend when no photo was taken
 		// (see Registration.jsx) -- do not add/remove fields here beyond

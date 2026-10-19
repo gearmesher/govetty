@@ -20,9 +20,10 @@ const PROVINCES = [
 ];
 const POSTAL_PATTERN = '[A-Za-z][0-9][A-Za-z] ?[0-9][A-Za-z][0-9]';
 
-// The CPP API takes one `address` string plus `zip_code`, so the separate form
-// fields are joined back into the same shape it has always accepted
-// ("81 Rimmington Drive, Thornhill, ON L4J6J9, Canada").
+// /register takes the street in `address` plus separate optional flat_number,
+// city, province and country (confirmed by the client), with zip_code. The
+// "Check address" button still validates one full line, so that line is
+// composed here ("81 Rimmington Drive, Unit 4B, Thornhill, ON L4J6J9, Canada").
 function composeAddress(a) {
   const street = [a.street.trim(), a.unit.trim()].filter(Boolean).join(', ');
   return `${street}, ${a.city.trim()}, ${a.province} ${a.postal_code.trim().toUpperCase()}, Canada`;
@@ -76,7 +77,12 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
     e.preventDefault();
     const payload = {
       ...owner,
-      address: composeAddress(addr),
+      address: addr.street.trim(),
+      // Optional on the API side: omitted entirely when empty.
+      ...(addr.unit.trim() ? { flat_number: addr.unit.trim() } : {}),
+      city: addr.city.trim(),
+      province: addr.province,
+      country: 'Canada',
       zip_code: addr.postal_code.trim().toUpperCase().replace(/[\s-]/g, ''),
       phone,
       pets: [
@@ -153,7 +159,14 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
           <label className="gv-label" htmlFor="gv-unit">
             Apartment / unit / suite (optional)
           </label>
-          <input id="gv-unit" className="gv-input" autoComplete="off" value={addr.unit} onChange={updateAddr('unit')} />
+          <input
+            id="gv-unit"
+            className="gv-input"
+            autoComplete="off"
+            maxLength={50}
+            value={addr.unit}
+            onChange={updateAddr('unit')}
+          />
         </div>
 
         <div className="gv-row-2">
@@ -161,7 +174,7 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
             <label className="gv-label" htmlFor="gv-city">
               City
             </label>
-            <input id="gv-city" className="gv-input" required value={addr.city} onChange={updateAddr('city')} />
+            <input id="gv-city" className="gv-input" required maxLength={255} value={addr.city} onChange={updateAddr('city')} />
           </div>
           <div className="gv-field">
             <label className="gv-label" htmlFor="gv-province">
