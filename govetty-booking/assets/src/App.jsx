@@ -29,6 +29,7 @@ export default function App() {
         onSubmit={(phone) => send({ type: 'SUBMIT_PHONE', phone })}
         loading={state.matches('otpSending')}
         error={context.otpError}
+        loginOnly={context.loginOnly}
       />
     );
   }

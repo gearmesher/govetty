@@ -10,6 +10,17 @@ import { api } from './api';
  * there's no client-side routing here), same timing index.jsx already
  * relies on for its own govetty_step check.
  */
+function readRequestedPetId() {
+  // The Personal Area's per-pet "Book" button links to the booking page with
+  // ?govetty_pet=<id>, meaning "book this pet" -- skip pet selection.
+  if (typeof window === 'undefined' || !window.location) return null;
+  try {
+    return new URLSearchParams(window.location.search).get('govetty_pet') || null;
+  } catch (e) {
+    return null;
+  }
+}
+
 function readLoginOnly() {
   if (typeof window === 'undefined' || !window.location) return false;
   try {
@@ -79,6 +90,11 @@ const machine = setup({
     },
     canResend: ({ context }) => context.canResend,
     isLoginOnly: ({ context }) => context.loginOnly,
+    // Existing session, arrived from a pet's "Book" button, and that pet is
+    // really on this account (never trust the URL alone).
+    hasRequestedPet: ({ context, event }) =>
+      !!context.requestedPetId &&
+      (event.output.data.pets || []).some((p) => String(p.id) === String(context.requestedPetId)),
     // Existing-session check (page load while already logged in).
     noActiveSession: ({ event }) => event.output.status !== 200 || !event.output.data.customer,
   },
@@ -90,6 +106,7 @@ const machine = setup({
     code: '',
     otpPurpose: 'login', // 'login' | 'postRegistration'
     loginOnly: readLoginOnly(),
+    requestedPetId: readRequestedPetId(),
     otpSentAt: null,
     canResend: false,
     otpError: null,
@@ -122,6 +139,22 @@ const machine = setup({
               window.location.href =
                 (typeof window.GovettyBooking !== 'undefined' && window.GovettyBooking.personalAreaUrl) || '/';
             },
+          },
+          {
+            // From a pet's "Book" button in the Personal Area: that pet is
+            // already chosen, so go to Slot Selection and fork on its balance
+            // there like everyone else.
+            guard: 'hasRequestedPet',
+            target: 'slotSelection',
+            actions: assign(({ context, event }) => {
+              const pet = event.output.data.pets.find((p) => String(p.id) === String(context.requestedPetId));
+              return {
+                customer: event.output.data.customer,
+                pets: event.output.data.pets,
+                selectedPetId: pet.id,
+                flowVariant: pet.token_amount > 0 ? 'existingHasBalance' : 'existingNoBalance',
+              };
+            }),
           },
           {
             target: 'petSelection',

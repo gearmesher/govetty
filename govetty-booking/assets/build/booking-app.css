@@ -627,6 +627,14 @@
   min-width: 0;
 }
 
+.gv-pa-pet-book {
+  order: 4;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
 .gv-pa-pet-card .gv-pet-photo {
   order: 3;
   margin-top: auto;

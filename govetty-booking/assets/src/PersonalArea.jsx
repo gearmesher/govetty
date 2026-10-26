@@ -197,6 +197,14 @@ function PetImageUpload({ pet, onUpdated }) {
   );
 }
 
+// "Book" for one pet: the booking page with that pet already chosen (see
+// bookingMachine.js, govetty_pet). Slot selection, plan and payment follow
+// the same flow as "Talk to a Vet Now".
+function bookUrl(petId) {
+  const base = (window.GovettyBooking && window.GovettyBooking.bookingUrl) || '/';
+  return base + (base.includes('?') ? '&' : '?') + 'govetty_pet=' + encodeURIComponent(petId);
+}
+
 export default function PersonalArea() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -277,6 +285,9 @@ export default function PersonalArea() {
                           : 'No calls available'}
                       </p>
                     </div>
+                    <a className="gv-btn gv-btn-primary gv-pa-pet-book" href={bookUrl(pet.id)}>
+                      Book
+                    </a>
                   </div>
                 ))}
               </div>

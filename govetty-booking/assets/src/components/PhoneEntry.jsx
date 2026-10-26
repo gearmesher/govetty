@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Shell, Button, ErrorBanner, PROGRESS_BY_STATE } from './shared/UI';
 
-export default function PhoneEntry({ onSubmit, loading, error }) {
+export default function PhoneEntry({ onSubmit, loading, error, loginOnly }) {
   const [phone, setPhone] = useState('');
 
   const handleSubmit = (e) => {
@@ -12,7 +12,7 @@ export default function PhoneEntry({ onSubmit, loading, error }) {
   return (
     <Shell
       progress={PROGRESS_BY_STATE.phoneEntry}
-      eyebrow="Talk to a vet"
+      eyebrow={loginOnly ? 'Login' : 'Talk to a vet'}
       title="What's your phone number?"
       subtitle="We'll text you a one-time code to continue -- no password needed."
     >
