@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { api, saveContinuation } from './api';
 import PlanSelection from './components/PlanSelection';
 import PaymentCancelled from './components/PaymentCancelled';
@@ -16,11 +16,32 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [plansError, setPlansError] = useState(null);
+  const [checkoutError, setCheckoutError] = useState(null);
   const [redirecting, setRedirecting] = useState(false);
   const confirmedRef = useRef(false);
 
   const petId = continuation?.selectedPetId;
+
+  const fetchPlans = useCallback(async () => {
+    if (!petId) return;
+    setLoading(true);
+    setPlansError(null);
+    try {
+      const res = await api.billingPlans(petId);
+      if (res.ok && Array.isArray(res.data.plans)) {
+        setPlans(res.data.plans);
+      } else {
+        setPlans([]);
+        setPlansError(res.data.message || res.data.error || 'plans_load_failed');
+      }
+    } catch (e) {
+      setPlans([]);
+      setPlansError('plans_load_failed');
+    } finally {
+      setLoading(false);
+    }
+  }, [petId]);
 
   // Fire-and-forget, same as PostPaymentApp's success-side ping -- lets the
   // admin's Subscriptions & Revenue log know this checkout was cancelled
@@ -34,25 +55,25 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
 
   useEffect(() => {
     if (!acknowledged || !petId) return;
-    (async () => {
-      const res = await api.billingPlans(petId);
-      setLoading(false);
-      if (res.ok) setPlans(res.data.plans || []);
-      else setError(res.data.message);
-    })();
-  }, [acknowledged, petId]);
+    fetchPlans();
+  }, [acknowledged, petId, fetchPlans]);
 
   const handleSelect = async (planKey) => {
     setCheckoutLoading(true);
-    setError(null);
-    const res = await api.billingCheckout(planKey, [petId]);
-    setCheckoutLoading(false);
-    if (res.ok && res.data.checkout_url) {
-      saveContinuation({ selectedPetId: petId, flowVariant: continuation.flowVariant });
-      setRedirecting(true);
-      window.location.href = res.data.checkout_url;
-    } else {
-      setError(res.data.message || 'checkout_session_failed');
+    setCheckoutError(null);
+    try {
+      const res = await api.billingCheckout(planKey, [petId]);
+      if (res.ok && res.data.checkout_url) {
+        saveContinuation({ selectedPetId: petId, flowVariant: continuation.flowVariant });
+        setRedirecting(true);
+        window.location.href = res.data.checkout_url;
+      } else {
+        setCheckoutError(res.data.message || 'checkout_session_failed');
+      }
+    } catch (e) {
+      setCheckoutError('checkout_session_failed');
+    } finally {
+      setCheckoutLoading(false);
     }
   };
 
@@ -71,9 +92,11 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
   return (
     <PlanSelection
       plans={plans}
-      loading={loading}
+      plansStatus={loading ? 'loading' : plansError ? 'error' : 'ready'}
+      plansError={plansError}
+      error={checkoutError}
       checkoutLoading={checkoutLoading}
-      error={error}
+      onRetry={fetchPlans}
       onSelect={handleSelect}
     />
   );

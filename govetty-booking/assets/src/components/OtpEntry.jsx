@@ -3,7 +3,17 @@ import { Shell, Button, LinkButton, ErrorBanner, PROGRESS_BY_STATE } from './sha
 
 const COOLDOWN_SECONDS = 60;
 
-export default function OtpEntry({ phone, otpSentAt, canResend, onSubmit, onResend, onEditPhone, loading, error }) {
+export default function OtpEntry({
+  phone,
+  otpSentAt,
+  canResend,
+  attemptsRemaining,
+  onSubmit,
+  onResend,
+  onEditPhone,
+  loading,
+  error,
+}) {
   const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const [secondsLeft, setSecondsLeft] = useState(COOLDOWN_SECONDS);
   const inputsRef = useRef([]);
@@ -38,6 +48,7 @@ export default function OtpEntry({ phone, otpSentAt, canResend, onSubmit, onRese
   };
 
   const handlePaste = (e) => {
+    if (attemptsRemaining === 0 || loading) return;
     const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
     if (!pasted) return;
     e.preventDefault();
@@ -61,6 +72,11 @@ export default function OtpEntry({ phone, otpSentAt, canResend, onSubmit, onRese
       subtitle={`We sent a code to ${phone}.`}
     >
       <ErrorBanner code={error} />
+      {attemptsRemaining > 0 && (
+        <p className="gv-hint" aria-live="polite">
+          {attemptsRemaining} verification {attemptsRemaining === 1 ? 'attempt' : 'attempts'} remaining for this code.
+        </p>
+      )}
       <div className="gv-otp-row" onPaste={handlePaste}>
         {digits.map((d, i) => (
           <input
@@ -71,7 +87,7 @@ export default function OtpEntry({ phone, otpSentAt, canResend, onSubmit, onRese
             inputMode="numeric"
             maxLength={1}
             value={d}
-            disabled={loading}
+            disabled={loading || attemptsRemaining === 0}
             onChange={(e) => setDigit(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             aria-label={`Digit ${i + 1} of 6`}

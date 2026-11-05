@@ -1,5 +1,5 @@
 import { setup, assign, fromPromise } from 'xstate';
-import { api } from './api';
+import { api, saveContinuation } from './api';
 
 /**
  * The header's [govetty_login] shortcode appends ?govetty_intent=login to
@@ -57,18 +57,15 @@ function readLoginOnly() {
  * so logging in from the site header goes straight to the Personal Area
  * dashboard instead of into this booking flow.
  *
- * Flow (client update, Oct 2026) -- same start for everyone, then it forks on
- * the selected pet's call balance:
+ * Flow -- the selected pet's balance determines whether payment is needed:
  *
- *   Login (OTP) -> Pet Selection -> Slot Selection (Marpet Video, PLACEHOLDER)
- *     pet has >= 1 call:  -> Appointment Confirmation (Marpet Video, PLACEHOLDER)
- *     pet has 0 calls:    -> Plan Selection -> Payment (PLACEHOLDER)
- *                         -> Appointment Confirmation (PLACEHOLDER)
+ *   Login (OTP) -> Pet Selection
+ *     pet has >= 1 call:  -> Slot Selection -> provisional slot response
+ *     pet has 0 calls:    -> Plan Selection -> Stripe Checkout
+ *                         -> Slot Selection -> provisional slot response
  *
- * A new customer who just registered has one pet and no calls, so they enter
- * at Slot Selection with that pet. Slot Selection, Payment and Appointment
- * Confirmation are placeholders until the Marpet Video team's screens and the
- * payment page are ready (see components/Placeholders.jsx).
+ * The API currently returns dummy availability and /slot/book only validates
+ * the request; the UI must not represent that response as a confirmed booking.
  */
 
 const machine = setup({
@@ -79,22 +76,34 @@ const machine = setup({
     loadBreeds: fromPromise(() => api.infoBreeds()),
     submitRegistration: fromPromise(({ input }) => api.register(input.payload)),
     loadPlans: fromPromise(({ input }) => api.billingPlans(input.petId)),
+    loadSlots: fromPromise(({ input }) => api.slotAvailable(input.petCount)),
+    bookSlot: fromPromise(({ input }) => api.slotBook(input.petId, input.slotId)),
+    createCheckout: fromPromise(({ input }) => api.billingCheckout(input.planKey, [input.petId])),
   },
   guards: {
+    otpStartFailed: ({ event }) => event.output.status !== 200,
     isNewCustomer: ({ event }) => event.output.data.customer === null,
     isPostRegistrationPurpose: ({ context }) => context.otpPurpose === 'postRegistration',
-    // Reads the pet picked on Pet Selection (or the new customer's only pet).
-    selectedPetHasBalance: ({ context }) => {
-      const pet = context.pets.find((p) => p.id === context.selectedPetId);
-      return !!pet && pet.token_amount > 0;
-    },
     canResend: ({ context }) => context.canResend,
     isLoginOnly: ({ context }) => context.loginOnly,
     // Existing session, arrived from a pet's "Book" button, and that pet is
     // really on this account (never trust the URL alone).
-    hasRequestedPet: ({ context, event }) =>
-      !!context.requestedPetId &&
-      (event.output.data.pets || []).some((p) => String(p.id) === String(context.requestedPetId)),
+    hasRequestedPetWithBalance: ({ context, event }) => {
+      const pet = (event.output.data.pets || []).find((p) => String(p.id) === String(context.requestedPetId));
+      return !!pet && pet.token_amount > 0;
+    },
+    hasRequestedPetWithoutBalance: ({ context, event }) => {
+      const pet = (event.output.data.pets || []).find((p) => String(p.id) === String(context.requestedPetId));
+      return !!pet && !(pet.token_amount > 0);
+    },
+    selectedEventPetHasBalance: ({ context, event }) => {
+      const pet = context.pets.find((p) => String(p.id) === String(event.petId));
+      return !!pet && pet.token_amount > 0;
+    },
+    slotLoadFailed: ({ event }) =>
+      !event.output.ok || !Array.isArray(event.output.data.slots) || event.output.data.status === 'error',
+    slotBookFailed: ({ event }) => !event.output.ok || event.output.data.status === 'error',
+    checkoutFailed: ({ event }) => !event.output.ok || !event.output.data.checkout_url,
     // Existing-session check (page load while already logged in).
     noActiveSession: ({ event }) => event.output.status !== 200 || !event.output.data.customer,
   },
@@ -110,6 +119,7 @@ const machine = setup({
     otpSentAt: null,
     canResend: false,
     otpError: null,
+    otpAttemptsRemaining: 5,
     customer: null,
     pets: [],
     selectedPetId: null,
@@ -121,6 +131,11 @@ const machine = setup({
     plans: [],
     plansStatus: 'idle',
     plansError: null,
+    checkoutError: null,
+    slots: [],
+    slotsLoading: false,
+    slotError: null,
+    bookingError: null,
   },
   states: {
     // Already logged in (valid customer_token cookie) and clicking "Talk to a
@@ -142,9 +157,8 @@ const machine = setup({
           },
           {
             // From a pet's "Book" button in the Personal Area: that pet is
-            // already chosen, so go to Slot Selection and fork on its balance
-            // there like everyone else.
-            guard: 'hasRequestedPet',
+            // already chosen; only pets with an available call skip payment.
+            guard: 'hasRequestedPetWithBalance',
             target: 'slotSelection',
             actions: assign(({ context, event }) => {
               const pet = event.output.data.pets.find((p) => String(p.id) === String(context.requestedPetId));
@@ -153,6 +167,19 @@ const machine = setup({
                 pets: event.output.data.pets,
                 selectedPetId: pet.id,
                 flowVariant: pet.token_amount > 0 ? 'existingHasBalance' : 'existingNoBalance',
+              };
+            }),
+          },
+          {
+            guard: 'hasRequestedPetWithoutBalance',
+            target: 'planSelection',
+            actions: assign(({ context, event }) => {
+              const pet = event.output.data.pets.find((p) => String(p.id) === String(context.requestedPetId));
+              return {
+                customer: event.output.data.customer,
+                pets: event.output.data.pets,
+                selectedPetId: pet.id,
+                flowVariant: 'existingNoBalance',
               };
             }),
           },
@@ -181,10 +208,21 @@ const machine = setup({
       invoke: {
         src: 'startOtp',
         input: ({ context }) => ({ phone: context.phone }),
-        onDone: {
-          target: 'otpEntry',
-          actions: assign({ otpError: null, otpSentAt: () => Date.now() }),
-        },
+        onDone: [
+          {
+            guard: 'otpStartFailed',
+            target: 'phoneEntry',
+            actions: assign({ otpError: ({ event }) => event.output.data.message || 'send_failed' }),
+          },
+          {
+            target: 'otpEntry',
+            actions: assign({
+              otpError: null,
+              otpSentAt: () => Date.now(),
+              otpAttemptsRemaining: 5,
+            }),
+          },
+        ],
         onError: { target: 'phoneEntry', actions: assign({ otpError: 'send_failed' }) },
       },
     },
@@ -229,20 +267,28 @@ const machine = setup({
             target: 'otpEntry.cooldown',
             actions: assign({
               otpError: ({ event }) =>
-                event.output.data.message === 'too_many_attempts'
+                event.output.data.message === 'too_many_attempts' ||
+                event.output.data.attempts_remaining === 0
                   ? 'too_many_attempts'
                   : 'invalid_or_expired',
+              otpAttemptsRemaining: ({ context, event }) =>
+                event.output.data.message === 'too_many_attempts'
+                  ? 0
+                  : Number.isInteger(event.output.data.attempts_remaining)
+                    ? Math.max(0, event.output.data.attempts_remaining)
+                    : Math.max(0, context.otpAttemptsRemaining - 1),
             }),
           },
           {
             guard: 'isPostRegistrationPurpose',
-            target: 'slotSelection',
+            target: 'planSelection',
             actions: assign({
               customer: ({ event }) => event.output.data.customer,
               pets: ({ event }) => event.output.data.pets,
               selectedPetId: ({ event }) => event.output.data.pets[0]?.id ?? null,
               flowVariant: 'newCustomer',
               otpError: null,
+              otpAttemptsRemaining: 5,
             }),
           },
           {
@@ -264,6 +310,7 @@ const machine = setup({
                 customer: ({ event }) => event.output.data.customer,
                 pets: ({ event }) => event.output.data.pets,
                 otpError: null,
+                otpAttemptsRemaining: 5,
               }),
               () => {
                 window.location.href =
@@ -277,6 +324,7 @@ const machine = setup({
               customer: ({ event }) => event.output.data.customer,
               pets: ({ event }) => event.output.data.pets,
               otpError: null,
+              otpAttemptsRemaining: 5,
             }),
           },
         ],
@@ -346,30 +394,86 @@ const machine = setup({
 
     petSelection: {
       on: {
-        // Both balance cases go to Slot Selection next; the fork on balance
-        // happens after the slot is chosen (see slotSelection).
-        SELECT_PET: {
-          target: 'slotSelection',
-          actions: assign(({ context, event }) => {
-            const pet = context.pets.find((p) => p.id === event.petId);
-            return {
+        SELECT_PET: [
+          {
+            guard: 'selectedEventPetHasBalance',
+            target: 'slotSelection',
+            actions: assign(({ event }) => ({
               selectedPetId: event.petId,
-              flowVariant: pet && pet.token_amount > 0 ? 'existingHasBalance' : 'existingNoBalance',
-            };
+              flowVariant: 'existingHasBalance',
+            })),
+          },
+          {
+            target: 'planSelection',
+            actions: assign(({ event }) => ({
+              selectedPetId: event.petId,
+              flowVariant: 'existingNoBalance',
+            })),
+          },
+        ],
+      },
+    },
+
+    slotSelection: {
+      entry: assign({ slotsLoading: true, slotError: null }),
+      invoke: {
+        src: 'loadSlots',
+        input: () => ({ petCount: 1 }),
+        onDone: [
+          {
+            guard: 'slotLoadFailed',
+            actions: assign({
+              slots: [],
+              slotsLoading: false,
+              slotError: ({ event }) => event.output.data.message || 'slots_load_failed',
+            }),
+          },
+          {
+            actions: assign({
+              slots: ({ event }) => event.output.data.slots,
+              slotsLoading: false,
+              slotError: null,
+            }),
+          },
+        ],
+        onError: {
+          actions: assign({ slots: [], slotsLoading: false, slotError: 'slots_load_failed' }),
+        },
+      },
+      on: {
+        RETRY_SLOTS: {
+          target: 'slotSelection',
+          reenter: true,
+          actions: assign({ bookingError: null }),
+        },
+        SELECT_SLOT: {
+          target: 'booking',
+          actions: assign({
+            selectedSlotId: ({ event }) => event.slotId,
+            bookingError: null,
           }),
         },
       },
     },
 
-    // Placeholder -- Marpet Video's slot picker goes here. For now a button
-    // stands in for choosing a slot. The 5-minute slot hold in the client's
-    // flow is Marpet's to enforce and is not implemented here.
-    slotSelection: {
-      on: {
-        CONTINUE: [
-          { guard: 'selectedPetHasBalance', target: 'appointmentConfirmation' },
-          { target: 'planSelection' },
+    booking: {
+      invoke: {
+        src: 'bookSlot',
+        input: ({ context }) => ({ petId: context.selectedPetId, slotId: context.selectedSlotId }),
+        onDone: [
+          {
+            guard: 'slotBookFailed',
+            target: 'slotSelection',
+            actions: assign({
+              bookingError: ({ event }) => event.output.data.message || 'slot_book_failed',
+            }),
+          },
+          { target: 'appointmentConfirmation' },
         ],
+        onError: {
+          target: 'slotSelection',
+          actions: assign({ bookingError: 'slot_book_failed' }),
+        },
       },
     },
 
@@ -406,24 +510,55 @@ const machine = setup({
         },
       },
       on: {
-        RETRY_PLANS: { target: 'planSelection', reenter: true },
+        RETRY_PLANS: {
+          target: 'planSelection',
+          reenter: true,
+          actions: assign({ checkoutError: null }),
+        },
         SELECT_PLAN: {
-          target: 'paymentPlaceholder',
-          actions: assign({ selectedPlanKey: ({ event }) => event.planKey }),
+          target: 'checkingOut',
+          actions: assign({
+            selectedPlanKey: ({ event }) => event.planKey,
+            checkoutError: null,
+          }),
         },
       },
     },
 
-    // Placeholder -- the payment page goes here. Stripe checkout is no longer
-    // started from this flow (the billing/checkout REST routes and the
-    // payment-success/cancelled return screens are untouched, ready to be
-    // wired back in or replaced).
-    paymentPlaceholder: {
-      on: {
-        PAYMENT_COMPLETE: 'appointmentConfirmation',
-        BACK_TO_PLANS: 'planSelection',
+    checkingOut: {
+      invoke: {
+        src: 'createCheckout',
+        input: ({ context }) => ({ planKey: context.selectedPlanKey, petId: context.selectedPetId }),
+        onDone: [
+          {
+            guard: 'checkoutFailed',
+            target: 'planSelection',
+            actions: assign({
+              checkoutError: ({ event }) => event.output.data.message || 'checkout_session_failed',
+            }),
+          },
+          {
+            target: 'redirectingToStripe',
+            actions: [
+              ({ context }) =>
+                saveContinuation({
+                  selectedPetId: context.selectedPetId,
+                  flowVariant: context.flowVariant,
+                }),
+              ({ event }) => {
+                window.location.href = event.output.data.checkout_url;
+              },
+            ],
+          },
+        ],
+        onError: {
+          target: 'planSelection',
+          actions: assign({ checkoutError: 'checkout_session_failed' }),
+        },
       },
     },
+
+    redirectingToStripe: { type: 'final' },
 
     redirectingToAccount: {
       // Terminal from the SPA's point of view -- same pattern as
@@ -437,9 +572,6 @@ const machine = setup({
       type: 'final',
     },
 
-    // Placeholder -- Marpet Video's appointment confirmation. Reached with a
-    // paid plan (after payment) or with an existing call balance (after the
-    // slot). Booking and the token deduction are Marpet's, not done here.
     appointmentConfirmation: { type: 'final' },
   },
 });

@@ -5,7 +5,7 @@ import { api } from './api';
 
 import ScheduleCallPrompt from './components/ScheduleCallPrompt';
 import SlotSelection from './components/SlotSelection';
-import { BookingConfirmation, BookingCompleteNoCall } from './components/BookingConfirmation';
+import { SlotRequestStatus, BookingCompleteNoCall } from './components/BookingConfirmation';
 import { Shell, Loading } from './components/shared/UI';
 
 export default function PostPaymentApp({ continuation, checkoutRef }) {
@@ -42,21 +42,33 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
     return (
       <SlotSelection
         slots={context.slots}
-        loading={state.matches('slotSelection')}
+        loading={context.slotsLoading}
         booking={state.matches('booking')}
-        error={context.slotError}
+        error={context.slotError || context.bookingError}
         onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
+        onRetry={() => send({ type: 'RETRY_SLOTS' })}
       />
     );
   }
 
   if (state.matches('bookingConfirmation')) {
-    const slot = context.slots.find((s) => s.slot_id === context.selectedSlotId);
-    return <BookingConfirmation slot={slot} />;
+    const slot = context.slots.find((s) => String(s.slot_id) === String(context.selectedSlotId));
+    return <SlotRequestStatus slot={slot} />;
   }
 
   if (state.matches('bookingCompleteNoCall')) {
     return <BookingCompleteNoCall />;
+  }
+
+  if (state.matches('continuationMissing')) {
+    return (
+      <Shell title="We couldn't resume your appointment">
+        <p className="gv-subtitle">
+          Your checkout return could not be matched to a selected pet. Check your account for payment status, then
+          contact GoVetty if you need help scheduling.
+        </p>
+      </Shell>
+    );
   }
 
   return (

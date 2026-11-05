@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Govetty_Rest_Routes {
 
 	const NAMESPACE_ = 'govetty/v1';
+	const OTP_MAX_ATTEMPTS   = 5;
+	const OTP_ATTEMPT_WINDOW = 900;
 
 	public static function register_routes() {
 		$routes = array(
@@ -93,6 +95,10 @@ class Govetty_Rest_Routes {
 			)
 		);
 
+		if ( 200 === $result['code'] ) {
+			delete_transient( self::otp_attempt_key( $phone ) );
+		}
+
 		$log = array(
 			'phone'  => $phone,
 			'ip'     => $ip,
@@ -114,6 +120,27 @@ class Govetty_Rest_Routes {
 	public static function otp_verify( WP_REST_Request $request ) {
 		$phone = sanitize_text_field( (string) $request->get_param( 'phone' ) );
 		$code  = sanitize_text_field( (string) $request->get_param( 'code' ) );
+		$key      = self::otp_attempt_key( $phone );
+		$attempts = (int) get_transient( $key );
+
+		if ( $attempts >= self::OTP_MAX_ATTEMPTS ) {
+			Govetty_Logger::log(
+				'otp_verify',
+				array(
+					'phone'   => $phone,
+					'status'  => 429,
+					'message' => 'too_many_attempts',
+				)
+			);
+			return new WP_REST_Response(
+				array(
+					'status'             => 'error',
+					'message'            => 'too_many_attempts',
+					'attempts_remaining' => 0,
+				),
+				429
+			);
+		}
 
 		$result = self::api_request(
 			'POST',
@@ -123,6 +150,19 @@ class Govetty_Rest_Routes {
 				'code'  => $code,
 			)
 		);
+
+		if ( 200 === $result['code'] ) {
+			delete_transient( $key );
+		} elseif ( $result['code'] >= 400 && $result['code'] < 500 ) {
+			$attempts = min( self::OTP_MAX_ATTEMPTS, $attempts + 1 );
+			set_transient( $key, $attempts, self::OTP_ATTEMPT_WINDOW );
+			if ( is_array( $result['body'] ) ) {
+				$result['body']['attempts_remaining'] = max( 0, self::OTP_MAX_ATTEMPTS - $attempts );
+				if ( $attempts >= self::OTP_MAX_ATTEMPTS ) {
+					$result['body']['message'] = 'too_many_attempts';
+				}
+			}
+		}
 
 		if ( 200 === $result['code'] && ! empty( $result['body']['customer']['token'] ) ) {
 			$token    = $result['body']['customer']['token'];
@@ -191,6 +231,16 @@ class Govetty_Rest_Routes {
 		}
 
 		return self::passthrough( $result );
+	}
+
+	/**
+	 * Use a one-way phone hash so raw phone numbers are never stored as
+	 * transient keys. Attempts are cleared only after a new OTP was
+	 * successfully sent or a code was verified.
+	 */
+	private static function otp_attempt_key( $phone ) {
+		$normalized_phone = preg_replace( '/\D+/', '', (string) $phone );
+		return 'govetty_otp_attempts_' . md5( $normalized_phone );
 	}
 
 	/**
@@ -724,10 +774,9 @@ class Govetty_Rest_Routes {
 			)
 		);
 
-		// NOTE (flag for backend): per the API doc, /slot/book currently
-		// only validates the request shape and doesn't persist a booking
-		// record yet. Treat "Booking Confirmation" in the UI as
-		// provisional until that's implemented upstream.
+		// The API documentation describes validation but doesn't confirm
+		// that a booking is persisted. Keep the frontend status provisional
+		// until the backend confirms the booking and payment workflow.
 		return self::passthrough( $result );
 	}
 

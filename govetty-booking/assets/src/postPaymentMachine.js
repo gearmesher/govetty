@@ -11,7 +11,7 @@ import { api } from './api';
  * the redirect (see api.js: saveContinuation / readContinuation).
  *
  * Mirrors the tail end of bookingMachine.js:
- *   Schedule Immediate Call? -> Slot Selection -> Booking Confirmation
+ *   Schedule Immediate Call? -> Slot Selection -> slot response status
  */
 const postPaymentMachine = setup({
   actors: {
@@ -20,6 +20,9 @@ const postPaymentMachine = setup({
   },
   guards: {
     isNewCustomer: ({ context }) => context.flowVariant === 'newCustomer',
+    slotLoadFailed: ({ event }) =>
+      !event.output.ok || !Array.isArray(event.output.data.slots) || event.output.data.status === 'error',
+    slotBookFailed: ({ event }) => !event.output.ok || event.output.data.status === 'error',
   },
 }).createMachine({
   id: 'postPayment',
@@ -29,11 +32,14 @@ const postPaymentMachine = setup({
     slots: [],
     selectedSlotId: null,
     slotError: null,
+    bookingError: null,
+    slotsLoading: false,
   }),
   initial: 'start',
   states: {
     start: {
       always: [
+        { guard: ({ context }) => !context.selectedPetId, target: 'continuationMissing' },
         { guard: 'isNewCustomer', target: 'scheduleImmediateCall' },
         { target: 'slotSelection' },
       ],
@@ -47,17 +53,43 @@ const postPaymentMachine = setup({
     },
 
     slotSelection: {
+      entry: assign({ slotsLoading: true, slotError: null }),
       invoke: {
         src: 'loadSlots',
         input: () => ({ petCount: 1 }),
-        onDone: {
-          actions: assign({ slots: ({ event }) => event.output.data.slots || [] }),
+        onDone: [
+          {
+            guard: 'slotLoadFailed',
+            actions: assign({
+              slots: [],
+              slotsLoading: false,
+              slotError: ({ event }) => event.output.data.message || 'slots_load_failed',
+            }),
+          },
+          {
+            actions: assign({
+              slots: ({ event }) => event.output.data.slots,
+              slotsLoading: false,
+              slotError: null,
+            }),
+          },
+        ],
+        onError: {
+          actions: assign({ slots: [], slotsLoading: false, slotError: 'slots_load_failed' }),
         },
       },
       on: {
+        RETRY_SLOTS: {
+          target: 'slotSelection',
+          reenter: true,
+          actions: assign({ bookingError: null }),
+        },
         SELECT_SLOT: {
           target: 'booking',
-          actions: assign({ selectedSlotId: ({ event }) => event.slotId }),
+          actions: assign({
+            selectedSlotId: ({ event }) => event.slotId,
+            bookingError: null,
+          }),
         },
       },
     },
@@ -68,19 +100,22 @@ const postPaymentMachine = setup({
         input: ({ context }) => ({ petId: context.selectedPetId, slotId: context.selectedSlotId }),
         onDone: [
           {
-            guard: ({ event }) => event.output.status !== 200,
+            guard: 'slotBookFailed',
             target: 'slotSelection',
-            actions: assign({ slotError: ({ event }) => event.output.data.message }),
+            actions: assign({
+              bookingError: ({ event }) => event.output.data.message || 'slot_book_failed',
+            }),
           },
           { target: 'bookingConfirmation' },
         ],
         onError: {
           target: 'slotSelection',
-          actions: assign({ slotError: 'server_error' }),
+          actions: assign({ bookingError: 'slot_book_failed' }),
         },
       },
     },
 
+    continuationMissing: { type: 'final' },
     bookingConfirmation: { type: 'final' },
     bookingCompleteNoCall: { type: 'final' },
   },
