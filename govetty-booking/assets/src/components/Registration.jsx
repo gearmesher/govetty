@@ -157,7 +157,7 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
 
         <div className="gv-field">
           <label className="gv-label" htmlFor="gv-unit">
-            Apartment / unit / suite (optional)
+            Apartment / Unit / Suite (optional)
           </label>
           <input
             id="gv-unit"
