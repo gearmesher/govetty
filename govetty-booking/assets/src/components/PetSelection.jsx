@@ -1,10 +1,11 @@
 import React from 'react';
 import { Shell, PROGRESS_BY_STATE } from './shared/UI';
 
-export default function PetSelection({ customer, pets, onSelect }) {
+export default function PetSelection({ customer, pets, onSelect, onBack }) {
   return (
     <Shell
       progress={PROGRESS_BY_STATE.petSelection}
+      onBack={onBack}
       eyebrow={customer ? `Welcome back, ${customer.first_name}` : 'Welcome back'}
       title="Which pet is this call for?"
       subtitle="Each pet has its own call balance, so pick the one you need help with."

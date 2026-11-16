@@ -1,10 +1,11 @@
 import React from 'react';
 import { Shell, PROGRESS_BY_STATE } from './shared/UI';
 
-export function SlotRequestStatus({ slot, petName }) {
+export function SlotRequestStatus({ slot, petName, onBack }) {
   return (
     <Shell
       progress={PROGRESS_BY_STATE.bookingConfirmation}
+      onBack={onBack}
       eyebrow="Slot response received"
       title="Your appointment is not confirmed"
     >

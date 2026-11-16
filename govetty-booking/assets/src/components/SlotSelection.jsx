@@ -6,10 +6,11 @@ function formatDate(dateStr) {
   return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
-export default function SlotSelection({ slots, loading, error, onSelect, booking }) {
+export default function SlotSelection({ slots, loading, error, onSelect, booking, onBack, onRetry }) {
   return (
     <Shell
       progress={PROGRESS_BY_STATE.slotSelection}
+      onBack={booking ? undefined : onBack}
       eyebrow="Pick a time"
       title="Choose an available slot"
       subtitle="Choose one of the times currently returned by the scheduling API."

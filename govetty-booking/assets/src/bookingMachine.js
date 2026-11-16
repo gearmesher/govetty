@@ -337,6 +337,9 @@ const machine = setup({
     // -----------------------------------------------------------------
 
     registration: {
+      on: {
+        BACK_TO_OTP: '#booking.otpEntry',
+      },
       initial: 'loadingBreeds',
       states: {
         loadingBreeds: {
@@ -394,6 +397,10 @@ const machine = setup({
 
     petSelection: {
       on: {
+        BACK_TO_PHONE: {
+          target: 'phoneEntry',
+          actions: assign({ customer: null, pets: [], selectedPetId: null }),
+        },
         SELECT_PET: [
           {
             guard: 'selectedEventPetHasBalance',
@@ -441,6 +448,7 @@ const machine = setup({
         },
       },
       on: {
+        BACK_TO_PETS: 'petSelection',
         RETRY_SLOTS: {
           target: 'slotSelection',
           reenter: true,
@@ -510,6 +518,7 @@ const machine = setup({
         },
       },
       on: {
+        BACK_TO_PETS: 'petSelection',
         RETRY_PLANS: {
           target: 'planSelection',
           reenter: true,
@@ -572,7 +581,14 @@ const machine = setup({
       type: 'final',
     },
 
-    appointmentConfirmation: { type: 'final' },
+    appointmentConfirmation: {
+      on: {
+        BACK_TO_SLOTS: {
+          target: 'slotSelection',
+          actions: assign({ selectedSlotId: null }),
+        },
+      },
+    },
   },
 });
 

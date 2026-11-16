@@ -9,6 +9,7 @@ import { Shell, ErrorBanner, Loading, errorMessage } from './components/shared/U
 const PLAN_NAMES = {
   single_call: 'One-Time Call',
   single_pet_monthly: 'Monthly Subscription',
+  single_pet_yearly: 'Annual Subscription',
   multi_pet_monthly: 'Monthly Subscription',
 };
 

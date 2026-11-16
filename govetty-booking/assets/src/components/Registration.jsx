@@ -31,7 +31,7 @@ function composeAddress(a) {
 
 const emptyPet = { name: '', dob: '', chip: '', gender: 'female', type: 'dog', breed_id: '' };
 
-export default function Registration({ phone, breeds, loading, error, onSubmit }) {
+export default function Registration({ phone, breeds, loading, error, onSubmit, onBack }) {
   const [owner, setOwner] = useState({ first_name: '', last_name: '', email: '' });
   const [addr, setAddr] = useState({ street: '', unit: '', city: '', province: '', postal_code: '' });
   const autocompleteOn = !!(window.GovettyBooking && window.GovettyBooking.addressAutocomplete);
@@ -101,6 +101,7 @@ export default function Registration({ phone, breeds, loading, error, onSubmit }
   return (
     <Shell
       progress={PROGRESS_BY_STATE.registration}
+      onBack={loading ? undefined : onBack}
       eyebrow="Almost there"
       title="Tell us about you and your pet"
       subtitle="This is the info GoVetty has on file for your account."

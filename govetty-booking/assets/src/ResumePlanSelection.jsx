@@ -96,6 +96,7 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
       plansError={plansError}
       error={checkoutError}
       checkoutLoading={checkoutLoading}
+      onBack={() => setAcknowledged(false)}
       onRetry={fetchPlans}
       onSelect={handleSelect}
     />

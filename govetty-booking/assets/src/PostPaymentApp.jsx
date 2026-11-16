@@ -47,13 +47,14 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
         error={context.slotError || context.bookingError}
         onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
         onRetry={() => send({ type: 'RETRY_SLOTS' })}
+        onBack={() => send({ type: 'BACK_FROM_SLOTS' })}
       />
     );
   }
 
   if (state.matches('bookingConfirmation')) {
     const slot = context.slots.find((s) => String(s.slot_id) === String(context.selectedSlotId));
-    return <SlotRequestStatus slot={slot} />;
+    return <SlotRequestStatus slot={slot} onBack={() => send({ type: 'BACK_TO_SLOTS' })} />;
   }
 
   if (state.matches('bookingCompleteNoCall')) {

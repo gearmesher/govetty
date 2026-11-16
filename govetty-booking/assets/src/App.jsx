@@ -59,13 +59,21 @@ export default function App() {
         breeds={context.breeds}
         loading={state.matches('registering')}
         error={context.registrationError}
+        onBack={() => send({ type: 'BACK_TO_OTP' })}
         onSubmit={(payload) => send({ type: 'SUBMIT_REGISTRATION', payload })}
       />
     );
   }
 
   if (state.matches('petSelection')) {
-    return <PetSelection customer={context.customer} pets={context.pets} onSelect={(petId) => send({ type: 'SELECT_PET', petId })} />;
+    return (
+      <PetSelection
+        customer={context.customer}
+        pets={context.pets}
+        onSelect={(petId) => send({ type: 'SELECT_PET', petId })}
+        onBack={() => send({ type: 'BACK_TO_PHONE' })}
+      />
+    );
   }
 
   if (state.matches('slotSelection') || state.matches('booking')) {
@@ -77,6 +85,7 @@ export default function App() {
         booking={state.matches('booking')}
         onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
         onRetry={() => send({ type: 'RETRY_SLOTS' })}
+        onBack={() => send({ type: 'BACK_TO_PETS' })}
       />
     );
   }
@@ -89,6 +98,7 @@ export default function App() {
         plansError={context.plansError}
         error={context.checkoutError}
         checkoutLoading={state.matches('checkingOut')}
+        onBack={() => send({ type: 'BACK_TO_PETS' })}
         onRetry={() => send({ type: 'RETRY_PLANS' })}
         onSelect={(planKey) => send({ type: 'SELECT_PLAN', planKey })}
       />
@@ -106,7 +116,7 @@ export default function App() {
   if (state.matches('appointmentConfirmation')) {
     const pet = context.pets.find((p) => p.id === context.selectedPetId);
     const slot = context.slots.find((item) => String(item.slot_id) === String(context.selectedSlotId));
-    return <SlotRequestStatus slot={slot} petName={pet && pet.name} />;
+    return <SlotRequestStatus slot={slot} petName={pet && pet.name} onBack={() => send({ type: 'BACK_TO_SLOTS' })} />;
   }
 
   return (

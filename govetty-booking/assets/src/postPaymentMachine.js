@@ -79,6 +79,10 @@ const postPaymentMachine = setup({
         },
       },
       on: {
+        BACK_FROM_SLOTS: [
+          { guard: 'isNewCustomer', target: 'scheduleImmediateCall' },
+          { target: 'bookingCompleteNoCall' },
+        ],
         RETRY_SLOTS: {
           target: 'slotSelection',
           reenter: true,
@@ -116,7 +120,14 @@ const postPaymentMachine = setup({
     },
 
     continuationMissing: { type: 'final' },
-    bookingConfirmation: { type: 'final' },
+    bookingConfirmation: {
+      on: {
+        BACK_TO_SLOTS: {
+          target: 'slotSelection',
+          actions: assign({ selectedSlotId: null }),
+        },
+      },
+    },
     bookingCompleteNoCall: { type: 'final' },
   },
 });
