@@ -13,6 +13,12 @@ import RedirectingToStripe from './components/RedirectingToStripe';
 import { SlotRequestStatus } from './components/BookingConfirmation';
 import { Shell, Loading } from './components/shared/UI';
 
+function goToPersonalArea() {
+  const url =
+    (typeof window.GovettyBooking !== 'undefined' && window.GovettyBooking.personalAreaUrl) || '/';
+  window.location.assign(url);
+}
+
 export default function App() {
   const [state, send] = useMachine(machine);
   const { context } = state;
@@ -71,7 +77,7 @@ export default function App() {
         customer={context.customer}
         pets={context.pets}
         onSelect={(petId) => send({ type: 'SELECT_PET', petId })}
-        onBack={() => send({ type: 'BACK_TO_PHONE' })}
+        onBack={goToPersonalArea}
       />
     );
   }
