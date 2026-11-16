@@ -90,6 +90,7 @@ const ERROR_MESSAGES = {
   not_found: "We couldn't find that -- try again.",
   plans_load_failed: "We couldn't load the plans just now. Try again in a moment.",
   slots_load_failed: "We couldn't load available times just now. Try again in a moment.",
+  slot_network_error: "We couldn't connect to the scheduling service. Check your connection and try again.",
   slot_book_failed: "We couldn't validate that time. Choose another slot or try again.",
   not_logged_in: 'Your session has ended. Please log in again.',
   invalid_customer_token: 'Your session has ended. Please log in again.',
@@ -99,7 +100,16 @@ const ERROR_MESSAGES = {
 };
 
 export function errorMessage(code) {
-  return ERROR_MESSAGES[code] || 'Something went wrong. Please try again.';
+  if (ERROR_MESSAGES[code]) return ERROR_MESSAGES[code];
+  const statusMatch = typeof code === 'string' && code.match(/^slot_http_(\d{3})$/);
+  if (statusMatch) {
+    return `The scheduling service returned an HTTP ${statusMatch[1]} error. Please try again.`;
+  }
+  if (typeof code === 'string' && /^[a-zA-Z0-9 _.-]{1,120}$/.test(code)) {
+    const message = code.replace(/[_-]+/g, ' ').trim();
+    return `The service reported: ${message}. Please try again.`;
+  }
+  return 'Something went wrong. Please try again.';
 }
 
 export function ErrorBanner({ code }) {

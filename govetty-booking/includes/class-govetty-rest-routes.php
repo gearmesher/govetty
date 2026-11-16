@@ -22,6 +22,7 @@ class Govetty_Rest_Routes {
 			array( 'POST', '/otp/start', array( __CLASS__, 'otp_start' ) ),
 			array( 'POST', '/otp/verify', array( __CLASS__, 'otp_verify' ) ),
 			array( 'POST', '/logout', array( __CLASS__, 'logout' ) ),
+			array( 'GET', '/session/status', array( __CLASS__, 'session_status' ) ),
 			array( 'POST', '/register', array( __CLASS__, 'register_customer' ) ),
 			array( 'GET', '/info/user', array( __CLASS__, 'info_user' ) ),
 			array( 'GET', '/customer/dashboard', array( __CLASS__, 'customer_dashboard' ) ),
@@ -51,11 +52,13 @@ class Govetty_Rest_Routes {
 				array(
 					'methods'             => $method,
 					'callback'            => $handler,
-					// Logout only clears the caller's own cookie, so it
-					// deliberately skips the nonce: a page served from a
-					// cache carries an expired nonce, and a nonce failure
-					// here silently left visitors logged in.
-					'permission_callback' => '/logout' === $path ? '__return_true' : array( __CLASS__, 'check_nonce' ),
+					// Logout only clears the caller's own cookie, while
+					// session/status only returns whether that cookie exists.
+					// Both are safe without a nonce and must work on cached
+					// pages whose localized nonce may have expired.
+					'permission_callback' => in_array( $path, array( '/logout', '/session/status' ), true )
+						? '__return_true'
+						: array( __CLASS__, 'check_nonce' ),
 				)
 			);
 		}
@@ -350,6 +353,15 @@ class Govetty_Rest_Routes {
 	// ---------------------------------------------------------------------
 	// Info
 	// ---------------------------------------------------------------------
+
+	public static function session_status( WP_REST_Request $request ) {
+		$response = new WP_REST_Response(
+			array( 'logged_in' => (bool) Govetty_Customer_Session::get_token() ),
+			200
+		);
+		$response->header( 'Cache-Control', 'no-store, private, max-age=0' );
+		return $response;
+	}
 
 	public static function info_user( WP_REST_Request $request ) {
 		$token = Govetty_Customer_Session::get_token();

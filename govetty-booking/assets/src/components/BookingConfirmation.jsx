@@ -39,10 +39,11 @@ export function SlotRequestStatus({ slot, petName, onBack }) {
   );
 }
 
-export function BookingCompleteNoCall() {
+export function BookingCompleteNoCall({ onBack }) {
   return (
     <Shell
       progress={PROGRESS_BY_STATE.bookingCompleteNoCall}
+      onBack={onBack}
       eyebrow="Checkout return received"
       title="Check your account for payment status"
     >

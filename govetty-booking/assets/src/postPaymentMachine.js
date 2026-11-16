@@ -19,7 +19,6 @@ const postPaymentMachine = setup({
     bookSlot: fromPromise(({ input }) => api.slotBook(input.petId, input.slotId)),
   },
   guards: {
-    isNewCustomer: ({ context }) => context.flowVariant === 'newCustomer',
     slotLoadFailed: ({ event }) =>
       !event.output.ok || !Array.isArray(event.output.data.slots) || event.output.data.status === 'error',
     slotBookFailed: ({ event }) => !event.output.ok || event.output.data.status === 'error',
@@ -40,8 +39,7 @@ const postPaymentMachine = setup({
     start: {
       always: [
         { guard: ({ context }) => !context.selectedPetId, target: 'continuationMissing' },
-        { guard: 'isNewCustomer', target: 'scheduleImmediateCall' },
-        { target: 'slotSelection' },
+        { target: 'scheduleImmediateCall' },
       ],
     },
 
@@ -63,7 +61,10 @@ const postPaymentMachine = setup({
             actions: assign({
               slots: [],
               slotsLoading: false,
-              slotError: ({ event }) => event.output.data.message || 'slots_load_failed',
+              slotError: ({ event }) =>
+                !event.output.ok
+                  ? `slot_http_${event.output.status}`
+                  : event.output.data.message || 'slots_load_failed',
             }),
           },
           {
@@ -75,14 +76,11 @@ const postPaymentMachine = setup({
           },
         ],
         onError: {
-          actions: assign({ slots: [], slotsLoading: false, slotError: 'slots_load_failed' }),
+          actions: assign({ slots: [], slotsLoading: false, slotError: 'slot_network_error' }),
         },
       },
       on: {
-        BACK_FROM_SLOTS: [
-          { guard: 'isNewCustomer', target: 'scheduleImmediateCall' },
-          { target: 'bookingCompleteNoCall' },
-        ],
+        BACK_FROM_SLOTS: 'scheduleImmediateCall',
         RETRY_SLOTS: {
           target: 'slotSelection',
           reenter: true,
@@ -128,7 +126,11 @@ const postPaymentMachine = setup({
         },
       },
     },
-    bookingCompleteNoCall: { type: 'final' },
+    bookingCompleteNoCall: {
+      on: {
+        BACK_TO_SCHEDULE: 'scheduleImmediateCall',
+      },
+    },
   },
 });
 

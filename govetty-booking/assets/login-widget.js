@@ -27,6 +27,48 @@
     });
   }
 
+  function setLoginState(loggedIn) {
+    document.querySelectorAll('[data-govetty-session-state]').forEach(function (element) {
+      var isLoggedInVariant = element.getAttribute('data-govetty-session-state') === 'logged-in';
+      element.hidden = isLoggedInVariant !== loggedIn;
+      if (element.hidden && element.matches('.gv-login-menu')) {
+        element.open = false;
+      }
+    });
+  }
+
+  function refreshLoginState() {
+    var config = window.GovettyBooking;
+    if (!config || !config.root) return;
+
+    fetch(config.root + 'session/status', {
+      credentials: 'same-origin',
+      headers: { 'X-WP-Nonce': config.nonce },
+    })
+      .then(function (res) {
+        if (!res.ok) {
+          console.error('Unable to refresh GoVetty login status (HTTP ' + res.status + ').');
+          return null;
+        }
+        return res.json();
+      })
+      .then(function (data) {
+        if (data && typeof data.logged_in === 'boolean') {
+          setLoginState(data.logged_in);
+        }
+      })
+      .catch(function (error) {
+        console.error('Unable to refresh GoVetty login status.', error);
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', refreshLoginState);
+  } else {
+    refreshLoginState();
+  }
+  window.addEventListener('govetty:session-changed', refreshLoginState);
+
   // Only one popup open at a time (defensive -- normally there's just one
   // instance on the page, e.g. in the header).
   document.addEventListener(

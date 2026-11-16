@@ -30,16 +30,11 @@ class Govetty_Shortcodes {
 
 	/**
 	 * Server-rendered login link / account popup -- no React, so it's cheap
-	 * enough to sit in the header on every page. Login state is read
-	 * straight from the customer_token cookie (Govetty_Customer_Session),
-	 * the same signal the dashboard's /info/user call relies on -- presence
-	 * of the cookie means "looks logged in", not a guarantee the token is
-	 * still valid upstream (that's only checked when it's actually used).
-	 *
-	 * If this page is served from a full-page cache (e.g. a caching plugin)
-	 * for anonymous visitors, make sure that cache varies on the
-	 * govetty_customer_token cookie, or logged-in customers can get served a
-	 * cached "Log in" link.
+	 * enough to sit in the header on every page. Both variants are rendered
+	 * so the sitewide login-widget.js can refresh the visible state from
+	 * /session/status after login and when a cached page is served. Presence
+	 * of the customer_token cookie means "looks logged in", not a guarantee
+	 * the token is still valid upstream.
 	 *
 	 * Logged out: a plain <a> to the booking page (OTP login happens there).
 	 *
@@ -91,45 +86,6 @@ class Govetty_Shortcodes {
 			'govetty_login'
 		);
 
-		$logged_in = (bool) Govetty_Customer_Session::get_token();
-		$icon      = $atts['icon']; // Raw HTML by design -- see docblock.
-
-		if ( $logged_in ) {
-			$redirect = $atts['redirect'];
-			if ( ! $redirect ) {
-				// Logging out from the Personal Area itself would land the
-				// visitor back on a page that needs a login -- send them
-				// home instead. Anywhere else, stay on the current page.
-				$on_personal_area = untrailingslashit( (string) wp_parse_url( self::current_url(), PHP_URL_PATH ) )
-					=== untrailingslashit( (string) wp_parse_url( Govetty_Rest_Routes::personal_area_page_url(), PHP_URL_PATH ) );
-				$redirect         = $on_personal_area ? home_url( '/' ) : self::current_url();
-			}
-			$account_url = $atts['account_url'] ? $atts['account_url'] : Govetty_Rest_Routes::personal_area_page_url();
-
-			return sprintf(
-				'<details class="gv-login-menu">' .
-					'<summary class="%1$s gv-login-menu-btn" aria-label="%2$s">%3$s%4$s</summary>' .
-					'<div class="gv-login-menu-panel" role="menu">' .
-						'<div class="gv-login-menu-balance" data-govetty-balance hidden>' .
-							'<span class="gv-login-menu-balance-label">%9$s</span>' .
-							'<span class="gv-login-menu-balance-value" data-govetty-balance-value></span>' .
-						'</div>' .
-						'<a href="%5$s" class="gv-login-menu-item" role="menuitem">%6$s</a>' .
-						'<button type="button" class="gv-login-menu-item" role="menuitem" data-govetty-logout="1" data-redirect="%7$s">%8$s</button>' .
-					'</div>' .
-				'</details>',
-				esc_attr( $atts['class'] ),
-				esc_attr( $atts['dashboard_text'] ),
-				$icon,
-				self::label( $atts['dashboard_text'], $atts['text_class'] ),
-				esc_url( $account_url ),
-				esc_html( $atts['account_text'] ),
-				esc_url( $redirect ),
-				esc_html( $atts['logout_text'] ),
-				esc_html__( 'Call balance', 'govetty-booking' )
-			);
-		}
-
 		// govetty_intent=login tells the booking flow this click came from the
 		// header's login control, not from "book a call" -- so once OTP
 		// verifies an existing customer, bookingMachine.js sends them straight
@@ -138,16 +94,54 @@ class Govetty_Shortcodes {
 		// way -- the intent only short-circuits the *existing customer*
 		// branch. Appended even when login_url is overridden, since the
 		// action is still "log in" regardless of which page it points at.
-		$login_url = $atts['login_url'] ? $atts['login_url'] : Govetty_Rest_Routes::booking_page_url();
+		$logged_in = (bool) Govetty_Customer_Session::get_token();
+		$icon      = $atts['icon']; // Raw HTML by design -- see docblock.
+
+		$redirect = $atts['redirect'];
+		if ( ! $redirect ) {
+			$on_personal_area = untrailingslashit( (string) wp_parse_url( self::current_url(), PHP_URL_PATH ) )
+				=== untrailingslashit( (string) wp_parse_url( Govetty_Rest_Routes::personal_area_page_url(), PHP_URL_PATH ) );
+			$redirect         = $on_personal_area ? home_url( '/' ) : self::current_url();
+		}
+		$account_url = $atts['account_url'] ? $atts['account_url'] : Govetty_Rest_Routes::personal_area_page_url();
+		$login_url   = $atts['login_url'] ? $atts['login_url'] : Govetty_Rest_Routes::booking_page_url();
 		$login_url = add_query_arg( 'govetty_intent', 'login', $login_url );
-		return sprintf(
-			'<a href="%1$s" class="%2$s" aria-label="%3$s">%4$s%5$s</a>',
+
+		$logged_in_menu = sprintf(
+			'<details class="gv-login-menu gv-login-state" data-govetty-session-state="logged-in"%1$s>' .
+				'<summary class="%2$s gv-login-menu-btn" aria-label="%3$s">%4$s%5$s</summary>' .
+				'<div class="gv-login-menu-panel" role="menu">' .
+					'<div class="gv-login-menu-balance" data-govetty-balance hidden>' .
+						'<span class="gv-login-menu-balance-label">%10$s</span>' .
+						'<span class="gv-login-menu-balance-value" data-govetty-balance-value></span>' .
+					'</div>' .
+					'<a href="%6$s" class="gv-login-menu-item" role="menuitem">%7$s</a>' .
+					'<button type="button" class="gv-login-menu-item" role="menuitem" data-govetty-logout="1" data-redirect="%8$s">%9$s</button>' .
+				'</div>' .
+			'</details>',
+			$logged_in ? '' : ' hidden',
+			esc_attr( $atts['class'] ),
+			esc_attr( $atts['dashboard_text'] ),
+			$icon,
+			self::label( $atts['dashboard_text'], $atts['text_class'] ),
+			esc_url( $account_url ),
+			esc_html( $atts['account_text'] ),
+			esc_url( $redirect ),
+			esc_html( $atts['logout_text'] ),
+			esc_html__( 'Call balance', 'govetty-booking' )
+		);
+
+		$logged_out_link = sprintf(
+			'<a href="%1$s" class="%2$s gv-login-state" data-govetty-session-state="logged-out" aria-label="%3$s"%4$s>%5$s%6$s</a>',
 			esc_url( $login_url ),
 			esc_attr( $atts['class'] ),
 			esc_attr( $atts['login_text'] ),
+			$logged_in ? ' hidden' : '',
 			$icon,
 			self::label( $atts['login_text'], $atts['text_class'] )
 		);
+
+		return $logged_in_menu . $logged_out_link;
 	}
 
 	private static function label( $text, $text_class ) {

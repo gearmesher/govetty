@@ -58,7 +58,7 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
   }
 
   if (state.matches('bookingCompleteNoCall')) {
-    return <BookingCompleteNoCall />;
+    return <BookingCompleteNoCall onBack={() => send({ type: 'BACK_TO_SCHEDULE' })} />;
   }
 
   if (state.matches('continuationMissing')) {

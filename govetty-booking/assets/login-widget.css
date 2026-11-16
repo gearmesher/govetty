@@ -14,6 +14,10 @@
   position: relative;
 }
 
+.gv-login-state[hidden] {
+  display: none !important;
+}
+
 /* Reset default <summary>/<button> chrome -- theme classes passed via the
    shortcode's `class` attribute (e.g. frame-66) supply the actual look. */
 .gv-login-menu-btn {

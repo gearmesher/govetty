@@ -123,6 +123,7 @@ const machine = setup({
     customer: null,
     pets: [],
     selectedPetId: null,
+    petSelectionSkipped: false,
     selectedPlanKey: null,
     selectedSlotId: null,
     flowVariant: null, // 'newCustomer' | 'existingHasBalance' | 'existingNoBalance'
@@ -166,6 +167,7 @@ const machine = setup({
                 customer: event.output.data.customer,
                 pets: event.output.data.pets,
                 selectedPetId: pet.id,
+                petSelectionSkipped: true,
                 flowVariant: pet.token_amount > 0 ? 'existingHasBalance' : 'existingNoBalance',
               };
             }),
@@ -179,6 +181,7 @@ const machine = setup({
                 customer: event.output.data.customer,
                 pets: event.output.data.pets,
                 selectedPetId: pet.id,
+                petSelectionSkipped: true,
                 flowVariant: 'existingNoBalance',
               };
             }),
@@ -432,7 +435,10 @@ const machine = setup({
             actions: assign({
               slots: [],
               slotsLoading: false,
-              slotError: ({ event }) => event.output.data.message || 'slots_load_failed',
+              slotError: ({ event }) =>
+                !event.output.ok
+                  ? `slot_http_${event.output.status}`
+                  : event.output.data.message || 'slots_load_failed',
             }),
           },
           {
@@ -444,7 +450,7 @@ const machine = setup({
           },
         ],
         onError: {
-          actions: assign({ slots: [], slotsLoading: false, slotError: 'slots_load_failed' }),
+          actions: assign({ slots: [], slotsLoading: false, slotError: 'slot_network_error' }),
         },
       },
       on: {

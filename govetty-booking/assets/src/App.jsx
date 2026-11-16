@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMachine } from '@xstate/react';
 import machine from './bookingMachine';
 
@@ -22,6 +22,12 @@ function goToPersonalArea() {
 export default function App() {
   const [state, send] = useMachine(machine);
   const { context } = state;
+
+  useEffect(() => {
+    if (context.customer && typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('govetty:session-changed'));
+    }
+  }, [context.customer]);
 
   if (state.matches('checkingSession')) {
     return (
@@ -91,7 +97,11 @@ export default function App() {
         booking={state.matches('booking')}
         onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
         onRetry={() => send({ type: 'RETRY_SLOTS' })}
-        onBack={() => send({ type: 'BACK_TO_PETS' })}
+        onBack={() =>
+          context.petSelectionSkipped
+            ? goToPersonalArea()
+            : send({ type: 'BACK_TO_PETS' })
+        }
       />
     );
   }
@@ -104,7 +114,11 @@ export default function App() {
         plansError={context.plansError}
         error={context.checkoutError}
         checkoutLoading={state.matches('checkingOut')}
-        onBack={() => send({ type: 'BACK_TO_PETS' })}
+        onBack={() =>
+          context.petSelectionSkipped
+            ? goToPersonalArea()
+            : send({ type: 'BACK_TO_PETS' })
+        }
         onRetry={() => send({ type: 'RETRY_PLANS' })}
         onSelect={(planKey) => send({ type: 'SELECT_PLAN', planKey })}
       />
