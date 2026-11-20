@@ -206,6 +206,11 @@ function bookUrl(petId) {
   return base + (base.includes('?') ? '&' : '?') + 'govetty_pet=' + encodeURIComponent(petId);
 }
 
+function addPetUrl() {
+  const base = (window.GovettyBooking && window.GovettyBooking.bookingUrl) || '/';
+  return base + (base.includes('?') ? '&' : '?') + 'govetty_action=add_pet';
+}
+
 export default function PersonalArea() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -272,27 +277,30 @@ export default function PersonalArea() {
             <h2 className="gv-pa-heading">Your pets</h2>
             {pets.length === 0 ? (
               <p className="gv-subtitle">We couldn't find any pets on your account.</p>
-            ) : (
-              <div className="gv-pa-pet-list">
-                {pets.map((pet) => (
-                  <div key={pet.id} className="gv-pa-pet-card">
-                    <PetImageUpload pet={pet} onUpdated={handlePetImageUpdated} />
-                    <div className="gv-pa-pet-info">
-                      <p className="gv-pa-pet-name">{pet.name}</p>
-                      <p className="gv-pa-pet-meta">{pet.type === 'dog' ? 'Dog' : pet.type === 'cat' ? 'Cat' : pet.type}</p>
-                      <p className="gv-pa-pet-meta">
-                        {pet.token_amount > 0
-                          ? `${pet.token_amount} call${pet.token_amount === 1 ? '' : 's'} available`
-                          : 'No calls available'}
-                      </p>
-                    </div>
-                    <a className="gv-btn gv-btn-primary gv-pa-pet-book" href={bookUrl(pet.id)}>
-                      Book
-                    </a>
+            ) : null}
+            <div className="gv-pa-pet-list">
+              {pets.map((pet) => (
+                <div key={pet.id} className="gv-pa-pet-card">
+                  <PetImageUpload pet={pet} onUpdated={handlePetImageUpdated} />
+                  <div className="gv-pa-pet-info">
+                    <p className="gv-pa-pet-name">{pet.name}</p>
+                    <p className="gv-pa-pet-meta">{pet.type === 'dog' ? 'Dog' : pet.type === 'cat' ? 'Cat' : pet.type}</p>
+                    <p className="gv-pa-pet-meta">
+                      {pet.token_amount > 0
+                        ? `${pet.token_amount} call${pet.token_amount === 1 ? '' : 's'} available`
+                        : 'No calls available'}
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
+                  <a className="gv-btn gv-btn-primary gv-pa-pet-book" href={bookUrl(pet.id)}>
+                    Book
+                  </a>
+                </div>
+              ))}
+              <a className="gv-pa-add-pet" href={addPetUrl()}>
+                <span className="gv-pa-add-pet-icon" aria-hidden="true">+</span>
+                <span>Book another pet</span>
+              </a>
+            </div>
           </section>
 
           <section className="gv-pa-section">

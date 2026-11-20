@@ -1,6 +1,5 @@
 import React from 'react';
 import { Shell, ErrorBanner, Loading, LinkButton, PROGRESS_BY_STATE } from './shared/UI';
-import SlotHoldCountdown from './SlotHoldCountdown';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Date to be confirmed';
@@ -26,8 +25,6 @@ export default function SlotSelection({
   onBack,
   onRetry,
   selectedSlot,
-  slotHoldExpiresAt,
-  onHoldExpired,
 }) {
   return (
     <Shell
@@ -35,7 +32,7 @@ export default function SlotSelection({
       onBack={booking ? undefined : onBack}
       eyebrow="Pick a time"
       title="Choose an available slot"
-      subtitle="Select one of the available times. If payment is needed, the slot will be held for five minutes while you complete checkout."
+      subtitle="Select an available time. If payment is needed, complete checkout within five minutes."
     >
       {selectedSlot && slotHoldExpiresAt && (
         <div className="gv-slot-hold-summary">
@@ -46,7 +43,6 @@ export default function SlotSelection({
           </span>
         </div>
       )}
-      <SlotHoldCountdown expiresAt={slotHoldExpiresAt} onExpired={onHoldExpired} />
       <ErrorBanner code={error} />
       {loading && slots.length === 0 ? (
         <Loading label="Loading available times…" />

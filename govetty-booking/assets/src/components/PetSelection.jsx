@@ -1,7 +1,7 @@
 import React from 'react';
-import { Shell, PROGRESS_BY_STATE } from './shared/UI';
+import { Button, ErrorBanner, Shell, PROGRESS_BY_STATE } from './shared/UI';
 
-export default function PetSelection({ customer, pets, onSelect, onBack }) {
+export default function PetSelection({ customer, pets, error, onSelect, onAddPet, onBack }) {
   return (
     <Shell
       progress={PROGRESS_BY_STATE.petSelection}
@@ -10,6 +10,7 @@ export default function PetSelection({ customer, pets, onSelect, onBack }) {
       title="Which pet is this call for?"
       subtitle="Each pet has its own call balance, so pick the one you need help with."
     >
+      <ErrorBanner code={error} />
       <div className="gv-list">
         {pets.map((pet) => (
           <button key={pet.id} type="button" className="gv-pet-card" onClick={() => onSelect(pet.id)}>
@@ -26,6 +27,11 @@ export default function PetSelection({ customer, pets, onSelect, onBack }) {
             )}
           </button>
         ))}
+      </div>
+      <div className="gv-actions">
+        <Button onClick={onAddPet}>
+          <span aria-hidden="true">+</span> Book another pet
+        </Button>
       </div>
     </Shell>
   );

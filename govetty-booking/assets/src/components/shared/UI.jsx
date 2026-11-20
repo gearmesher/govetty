@@ -92,6 +92,8 @@ const ERROR_MESSAGES = {
   slots_load_failed: "We couldn't load available times just now. Try again in a moment.",
   slot_network_error: "We couldn't connect to the scheduling service. Check your connection and try again.",
   slot_book_failed: "We couldn't validate that time. Choose another slot or try again.",
+  pet_attach_failed: "We couldn't add that pet. Check the details and try again.",
+  pet_attach_refresh_failed: "Your pet may have been added, but we couldn't load your pet list. Please return to your account and try again.",
   not_logged_in: 'Your session has ended. Please log in again.',
   invalid_customer_token: 'Your session has ended. Please log in again.',
   customer_not_found: "We couldn't find your account. Please log in again.",

@@ -113,10 +113,24 @@ class Govetty_Mock_Api {
 				return self::ok( array( 'status' => 'ok' ) );
 
 			case '/customer/attachPet':
+				$token   = (string) ( $params['customer_token'] ?? '' );
+				$session = $token ? get_transient( self::session_key( $token ) ) : false;
+				if ( ! $session ) {
+					return self::error( 422, array( 'status' => 'error', 'message' => 'customer_not_found' ) );
+				}
+				$pet = array(
+					'id'           => wp_rand( 9000, 9999 ),
+					'name'         => sanitize_text_field( $params['name'] ?? 'New pet' ),
+					'type'         => sanitize_text_field( $params['type'] ?? '' ),
+					'token_amount' => 0,
+					'image_id'     => $params['image_id'] ?? null,
+				);
+				$session['pets'][] = $pet;
+				set_transient( self::session_key( $token ), $session, 12 * HOUR_IN_SECONDS );
 				return self::ok(
 					array(
-						'id'   => wp_rand( 9000, 9999 ),
-						'name' => $params['name'] ?? 'New pet',
+						'id'   => $pet['id'],
+						'name' => $pet['name'],
 					)
 				);
 

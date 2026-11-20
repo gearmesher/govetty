@@ -6,6 +6,7 @@ import PhoneEntry from './components/PhoneEntry';
 import OtpEntry from './components/OtpEntry';
 import Registration from './components/Registration';
 import PetSelection from './components/PetSelection';
+import PetRegistration from './components/PetRegistration';
 import PlanSelection from './components/PlanSelection';
 import SlotSelection from './components/SlotSelection';
 import RedirectingToAccount from './components/RedirectingToAccount';
@@ -22,12 +23,24 @@ function goToPersonalArea() {
 export default function App() {
   const [state, send] = useMachine(machine);
   const { context } = state;
+  const holdActive =
+    state.matches('slotSelection') ||
+    state.matches('booking') ||
+    state.matches('planSelection') ||
+    state.matches('checkingOut');
 
   useEffect(() => {
     if (context.customer && typeof window !== 'undefined') {
       window.dispatchEvent(new Event('govetty:session-changed'));
     }
   }, [context.customer]);
+
+  useEffect(() => {
+    if (!holdActive || !context.slotHoldExpiresAt) return undefined;
+    const remaining = context.slotHoldExpiresAt - Date.now();
+    const timeout = window.setTimeout(() => send({ type: 'SLOT_HOLD_EXPIRED' }), Math.max(0, remaining));
+    return () => window.clearTimeout(timeout);
+  }, [context.slotHoldExpiresAt, holdActive, state.value, send]);
 
   if (state.matches('checkingSession')) {
     return (
@@ -77,12 +90,26 @@ export default function App() {
     );
   }
 
+  if (state.matches('petRegistration') || state.matches('attachingPet')) {
+    return (
+      <PetRegistration
+        breeds={context.breeds}
+        loading={state.matches('petRegistration.loadingBreeds') || state.matches('attachingPet')}
+        error={context.registrationError}
+        onBack={() => send({ type: 'BACK_TO_PETS' })}
+        onSubmit={(payload) => send({ type: 'SUBMIT_NEW_PET', payload })}
+      />
+    );
+  }
+
   if (state.matches('petSelection')) {
     return (
       <PetSelection
         customer={context.customer}
         pets={context.pets}
+        error={context.petSelectionError}
         onSelect={(petId) => send({ type: 'SELECT_PET', petId })}
+        onAddPet={() => send({ type: 'ADD_PET' })}
         onBack={goToPersonalArea}
       />
     );
@@ -98,8 +125,6 @@ export default function App() {
         onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
         onRetry={() => send({ type: 'RETRY_SLOTS' })}
         selectedSlot={context.selectedSlot}
-        slotHoldExpiresAt={context.slotHoldExpiresAt}
-        onHoldExpired={() => send({ type: 'SLOT_HOLD_EXPIRED' })}
         onBack={() =>
           context.petSelectionSkipped
             ? goToPersonalArea()
@@ -120,7 +145,6 @@ export default function App() {
         onBack={() => send({ type: 'BACK_TO_SLOTS' })}
         selectedSlot={context.selectedSlot}
         slotHoldExpiresAt={context.slotHoldExpiresAt}
-        onHoldExpired={() => send({ type: 'SLOT_HOLD_EXPIRED' })}
         onRetry={() => send({ type: 'RETRY_PLANS' })}
         onSelect={(planKey) => send({ type: 'SELECT_PLAN', planKey })}
       />

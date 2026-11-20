@@ -71,6 +71,17 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
     fetchPlans();
   }, [acknowledged, petId, fetchPlans]);
 
+  useEffect(() => {
+    if (!acknowledged || !slotHoldExpiresAt) return undefined;
+    const remaining = slotHoldExpiresAt - Date.now();
+    if (remaining <= 0) {
+      returnToSlotSelection();
+      return undefined;
+    }
+    const timeout = window.setTimeout(returnToSlotSelection, remaining);
+    return () => window.clearTimeout(timeout);
+  }, [acknowledged, slotHoldExpiresAt, returnToSlotSelection]);
+
   const handleSelect = async (planKey) => {
     if (slotHoldExpiresAt && Date.now() >= slotHoldExpiresAt) {
       returnToSlotSelection();
@@ -122,7 +133,6 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
       onBack={() => setAcknowledged(false)}
       selectedSlot={continuation.selectedSlot}
       slotHoldExpiresAt={slotHoldExpiresAt}
-      onHoldExpired={returnToSlotSelection}
       onRetry={fetchPlans}
       onSelect={handleSelect}
     />

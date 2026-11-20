@@ -610,6 +610,47 @@
   gap: 14px;
 }
 
+.gv-pa-add-pet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 190px;
+  padding: 16px;
+  border: 1.5px dashed var(--gv-border);
+  border-radius: var(--gv-radius);
+  background: var(--gv-surface);
+  color: var(--gv-primary);
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.gv-pa-add-pet:hover {
+  border-color: var(--gv-primary);
+  background: var(--gv-primary-tint);
+}
+
+.gv-pa-add-pet:focus-visible {
+  outline: 2.5px solid var(--gv-accent);
+  outline-offset: 2px;
+}
+
+.gv-pa-add-pet-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1;
+}
+
 .gv-pa-pet-card {
   display: flex;
   flex-direction: column;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Shell, ErrorBanner, Loading, LinkButton, PROGRESS_BY_STATE } from './shared/UI';
-import SlotHoldCountdown from './SlotHoldCountdown';
 
 // The API only returns plan_key + price -- friendly copy lives here so it's
 // easy to update without touching the machine or the API layer. Keys
@@ -63,7 +62,6 @@ export default function PlanSelection({
   onBack,
   selectedSlot,
   slotHoldExpiresAt,
-  onHoldExpired,
 }) {
   const slotExpired = Boolean(slotHoldExpiresAt && Date.now() >= slotHoldExpiresAt);
 
@@ -81,7 +79,6 @@ export default function PlanSelection({
           <span>{formatSlot(selectedSlot)}</span>
         </div>
       )}
-      <SlotHoldCountdown expiresAt={slotHoldExpiresAt} onExpired={onHoldExpired} />
       <ErrorBanner code={error} />
       {plansStatus === 'loading' || plansStatus === 'idle' ? (
         <Loading label="Loading plans…" />

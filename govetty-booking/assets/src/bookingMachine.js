@@ -30,6 +30,27 @@ function readLoginOnly() {
   }
 }
 
+function readAddPetRequest() {
+  if (typeof window === 'undefined' || !window.location) return false;
+  try {
+    return new URLSearchParams(window.location.search).get('govetty_action') === 'add_pet';
+  } catch (e) {
+    return false;
+  }
+}
+
+function findAttachedPet(context, pets) {
+  if (context.attachedPetId) {
+    const attachedPet = pets.find((pet) => String(pet.id) === String(context.attachedPetId));
+    if (attachedPet) return attachedPet;
+  }
+  return pets.find(
+    (pet) =>
+      pet.name === context.pendingPet?.name &&
+      !context.pets.some((existingPet) => String(existingPet.id) === String(pet.id))
+  );
+}
+
 /**
  * This machine's states map 1:1 onto the Figma board's nodes, and its
  * guarded transitions map onto the board's diamonds. Keeping that
@@ -75,6 +96,7 @@ const machine = setup({
     loadSession: fromPromise(() => api.infoUser()),
     loadBreeds: fromPromise(() => api.infoBreeds()),
     submitRegistration: fromPromise(({ input }) => api.register(input.payload)),
+    attachPet: fromPromise(({ input }) => api.attachPet(input.payload)),
     loadPlans: fromPromise(({ input }) => api.billingPlans(input.petId)),
     loadSlots: fromPromise(({ input }) => api.slotAvailable(input.petCount)),
     bookSlot: fromPromise(({ input }) => api.slotBook(input.petId, input.slotId)),
@@ -86,6 +108,11 @@ const machine = setup({
     isPostRegistrationPurpose: ({ context }) => context.otpPurpose === 'postRegistration',
     canResend: ({ context }) => context.canResend,
     isLoginOnly: ({ context }) => context.loginOnly,
+    isAddPetRequest: ({ context }) => context.addPetRequest,
+    petAttachFailed: ({ event }) =>
+      !event.output.ok || event.output.data.status === 'error' || !!event.output.data.error,
+    attachedPetFound: ({ context, event }) =>
+      !!findAttachedPet(context, event.output.data.pets || []),
     // Existing session, arrived from a pet's "Book" button, and that pet is
     // really on this account (never trust the URL alone).
     hasRequestedPetWithBalance: ({ context, event }) => {
@@ -115,6 +142,7 @@ const machine = setup({
     code: '',
     otpPurpose: 'login', // 'login' | 'postRegistration'
     loginOnly: readLoginOnly(),
+    addPetRequest: readAddPetRequest(),
     requestedPetId: readRequestedPetId(),
     otpSentAt: null,
     canResend: false,
@@ -124,6 +152,9 @@ const machine = setup({
     pets: [],
     selectedPetId: null,
     petSelectionSkipped: false,
+    petSelectionError: null,
+    pendingPet: null,
+    attachedPetId: null,
     selectedPlanKey: null,
     selectedSlotId: null,
     selectedSlot: null,
@@ -157,6 +188,14 @@ const machine = setup({
               window.location.href =
                 (typeof window.GovettyBooking !== 'undefined' && window.GovettyBooking.personalAreaUrl) || '/';
             },
+          },
+          {
+            guard: 'isAddPetRequest',
+            target: 'petRegistration',
+            actions: assign(({ event }) => ({
+              customer: event.output.data.customer,
+              pets: event.output.data.pets || [],
+            })),
           },
           {
             // From a pet's "Book" button in the Personal Area: that pet is
@@ -302,6 +341,15 @@ const machine = setup({
             actions: assign({ otpError: null }),
           },
           {
+            guard: 'isAddPetRequest',
+            target: 'petRegistration',
+            actions: assign({
+              customer: ({ event }) => event.output.data.customer,
+              pets: ({ event }) => event.output.data.pets || [],
+              otpError: null,
+            }),
+          },
+          {
             // Header "Login" click (govetty_intent=login) by a recognized,
             // already-registered customer -- the client wants this to land
             // on the Personal Area dashboard directly, not continue into
@@ -396,15 +444,119 @@ const machine = setup({
       },
     },
 
+    petRegistration: {
+      initial: 'loadingBreeds',
+      on: {
+        BACK_TO_PETS: 'petSelection',
+        SUBMIT_NEW_PET: '#booking.attachingPet',
+      },
+      states: {
+        loadingBreeds: {
+          invoke: {
+            src: 'loadBreeds',
+            onDone: {
+              target: 'form',
+              actions: assign({ breeds: ({ event }) => event.output.data }),
+            },
+            onError: 'form',
+          },
+        },
+        form: {},
+      },
+    },
+
+    attachingPet: {
+      entry: assign(({ event }) => ({
+        pendingPet: event.payload,
+        attachedPetId: null,
+      })),
+      invoke: {
+        src: 'attachPet',
+        input: ({ event }) => ({ payload: event.payload }),
+        onDone: [
+          {
+            guard: 'petAttachFailed',
+            target: 'petRegistration.form',
+            actions: assign({
+              registrationError: ({ event }) =>
+                event.output.data.message || event.output.data.error || 'pet_attach_failed',
+            }),
+          },
+          {
+            target: 'refreshingPets',
+            actions: assign(({ context, event }) => ({
+              pendingPet: event.output.data.pet || context.pendingPet,
+              attachedPetId:
+                event.output.data.pet_id ??
+                event.output.data.id ??
+                event.output.data.pet?.id ??
+                event.output.data.pet?.pet_id ??
+                null,
+              registrationError: null,
+            })),
+          },
+        ],
+        onError: {
+          target: 'petRegistration.form',
+          actions: assign({ registrationError: 'server_error' }),
+        },
+      },
+    },
+
+    refreshingPets: {
+      invoke: {
+        src: 'loadSession',
+        onDone: [
+          {
+            guard: 'noActiveSession',
+            target: 'petRegistration.form',
+            actions: assign({ registrationError: 'not_logged_in' }),
+          },
+          {
+            guard: 'attachedPetFound',
+            target: 'slotSelection',
+            actions: assign(({ context, event }) => {
+              const pets = event.output.data.pets || [];
+              const pet = findAttachedPet(context, pets);
+              return {
+                customer: event.output.data.customer,
+                pets,
+                selectedPetId: pet.id,
+                flowVariant: 'existingNoBalance',
+                petSelectionError: null,
+                registrationError: null,
+              };
+            }),
+          },
+          {
+            target: 'petSelection',
+            actions: assign(({ event }) => ({
+              customer: event.output.data.customer,
+              pets: event.output.data.pets || [],
+              petSelectionError: 'pet_attach_refresh_failed',
+            })),
+          },
+        ],
+        onError: {
+          target: 'petSelection',
+          actions: assign({ petSelectionError: 'pet_attach_refresh_failed' }),
+        },
+      },
+    },
+
     // -----------------------------------------------------------------
     // Existing customer
     // -----------------------------------------------------------------
 
     petSelection: {
       on: {
+        ADD_PET: {
+          target: 'petRegistration',
+          actions: assign({ registrationError: null, petSelectionError: null }),
+        },
         BACK_TO_PHONE: {
           target: 'phoneEntry',
-          actions: assign({ customer: null, pets: [], selectedPetId: null }),
+          actions: assign({ customer: null, pets: [], selectedPetId: null, petSelectionError: null }),
         },
         SELECT_PET: [
           {
@@ -413,6 +565,7 @@ const machine = setup({
             actions: assign(({ event }) => ({
               selectedPetId: event.petId,
               flowVariant: 'existingHasBalance',
+              petSelectionError: null,
             })),
           },
           {
@@ -420,6 +573,7 @@ const machine = setup({
             actions: assign(({ event }) => ({
               selectedPetId: event.petId,
               flowVariant: 'existingNoBalance',
+              petSelectionError: null,
             })),
           },
         ],
@@ -486,6 +640,16 @@ const machine = setup({
     },
 
     booking: {
+      on: {
+        SLOT_HOLD_EXPIRED: {
+          target: 'slotSelection',
+          actions: assign({
+            selectedSlotId: null,
+            selectedSlot: null,
+            slotHoldExpiresAt: null,
+          }),
+        },
+      },
       invoke: {
         src: 'bookSlot',
         input: ({ context }) => ({ petId: context.selectedPetId, slotId: context.selectedSlotId }),
