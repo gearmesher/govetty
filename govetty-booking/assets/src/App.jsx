@@ -97,6 +97,9 @@ export default function App() {
         booking={state.matches('booking')}
         onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
         onRetry={() => send({ type: 'RETRY_SLOTS' })}
+        selectedSlot={context.selectedSlot}
+        slotHoldExpiresAt={context.slotHoldExpiresAt}
+        onHoldExpired={() => send({ type: 'SLOT_HOLD_EXPIRED' })}
         onBack={() =>
           context.petSelectionSkipped
             ? goToPersonalArea()
@@ -114,11 +117,10 @@ export default function App() {
         plansError={context.plansError}
         error={context.checkoutError}
         checkoutLoading={state.matches('checkingOut')}
-        onBack={() =>
-          context.petSelectionSkipped
-            ? goToPersonalArea()
-            : send({ type: 'BACK_TO_PETS' })
-        }
+        onBack={() => send({ type: 'BACK_TO_SLOTS' })}
+        selectedSlot={context.selectedSlot}
+        slotHoldExpiresAt={context.slotHoldExpiresAt}
+        onHoldExpired={() => send({ type: 'SLOT_HOLD_EXPIRED' })}
         onRetry={() => send({ type: 'RETRY_PLANS' })}
         onSelect={(planKey) => send({ type: 'SELECT_PLAN', planKey })}
       />

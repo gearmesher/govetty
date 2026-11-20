@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMachine } from '@xstate/react';
 import postPaymentMachine from './postPaymentMachine';
 import { api } from './api';
@@ -13,10 +13,15 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
     input: {
       selectedPetId: continuation?.selectedPetId ?? null,
       flowVariant: continuation?.flowVariant ?? 'existingNoBalance',
+      selectedSlot: continuation?.selectedSlot ?? null,
+      slotHoldExpiresAt: continuation?.slotHoldExpiresAt ?? null,
     },
   });
   const { context } = state;
   const confirmedRef = useRef(false);
+  const [holdExpired, setHoldExpired] = useState(
+    Boolean(context.slotHoldExpiresAt && Date.now() >= context.slotHoldExpiresAt)
+  );
 
   // Fire-and-forget: lets the admin's Subscriptions & Revenue log know the
   // browser came back via the success redirect. This is NOT payment
@@ -28,6 +33,17 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
       api.confirmReturn(checkoutRef, 'success');
     }
   }, [checkoutRef]);
+
+  useEffect(() => {
+    if (!context.slotHoldExpiresAt || holdExpired) return undefined;
+    const remaining = context.slotHoldExpiresAt - Date.now();
+    if (remaining <= 0) {
+      setHoldExpired(true);
+      return undefined;
+    }
+    const timeout = window.setTimeout(() => setHoldExpired(true), remaining);
+    return () => window.clearTimeout(timeout);
+  }, [context.slotHoldExpiresAt, holdExpired]);
 
   if (state.matches('scheduleImmediateCall')) {
     return (
@@ -53,8 +69,13 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
   }
 
   if (state.matches('bookingConfirmation')) {
-    const slot = context.slots.find((s) => String(s.slot_id) === String(context.selectedSlotId));
-    return <SlotRequestStatus slot={slot} onBack={() => send({ type: 'BACK_TO_SLOTS' })} />;
+    return (
+      <SlotRequestStatus
+        slot={context.selectedSlot}
+        paymentReturnReceived
+        holdExpired={holdExpired}
+      />
+    );
   }
 
   if (state.matches('bookingCompleteNoCall')) {

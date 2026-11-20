@@ -10,8 +10,8 @@ import { api } from './api';
  * from the non-sensitive continuation data saved to sessionStorage before
  * the redirect (see api.js: saveContinuation / readContinuation).
  *
- * Mirrors the tail end of bookingMachine.js:
- *   Schedule Immediate Call? -> Slot Selection -> slot response status
+ * Resumes the slot chosen before Stripe checkout. Older continuation data
+ * without a slot falls back to the legacy scheduling prompt.
  */
 const postPaymentMachine = setup({
   actors: {
@@ -28,6 +28,8 @@ const postPaymentMachine = setup({
   context: ({ input }) => ({
     selectedPetId: input.selectedPetId,
     flowVariant: input.flowVariant,
+    selectedSlot: input.selectedSlot,
+    slotHoldExpiresAt: input.slotHoldExpiresAt,
     slots: [],
     selectedSlotId: null,
     slotError: null,
@@ -39,6 +41,7 @@ const postPaymentMachine = setup({
     start: {
       always: [
         { guard: ({ context }) => !context.selectedPetId, target: 'continuationMissing' },
+        { guard: ({ context }) => !!context.selectedSlot, target: 'bookingConfirmation' },
         { target: 'scheduleImmediateCall' },
       ],
     },

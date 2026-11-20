@@ -370,6 +370,34 @@
   margin-bottom: 6px;
 }
 
+.gv-slot-list {
+  max-height: 390px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
+
+.gv-slot-hold-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--gv-border);
+  border-radius: var(--gv-radius);
+  font-size: 13px;
+}
+
+.gv-slot-hold-timer {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-radius: var(--gv-radius-sm);
+  background: var(--gv-primary-tint);
+  color: var(--gv-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .gv-pet-card,
 .gv-plan-card,
 .gv-slot {

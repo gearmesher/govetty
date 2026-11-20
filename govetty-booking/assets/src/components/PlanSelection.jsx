@@ -1,5 +1,6 @@
 import React from 'react';
 import { Shell, ErrorBanner, Loading, LinkButton, PROGRESS_BY_STATE } from './shared/UI';
+import SlotHoldCountdown from './SlotHoldCountdown';
 
 // The API only returns plan_key + price -- friendly copy lives here so it's
 // easy to update without touching the machine or the API layer. Keys
@@ -38,7 +39,34 @@ function formatPrice(plan) {
   return `$${amount}`;
 }
 
-export default function PlanSelection({ plans, plansStatus, plansError, error, onSelect, onRetry, checkoutLoading, onBack }) {
+function formatSlot(slot) {
+  if (!slot) return '';
+  const date = slot.date
+    ? new Date(`${slot.date}T00:00:00`).toLocaleDateString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      })
+    : '';
+  const time = [slot.time_start, slot.time_end].filter(Boolean).join('–');
+  return [date, time, slot.veterinary_name].filter(Boolean).join(' · ');
+}
+
+export default function PlanSelection({
+  plans,
+  plansStatus,
+  plansError,
+  error,
+  onSelect,
+  onRetry,
+  checkoutLoading,
+  onBack,
+  selectedSlot,
+  slotHoldExpiresAt,
+  onHoldExpired,
+}) {
+  const slotExpired = Boolean(slotHoldExpiresAt && Date.now() >= slotHoldExpiresAt);
+
   return (
     <Shell
       progress={PROGRESS_BY_STATE.planSelection}
@@ -47,6 +75,13 @@ export default function PlanSelection({ plans, plansStatus, plansError, error, o
       title="How would you like to connect?"
       subtitle="Pick the option that fits how often you'll need a vet."
     >
+      {selectedSlot && (
+        <div className="gv-slot-hold-summary">
+          <strong>Selected appointment</strong>
+          <span>{formatSlot(selectedSlot)}</span>
+        </div>
+      )}
+      <SlotHoldCountdown expiresAt={slotHoldExpiresAt} onExpired={onHoldExpired} />
       <ErrorBanner code={error} />
       {plansStatus === 'loading' || plansStatus === 'idle' ? (
         <Loading label="Loading plans…" />
@@ -69,7 +104,7 @@ export default function PlanSelection({ plans, plansStatus, plansError, error, o
                 key={plan.plan_key}
                 type="button"
                 className="gv-plan-card"
-                disabled={checkoutLoading}
+                disabled={checkoutLoading || slotExpired}
                 onClick={() => onSelect(plan.plan_key)}
               >
                 <div>
