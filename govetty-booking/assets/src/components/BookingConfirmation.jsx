@@ -1,13 +1,13 @@
 import React from 'react';
 import { Shell, PROGRESS_BY_STATE } from './shared/UI';
 
-export function SlotRequestStatus({ slot, petName, onBack }) {
+export function SlotRequestStatus({ slot, petName, onBack, paymentReturnReceived = false, holdExpired = false }) {
   return (
     <Shell
       progress={PROGRESS_BY_STATE.bookingConfirmation}
       onBack={onBack}
-      eyebrow="Slot response received"
-      title="Your appointment is not confirmed"
+      eyebrow={paymentReturnReceived ? 'Checkout return received' : 'Slot response received'}
+      title={paymentReturnReceived ? 'Check your appointment and payment status' : 'Your appointment is not confirmed'}
     >
       {petName && <p className="gv-subtitle">Consultation for {petName}.</p>}
       {slot && (
@@ -31,9 +31,15 @@ export function SlotRequestStatus({ slot, petName, onBack }) {
           )}
         </div>
       )}
+      {holdExpired && (
+        <p className="gv-error">
+          The five-minute slot hold expired while checkout was in progress. Please check your account before trying again.
+        </p>
+      )}
       <p className="gv-subtitle" style={{ marginBottom: 0 }}>
-        The API response validated the slot details, but the documentation does not confirm that an appointment is
-        saved. No consultation was deducted by this flow. Please contact GoVetty to complete scheduling.
+        {paymentReturnReceived
+          ? 'This site cannot independently confirm the payment or appointment. Check your account or contact GoVetty if the appointment is not shown.'
+          : 'The API response validated the slot details, but this flow cannot confirm that an appointment was saved. No consultation was deducted. Please contact GoVetty to complete scheduling.'}
       </p>
     </Shell>
   );

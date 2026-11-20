@@ -57,15 +57,15 @@ function readLoginOnly() {
  * so logging in from the site header goes straight to the Personal Area
  * dashboard instead of into this booking flow.
  *
- * Flow -- the selected pet's balance determines whether payment is needed:
+ * Flow -- a slot is held before payment when the selected pet has no calls:
  *
  *   Login (OTP) -> Pet Selection
- *     pet has >= 1 call:  -> Slot Selection -> provisional slot response
- *     pet has 0 calls:    -> Plan Selection -> Stripe Checkout
- *                         -> Slot Selection -> provisional slot response
+ *     choose slot -> existing call balance: provisional slot response
+ *                 -> no call balance: Plan Selection -> Stripe Checkout
+ *                    (the slot hold expires after five minutes)
  *
- * The API currently returns dummy availability and /slot/book only validates
- * the request; the UI must not represent that response as a confirmed booking.
+ * The API's slot endpoint may still return an empty array; /slot/book now
+ * starts the pre-payment hold for the five-minute checkout window.
  */
 
 const machine = setup({
@@ -126,6 +126,8 @@ const machine = setup({
     petSelectionSkipped: false,
     selectedPlanKey: null,
     selectedSlotId: null,
+    selectedSlot: null,
+    slotHoldExpiresAt: null,
     flowVariant: null, // 'newCustomer' | 'existingHasBalance' | 'existingNoBalance'
     breeds: { dog_breeds: [], cat_breeds: [] },
     registrationError: null,
@@ -174,7 +176,7 @@ const machine = setup({
           },
           {
             guard: 'hasRequestedPetWithoutBalance',
-            target: 'planSelection',
+            target: 'slotSelection',
             actions: assign(({ context, event }) => {
               const pet = event.output.data.pets.find((p) => String(p.id) === String(context.requestedPetId));
               return {
@@ -284,7 +286,7 @@ const machine = setup({
           },
           {
             guard: 'isPostRegistrationPurpose',
-            target: 'planSelection',
+            target: 'slotSelection',
             actions: assign({
               customer: ({ event }) => event.output.data.customer,
               pets: ({ event }) => event.output.data.pets,
@@ -414,7 +416,7 @@ const machine = setup({
             })),
           },
           {
-            target: 'planSelection',
+            target: 'slotSelection',
             actions: assign(({ event }) => ({
               selectedPetId: event.petId,
               flowVariant: 'existingNoBalance',
@@ -455,6 +457,15 @@ const machine = setup({
       },
       on: {
         BACK_TO_PETS: 'petSelection',
+        SLOT_HOLD_EXPIRED: {
+          target: 'slotSelection',
+          reenter: true,
+          actions: assign({
+            selectedSlotId: null,
+            selectedSlot: null,
+            slotHoldExpiresAt: null,
+          }),
+        },
         RETRY_SLOTS: {
           target: 'slotSelection',
           reenter: true,
@@ -464,6 +475,10 @@ const machine = setup({
           target: 'booking',
           actions: assign({
             selectedSlotId: ({ event }) => event.slotId,
+            selectedSlot: ({ context, event }) =>
+              context.slots.find((slot) => String(slot.slot_id) === String(event.slotId)) || null,
+            slotHoldExpiresAt: ({ context }) =>
+              context.flowVariant === 'existingHasBalance' ? null : Date.now() + 5 * 60 * 1000,
             bookingError: null,
           }),
         },
@@ -480,13 +495,18 @@ const machine = setup({
             target: 'slotSelection',
             actions: assign({
               bookingError: ({ event }) => event.output.data.message || 'slot_book_failed',
+              slotHoldExpiresAt: null,
             }),
           },
-          { target: 'appointmentConfirmation' },
+          {
+            guard: ({ context }) => context.flowVariant === 'existingHasBalance',
+            target: 'appointmentConfirmation',
+          },
+          { target: 'planSelection' },
         ],
         onError: {
           target: 'slotSelection',
-          actions: assign({ bookingError: 'slot_book_failed' }),
+          actions: assign({ bookingError: 'slot_book_failed', slotHoldExpiresAt: null }),
         },
       },
     },
@@ -524,7 +544,15 @@ const machine = setup({
         },
       },
       on: {
-        BACK_TO_PETS: 'petSelection',
+        BACK_TO_SLOTS: 'slotSelection',
+        SLOT_HOLD_EXPIRED: {
+          target: 'slotSelection',
+          actions: assign({
+            selectedSlotId: null,
+            selectedSlot: null,
+            slotHoldExpiresAt: null,
+          }),
+        },
         RETRY_PLANS: {
           target: 'planSelection',
           reenter: true,
@@ -541,6 +569,16 @@ const machine = setup({
     },
 
     checkingOut: {
+      on: {
+        SLOT_HOLD_EXPIRED: {
+          target: 'slotSelection',
+          actions: assign({
+            selectedSlotId: null,
+            selectedSlot: null,
+            slotHoldExpiresAt: null,
+          }),
+        },
+      },
       invoke: {
         src: 'createCheckout',
         input: ({ context }) => ({ planKey: context.selectedPlanKey, petId: context.selectedPetId }),
@@ -559,6 +597,8 @@ const machine = setup({
                 saveContinuation({
                   selectedPetId: context.selectedPetId,
                   flowVariant: context.flowVariant,
+                  selectedSlot: context.selectedSlot,
+                  slotHoldExpiresAt: context.slotHoldExpiresAt,
                 }),
               ({ event }) => {
                 window.location.href = event.output.data.checkout_url;

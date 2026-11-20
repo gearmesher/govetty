@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { api, saveContinuation } from './api';
+import { api, clearContinuation, saveContinuation } from './api';
 import PlanSelection from './components/PlanSelection';
 import PaymentCancelled from './components/PaymentCancelled';
 import RedirectingToStripe from './components/RedirectingToStripe';
@@ -22,6 +22,19 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
   const confirmedRef = useRef(false);
 
   const petId = continuation?.selectedPetId;
+  const slotHoldExpiresAt = continuation?.slotHoldExpiresAt ?? null;
+
+  const returnToSlotSelection = useCallback(() => {
+    const baseUrl =
+      (typeof window.GovettyBooking !== 'undefined' && window.GovettyBooking.bookingUrl) ||
+      window.location.pathname;
+    const url = new URL(baseUrl, window.location.href);
+    url.searchParams.delete('govetty_step');
+    url.searchParams.delete('checkout_ref');
+    if (petId) url.searchParams.set('govetty_pet', String(petId));
+    clearContinuation();
+    window.location.assign(url.toString());
+  }, [petId]);
 
   const fetchPlans = useCallback(async () => {
     if (!petId) return;
@@ -59,12 +72,22 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
   }, [acknowledged, petId, fetchPlans]);
 
   const handleSelect = async (planKey) => {
+    if (slotHoldExpiresAt && Date.now() >= slotHoldExpiresAt) {
+      returnToSlotSelection();
+      return;
+    }
+
     setCheckoutLoading(true);
     setCheckoutError(null);
     try {
       const res = await api.billingCheckout(planKey, [petId]);
       if (res.ok && res.data.checkout_url) {
-        saveContinuation({ selectedPetId: petId, flowVariant: continuation.flowVariant });
+        saveContinuation({
+          selectedPetId: petId,
+          flowVariant: continuation.flowVariant,
+          selectedSlot: continuation.selectedSlot,
+          slotHoldExpiresAt,
+        });
         setRedirecting(true);
         window.location.href = res.data.checkout_url;
       } else {
@@ -97,6 +120,9 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
       error={checkoutError}
       checkoutLoading={checkoutLoading}
       onBack={() => setAcknowledged(false)}
+      selectedSlot={continuation.selectedSlot}
+      slotHoldExpiresAt={slotHoldExpiresAt}
+      onHoldExpired={returnToSlotSelection}
       onRetry={fetchPlans}
       onSelect={handleSelect}
     />
