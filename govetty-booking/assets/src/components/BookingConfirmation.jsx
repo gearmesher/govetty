@@ -1,13 +1,22 @@
 import React from 'react';
-import { Shell, PROGRESS_BY_STATE } from './shared/UI';
+import { ErrorBanner, Shell, PROGRESS_BY_STATE } from './shared/UI';
 
-export function SlotRequestStatus({ slot, petName, onBack, paymentReturnReceived = false, holdExpired = false }) {
+export function SlotRequestStatus({
+  slot,
+  petName,
+  joinUrl,
+  bookingError,
+  onBack,
+  paymentReturnReceived = false,
+  holdExpired = false,
+}) {
+  const confirmed = !!joinUrl;
   return (
     <Shell
       progress={PROGRESS_BY_STATE.bookingConfirmation}
       onBack={onBack}
-      eyebrow={paymentReturnReceived ? 'Checkout return received' : 'Slot response received'}
-      title={paymentReturnReceived ? 'Check your appointment and payment status' : 'Your appointment is not confirmed'}
+      eyebrow={confirmed ? 'Appointment booked' : paymentReturnReceived ? 'Checkout return received' : 'Booking response received'}
+      title={confirmed ? 'Your appointment is confirmed' : 'Your appointment is not confirmed'}
     >
       {petName && <p className="gv-subtitle">Consultation for {petName}.</p>}
       {slot && (
@@ -31,16 +40,27 @@ export function SlotRequestStatus({ slot, petName, onBack, paymentReturnReceived
           )}
         </div>
       )}
-      {holdExpired && (
+      {bookingError && <ErrorBanner code={bookingError} />}
+      {holdExpired && !confirmed && (
         <p className="gv-error">
-          The five-minute slot hold expired while checkout was in progress. Please check your account before trying again.
+          The five-minute slot hold expired while checkout was in progress. The API could not confirm the appointment.
         </p>
       )}
-      <p className="gv-subtitle" style={{ marginBottom: 0 }}>
-        {paymentReturnReceived
-          ? 'This site cannot independently confirm the payment or appointment. Check your account or contact GoVetty if the appointment is not shown.'
-          : 'The API response validated the slot details, but this flow cannot confirm that an appointment was saved. No consultation was deducted. Please contact GoVetty to complete scheduling.'}
-      </p>
+      {confirmed ? (
+        <p className="gv-subtitle">
+          Your consultation is booked. Use this link to join:
+          <br />
+          <a href={joinUrl} target="_blank" rel="noopener noreferrer">
+            Join your consultation
+          </a>
+        </p>
+      ) : (
+        <p className="gv-subtitle" style={{ marginBottom: 0 }}>
+          {paymentReturnReceived
+            ? 'The payment return was received, but the API did not confirm an appointment. Check your account or contact GoVetty for help.'
+            : 'The API did not confirm an appointment. No consultation should be considered booked. Please try another time or contact GoVetty.'}
+        </p>
+      )}
     </Shell>
   );
 }

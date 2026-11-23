@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMachine } from '@xstate/react';
 import postPaymentMachine from './postPaymentMachine';
-import { api } from './api';
 
 import ScheduleCallPrompt from './components/ScheduleCallPrompt';
 import SlotSelection from './components/SlotSelection';
@@ -14,25 +13,15 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
       selectedPetId: continuation?.selectedPetId ?? null,
       flowVariant: continuation?.flowVariant ?? 'existingNoBalance',
       selectedSlot: continuation?.selectedSlot ?? null,
+      reservedSlotId: continuation?.reservedSlotId ?? null,
+      checkoutRef,
       slotHoldExpiresAt: continuation?.slotHoldExpiresAt ?? null,
     },
   });
   const { context } = state;
-  const confirmedRef = useRef(false);
   const [holdExpired, setHoldExpired] = useState(
     Boolean(context.slotHoldExpiresAt && Date.now() >= context.slotHoldExpiresAt)
   );
-
-  // Fire-and-forget: lets the admin's Subscriptions & Revenue log know the
-  // browser came back via the success redirect. This is NOT payment
-  // verification (no webhook exists to confirm that server-side) -- it
-  // never blocks or affects the actual booking flow either way.
-  useEffect(() => {
-    if (checkoutRef && !confirmedRef.current) {
-      confirmedRef.current = true;
-      api.confirmReturn(checkoutRef, 'success');
-    }
-  }, [checkoutRef]);
 
   useEffect(() => {
     if (!context.slotHoldExpiresAt || holdExpired) return undefined;
@@ -54,12 +43,12 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
     );
   }
 
-  if (state.matches('slotSelection') || state.matches('booking')) {
+  if (state.matches('slotSelection') || state.matches('reservingSlot') || state.matches('booking')) {
     return (
       <SlotSelection
         slots={context.slots}
         loading={context.slotsLoading}
-        booking={state.matches('booking')}
+        booking={state.matches('reservingSlot') || state.matches('booking')}
         error={context.slotError || context.bookingError}
         onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
         onRetry={() => send({ type: 'RETRY_SLOTS' })}
@@ -72,6 +61,7 @@ export default function PostPaymentApp({ continuation, checkoutRef }) {
     return (
       <SlotRequestStatus
         slot={context.selectedSlot}
+        joinUrl={context.joinUrl}
         paymentReturnReceived
         holdExpired={holdExpired}
       />

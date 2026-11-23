@@ -26,6 +26,7 @@ export default function App() {
   const holdActive =
     state.matches('slotSelection') ||
     state.matches('booking') ||
+    state.matches('reservingSlot') ||
     state.matches('planSelection') ||
     state.matches('checkingOut');
 
@@ -115,13 +116,13 @@ export default function App() {
     );
   }
 
-  if (state.matches('slotSelection') || state.matches('booking')) {
+  if (state.matches('slotSelection') || state.matches('reservingSlot') || state.matches('booking')) {
     return (
       <SlotSelection
         slots={context.slots}
         loading={context.slotsLoading}
         error={context.slotError || context.bookingError}
-        booking={state.matches('booking')}
+        booking={state.matches('reservingSlot') || state.matches('booking')}
         onSelect={(slotId) => send({ type: 'SELECT_SLOT', slotId })}
         onRetry={() => send({ type: 'RETRY_SLOTS' })}
         selectedSlot={context.selectedSlot}
@@ -162,7 +163,14 @@ export default function App() {
   if (state.matches('appointmentConfirmation')) {
     const pet = context.pets.find((p) => p.id === context.selectedPetId);
     const slot = context.slots.find((item) => String(item.slot_id) === String(context.selectedSlotId));
-    return <SlotRequestStatus slot={slot} petName={pet && pet.name} onBack={() => send({ type: 'BACK_TO_SLOTS' })} />;
+    return (
+      <SlotRequestStatus
+        slot={slot || context.selectedSlot}
+        petName={pet && pet.name}
+        joinUrl={context.joinUrl}
+        onBack={() => send({ type: 'BACK_TO_SLOTS' })}
+      />
+    );
   }
 
   return (

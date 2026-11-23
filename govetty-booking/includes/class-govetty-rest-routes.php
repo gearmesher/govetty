@@ -34,6 +34,7 @@ class Govetty_Rest_Routes {
 			array( 'GET', '/billing/plans', array( __CLASS__, 'billing_get_plans' ) ),
 			array( 'POST', '/billing/checkout', array( __CLASS__, 'billing_checkout' ) ),
 			array( 'GET', '/slot/available', array( __CLASS__, 'slot_available' ) ),
+			array( 'POST', '/slot/reserve', array( __CLASS__, 'slot_reserve' ) ),
 			array( 'POST', '/slot/book', array( __CLASS__, 'slot_book' ) ),
 			array( 'POST', '/customer/attach-pet', array( __CLASS__, 'attach_pet' ) ),
 			array( 'POST', '/customer/detach-pet', array( __CLASS__, 'detach_pet' ) ),
@@ -741,15 +742,47 @@ class Govetty_Rest_Routes {
 		}
 		$pet_count = absint( $request->get_param( 'pet_count' ) );
 
-		// Still a documented placeholder upstream (hard-coded slots, no
-		// real availability) -- timeline unconfirmed as of the last check
-		// with the backend team.
 		$result = self::api_request(
 			'GET',
 			'/slot/getAvailable',
 			array(
 				'customer_token' => $token,
 				'pet_count'      => $pet_count,
+			)
+		);
+		return self::passthrough( $result );
+	}
+
+	public static function slot_reserve( WP_REST_Request $request ) {
+		$token = Govetty_Customer_Session::get_token();
+		if ( ! $token ) {
+			return self::unauthenticated();
+		}
+		$payload = (array) $request->get_json_params();
+
+		$pet_id  = absint( $payload['pet_id'] ?? 0 );
+		$slot_id = absint( $payload['slot_id'] ?? 0 );
+		if ( ! $pet_id || ! $slot_id ) {
+			return new WP_Error( 'govetty_invalid_reservation', 'A pet and slot are required.', array( 'status' => 400 ) );
+		}
+
+		$result = self::api_request(
+			'POST',
+			'/slot/reserveSlot',
+			array(
+				'customer_token' => $token,
+				'pet_id'         => $pet_id,
+				'slot_id'        => $slot_id,
+			)
+		);
+		$meta = get_transient( 'govetty_token_meta_' . md5( $token ) ) ?: array();
+		Govetty_Logger::log(
+			'slot_reserved',
+			array(
+				'phone'   => $meta['phone'] ?? null,
+				'pet_id'  => $pet_id,
+				'slot_id' => $slot_id,
+				'status'  => $result['code'],
 			)
 		);
 		return self::passthrough( $result );
@@ -764,6 +797,9 @@ class Govetty_Rest_Routes {
 
 		$pet_id  = absint( $payload['pet_id'] ?? 0 );
 		$slot_id = absint( $payload['slot_id'] ?? 0 );
+		if ( ! $pet_id || ! $slot_id ) {
+			return new WP_Error( 'govetty_invalid_booking', 'A pet and reserved slot are required.', array( 'status' => 400 ) );
+		}
 
 		$result = self::api_request(
 			'POST',
@@ -786,9 +822,6 @@ class Govetty_Rest_Routes {
 			)
 		);
 
-		// The API documentation describes validation but doesn't confirm
-		// that a booking is persisted. Keep the frontend status provisional
-		// until the backend confirms the booking and payment workflow.
 		return self::passthrough( $result );
 	}
 

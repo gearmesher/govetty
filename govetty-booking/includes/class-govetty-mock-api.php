@@ -105,12 +105,15 @@ class Govetty_Mock_Api {
 				return self::ok(
 					array(
 						'status' => 'ok',
-						'slots'  => self::mock_slots(),
+						'slots'  => self::available_slots( $params ),
 					)
 				);
 
+			case '/slot/reserveSlot':
+				return self::reserve_slot( $params );
+
 			case '/slot/book':
-				return self::ok( array( 'status' => 'ok' ) );
+				return self::book_slot( $params );
 
 			case '/customer/attachPet':
 				$token   = (string) ( $params['customer_token'] ?? '' );
@@ -214,6 +217,113 @@ class Govetty_Mock_Api {
 
 	private static function session_key( $token ) {
 		return 'govetty_mock_session_' . md5( (string) $token );
+	}
+
+	private static function slot_reservation_key( $slot_id ) {
+		return 'govetty_mock_slot_reservation_' . absint( $slot_id );
+	}
+
+	private static function available_slots( $params ) {
+		$token     = md5( (string) ( $params['customer_token'] ?? '' ) );
+		$slots     = self::mock_slots();
+		$available = array();
+		foreach ( $slots as $slot ) {
+			$reservation = get_transient( self::slot_reservation_key( $slot['slot_id'] ) );
+			if ( ! $reservation || $reservation['token'] === $token ) {
+				$available[] = $slot;
+			}
+		}
+		return $available;
+	}
+
+	private static function reserve_slot( $params ) {
+		$token   = (string) ( $params['customer_token'] ?? '' );
+		$pet_id  = absint( $params['pet_id'] ?? 0 );
+		$slot_id = absint( $params['slot_id'] ?? 0 );
+		$session = $token ? get_transient( self::session_key( $token ) ) : false;
+		if ( ! $session || ! $pet_id || ! $slot_id ) {
+			return self::error( 422, array( 'status' => 'error', 'message' => 'invalid_reservation' ) );
+		}
+		$owns_pet = false;
+		foreach ( $session['pets'] as $pet ) {
+			if ( (int) $pet['id'] === $pet_id ) {
+				$owns_pet = true;
+				break;
+			}
+		}
+		if ( ! $owns_pet ) {
+			return self::error( 404, array( 'status' => 'error', 'message' => 'pet_not_found' ) );
+		}
+
+		$available = array_filter(
+			self::mock_slots(),
+			static function ( $slot ) use ( $slot_id ) {
+				return (int) $slot['slot_id'] === $slot_id;
+			}
+		);
+		if ( ! $available ) {
+			return self::error( 404, array( 'status' => 'error', 'message' => 'slot_not_found' ) );
+		}
+
+		$key         = self::slot_reservation_key( $slot_id );
+		$reservation = get_transient( $key );
+		if ( $reservation && ( $reservation['token'] !== md5( $token ) || (int) $reservation['pet_id'] !== $pet_id ) ) {
+			return self::error( 409, array( 'status' => 'error', 'message' => 'slot_unavailable' ) );
+		}
+
+		set_transient(
+			$key,
+			array(
+				'token'  => md5( $token ),
+				'pet_id' => $pet_id,
+			),
+			5 * MINUTE_IN_SECONDS
+		);
+		return self::ok( array( 'status' => 'ok', 'slot_id' => $slot_id ) );
+	}
+
+	private static function book_slot( $params ) {
+		$token   = (string) ( $params['customer_token'] ?? '' );
+		$pet_id  = absint( $params['pet_id'] ?? 0 );
+		$slot_id = absint( $params['slot_id'] ?? 0 );
+		$session = $token ? get_transient( self::session_key( $token ) ) : false;
+		$key     = self::slot_reservation_key( $slot_id );
+		$hold    = $slot_id ? get_transient( $key ) : false;
+		if ( ! $session || ! $hold || $hold['token'] !== md5( $token ) || (int) $hold['pet_id'] !== $pet_id ) {
+			return self::error( 409, array( 'status' => 'error', 'message' => 'slot_reservation_expired' ) );
+		}
+
+		$pet_index = null;
+		foreach ( $session['pets'] as $index => $pet ) {
+			if ( (int) $pet['id'] === $pet_id ) {
+				$pet_index = $index;
+				break;
+			}
+		}
+		if ( null === $pet_index ) {
+			return self::error( 404, array( 'status' => 'error', 'message' => 'pet_not_found' ) );
+		}
+		if ( (int) $session['pets'][ $pet_index ]['token_amount'] < 1 ) {
+			return self::error( 422, array( 'status' => 'error', 'message' => 'insufficient_consultation_balance' ) );
+		}
+
+		--$session['pets'][ $pet_index ]['token_amount'];
+		set_transient( self::session_key( $token ), $session, 12 * HOUR_IN_SECONDS );
+		$registered = self::get_registered( $session['phone'] );
+		if ( $registered ) {
+			$registered['pets'] = $session['pets'];
+			self::set_registered( $session['phone'], $registered );
+		}
+		delete_transient( $key );
+
+		$join_url = add_query_arg(
+			array(
+				'govetty_mock_consultation' => '1',
+				'join'                      => wp_generate_password( 32, false ),
+			),
+			home_url( '/' )
+		);
+		return self::ok( array( 'status' => 'ok', 'slot_id' => $slot_id, 'join_url' => $join_url ) );
 	}
 
 	/**

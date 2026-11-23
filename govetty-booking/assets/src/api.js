@@ -67,6 +67,7 @@ export const api = {
   billingCheckout: (planKey, petIds) =>
     call('POST', 'billing/checkout', { plan_key: planKey, pet_ids: petIds }),
   slotAvailable: (petCount) => call('GET', 'slot/available', { pet_count: petCount }),
+  slotReserve: (petId, slotId) => call('POST', 'slot/reserve', { pet_id: petId, slot_id: slotId }),
   slotBook: (petId, slotId) => call('POST', 'slot/book', { pet_id: petId, slot_id: slotId }),
   attachPet: (payload) => call('POST', 'customer/attach-pet', payload),
   detachPet: (petId) => call('POST', 'customer/detach-pet', { pet_id: petId }),

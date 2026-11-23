@@ -97,6 +97,7 @@ export default function ResumePlanSelection({ continuation, checkoutRef }) {
           selectedPetId: petId,
           flowVariant: continuation.flowVariant,
           selectedSlot: continuation.selectedSlot,
+          reservedSlotId: continuation.reservedSlotId,
           slotHoldExpiresAt,
         });
         setRedirecting(true);

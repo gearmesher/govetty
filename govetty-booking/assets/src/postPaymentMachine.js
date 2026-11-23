@@ -2,26 +2,26 @@ import { setup, assign, fromPromise } from 'xstate';
 import { api } from './api';
 
 /**
- * Stripe's hosted checkout means a full-page navigation away from the app
- * and back -- the original bookingMachine instance is gone by the time the
- * browser lands on the success_url. Rather than fight to rehydrate a whole
- * mid-flow XState snapshot across that boundary, this is a small, separate
- * machine that picks up exactly where the flow needs to continue, seeded
- * from the non-sensitive continuation data saved to sessionStorage before
- * the redirect (see api.js: saveContinuation / readContinuation).
- *
- * Resumes the slot chosen before Stripe checkout. Older continuation data
- * without a slot falls back to the legacy scheduling prompt.
+ * Stripe redirects destroy the original booking machine, so this machine
+ * resumes the saved reservation and confirms it after checkout returns.
  */
 const postPaymentMachine = setup({
   actors: {
+    confirmCheckoutReturn: fromPromise(({ input }) => api.confirmReturn(input.checkoutRef, 'success')),
     loadSlots: fromPromise(({ input }) => api.slotAvailable(input.petCount)),
+    reserveSlot: fromPromise(({ input }) => api.slotReserve(input.petId, input.slotId)),
     bookSlot: fromPromise(({ input }) => api.slotBook(input.petId, input.slotId)),
   },
   guards: {
     slotLoadFailed: ({ event }) =>
       !event.output.ok || !Array.isArray(event.output.data.slots) || event.output.data.status === 'error',
-    slotBookFailed: ({ event }) => !event.output.ok || event.output.data.status === 'error',
+    slotReserveFailed: ({ event }) =>
+      !event.output.ok ||
+      event.output.data.status === 'error' ||
+      !Number.isFinite(Number(event.output.data.slot_id)) ||
+      Number(event.output.data.slot_id) <= 0,
+    slotBookFailed: ({ event }) =>
+      !event.output.ok || event.output.data.status === 'error' || !event.output.data.join_url,
   },
 }).createMachine({
   id: 'postPayment',
@@ -29,9 +29,12 @@ const postPaymentMachine = setup({
     selectedPetId: input.selectedPetId,
     flowVariant: input.flowVariant,
     selectedSlot: input.selectedSlot,
+    reservedSlotId: input.reservedSlotId,
+    checkoutRef: input.checkoutRef,
     slotHoldExpiresAt: input.slotHoldExpiresAt,
     slots: [],
-    selectedSlotId: null,
+    selectedSlotId: Number(input.reservedSlotId) || null,
+    joinUrl: null,
     slotError: null,
     bookingError: null,
     slotsLoading: false,
@@ -41,7 +44,24 @@ const postPaymentMachine = setup({
     start: {
       always: [
         { guard: ({ context }) => !context.selectedPetId, target: 'continuationMissing' },
-        { guard: ({ context }) => !!context.selectedSlot, target: 'bookingConfirmation' },
+        { guard: ({ context }) => !!context.checkoutRef, target: 'confirmingCheckoutReturn' },
+        { target: 'resumeBooking' },
+      ],
+    },
+
+    confirmingCheckoutReturn: {
+      invoke: {
+        src: 'confirmCheckoutReturn',
+        input: ({ context }) => ({ checkoutRef: context.checkoutRef }),
+        onDone: 'resumeBooking',
+        onError: 'resumeBooking',
+      },
+    },
+
+    resumeBooking: {
+      always: [
+        { guard: ({ context }) => Number(context.reservedSlotId) > 0, target: 'booking' },
+        { guard: ({ context }) => !!context.selectedSlot, target: 'reservingSlot' },
         { target: 'scheduleImmediateCall' },
       ],
     },
@@ -90,11 +110,41 @@ const postPaymentMachine = setup({
           actions: assign({ bookingError: null }),
         },
         SELECT_SLOT: {
-          target: 'booking',
+          target: 'reservingSlot',
           actions: assign({
             selectedSlotId: ({ event }) => event.slotId,
+            selectedSlot: ({ context, event }) =>
+              context.slots.find((slot) => String(slot.slot_id) === String(event.slotId)) || null,
             bookingError: null,
           }),
+        },
+      },
+    },
+
+    reservingSlot: {
+      invoke: {
+        src: 'reserveSlot',
+        input: ({ context }) => ({ petId: context.selectedPetId, slotId: context.selectedSlotId }),
+        onDone: [
+          {
+            guard: 'slotReserveFailed',
+            target: 'slotSelection',
+            actions: assign({
+              bookingError: ({ event }) => event.output.data.message || 'slot_reserve_failed',
+              selectedSlotId: null,
+            }),
+          },
+          {
+            target: 'booking',
+            actions: assign(({ event }) => ({
+              reservedSlotId: Number(event.output.data.slot_id),
+              selectedSlotId: Number(event.output.data.slot_id),
+            })),
+          },
+        ],
+        onError: {
+          target: 'slotSelection',
+          actions: assign({ bookingError: 'slot_reserve_failed', selectedSlotId: null }),
         },
       },
     },
@@ -109,13 +159,18 @@ const postPaymentMachine = setup({
             target: 'slotSelection',
             actions: assign({
               bookingError: ({ event }) => event.output.data.message || 'slot_book_failed',
+              selectedSlotId: null,
+              reservedSlotId: null,
             }),
           },
-          { target: 'bookingConfirmation' },
+          {
+            target: 'bookingConfirmation',
+            actions: assign({ joinUrl: ({ event }) => event.output.data.join_url }),
+          },
         ],
         onError: {
           target: 'slotSelection',
-          actions: assign({ bookingError: 'slot_book_failed' }),
+          actions: assign({ bookingError: 'slot_book_failed', selectedSlotId: null, reservedSlotId: null }),
         },
       },
     },
@@ -125,7 +180,7 @@ const postPaymentMachine = setup({
       on: {
         BACK_TO_SLOTS: {
           target: 'slotSelection',
-          actions: assign({ selectedSlotId: null }),
+          actions: assign({ selectedSlotId: null, reservedSlotId: null, joinUrl: null }),
         },
       },
     },
