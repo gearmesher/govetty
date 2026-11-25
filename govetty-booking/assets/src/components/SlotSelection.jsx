@@ -34,7 +34,7 @@ export default function SlotSelection({
       title="Choose an available slot"
       subtitle="Select an available time. If payment is needed, complete checkout within five minutes."
     >
-      {selectedSlot && slotHoldExpiresAt && (
+      {selectedSlot && (
         <div className="gv-slot-hold-summary">
           <strong>Selected appointment</strong>
           <span>
