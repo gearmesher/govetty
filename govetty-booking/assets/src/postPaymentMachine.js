@@ -114,7 +114,9 @@ const postPaymentMachine = setup({
           actions: assign({
             selectedSlotId: ({ event }) => event.slotId,
             selectedSlot: ({ context, event }) =>
-              context.slots.find((slot) => String(slot.slot_id) === String(event.slotId)) || null,
+              context.slots.find((slot) =>
+                String(slot.slot_id ?? slot.slotId ?? slot.id) === String(event.slotId)
+              ) || null,
             bookingError: null,
           }),
         },

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ErrorBanner, Shell, PROGRESS_BY_STATE } from './shared/UI';
+import { formatSlotDate } from './shared/slotUtils';
 
 export function SlotRequestStatus({
   slot,
@@ -23,7 +24,7 @@ export function SlotRequestStatus({
         <div className="gv-summary">
           <div className="gv-summary-row">
             <span>Selected date</span>
-            <span>{slot.date || 'Not provided'}</span>
+            <span>{slot.date ? formatSlotDate(slot.date) : 'Not provided'}</span>
           </div>
           <div className="gv-summary-row">
             <span>Selected time</span>
@@ -32,10 +33,10 @@ export function SlotRequestStatus({
               {slot.time_end ? `–${slot.time_end}` : ''}
             </span>
           </div>
-          {slot.veterinary_name && (
+          {(slot.vet_name || slot.veterinary_name) && (
             <div className="gv-summary-row">
               <span>Vet</span>
-              <span>{slot.veterinary_name}</span>
+              <span>{slot.vet_name || slot.veterinary_name}</span>
             </div>
           )}
         </div>

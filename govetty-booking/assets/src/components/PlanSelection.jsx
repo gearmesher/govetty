@@ -1,5 +1,6 @@
 import React from 'react';
 import { Shell, ErrorBanner, Loading, LinkButton, PROGRESS_BY_STATE } from './shared/UI';
+import { formatSlotDate } from './shared/slotUtils';
 
 // The API only returns plan_key + price -- friendly copy lives here so it's
 // easy to update without touching the machine or the API layer. Keys
@@ -40,15 +41,9 @@ function formatPrice(plan) {
 
 function formatSlot(slot) {
   if (!slot) return '';
-  const date = slot.date
-    ? new Date(`${slot.date}T00:00:00`).toLocaleDateString(undefined, {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-      })
-    : '';
+  const date = slot.date ? formatSlotDate(slot.date) : '';
   const time = [slot.time_start, slot.time_end].filter(Boolean).join('–');
-  return [date, time, slot.veterinary_name].filter(Boolean).join(' · ');
+  return [date, time, slot.vet_name || slot.veterinary_name].filter(Boolean).join(' · ');
 }
 
 export default function PlanSelection({
